@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:transform="http://www.w3.org/1999/xhtml"
+      xmlns:width="http://www.w3.org/1999/xhtml" xmlns:transition-duration="http://www.w3.org/1999/xhtml" lang="an">
+<head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+
+<!--<style src="static/style.css"></style>-->
+<!--<script src="js/script.js"></script>-->
+
+<div th:fragment="slider">
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="nav justify-content-center">
+                <div class="row col-md-12 mb-12">
+                    <div th:each="el:${posts}" class="col-md-4 mb-4">
+                        <form>
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <iframe class="embed-responsive-item"
+                                        th:src="${el.video}"></iframe>
+                            </div>
+
+                        </form>
+                        <h3 th:text="${el.title}"/>
+                        <h4 th:text="${el.anons}"/>
+                        <a th:href="'/blog/user/'+${el.id}" class="btn btn-outline-warning btn-sm">Детальніше</a>
+                    </div>
+                    <!--                        <div class="col-md-4 mb-4">-->
+                    <!--                            <div class="embed-responsive embed-responsive-16by9">-->
+                    <!--                                <iframe class="embed-responsive-item"-->
+                    <!--                                        src="https://www.youtube.com/embed/YkHCWkQo0XM?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent"-->
+                    <!--                                        allowfullscreen></iframe>-->
+                    <!--                            </div>-->
+                    <!--                        </div>-->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+

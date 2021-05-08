@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+    <!--    <title th:text="${user}"></title>-->
+</head>
+
+<div th:insert="blocks/library::library"></div>
+
+<div class="container"><br>
+    <h2 class="text-center text-success">STUDY ROOM</h2>
+    <br>
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/read-letters" class="btn btn-info btn-lg btn-block" role="button">My letters</a>
+                    <br>
+                    <a href="/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a letter</a>
+                    <br>
+                    <a href="/read-publications" class="btn btn-danger btn-lg btn-block" role="button">My
+                        publications</a>
+                    <br>
+                    <a href="/study/write-publication" class="btn btn-info btn-lg btn-block" role="button">Write a
+                        publication</a>
+                    <br>
+                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <br>
+
+                </div>
+                <div class="col-md-8">
+
+                    <div th:each="el:${publicationUser}" class="alert alert-info mt-2">
+                        <h1 th:text="${el.localDate}"/>
+                        <p th:text="${el.titleText}"/>
+                        <p th:text="${el.fullText}"/>
+
+                        <a th:href="'/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>
+                        <a th:href="'/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <br><br>
+        <!--    <form action="/user-page" method="post">-->
+        <!--        <button class="btn btn-lg btn-info btn-block" type="submit">TO MY HOME</button>-->
+        <!--    </form>-->
+
+    </div>
+</div>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+    <!--    <title th:text="${user}"></title>-->
+</head>
+
+<div th:insert="blocks/library::library"></div>
+
+<div class="container"><br>
+    <h2 class="text-center text-success">STUDY ROOM</h2>
+    <br>
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/fireplace" class="btn btn-info btn-lg btn-block" role="button">Fireplace</a>
+                    <br>
+                    <a href="/music" class="btn btn-info btn-lg btn-block" role="button">Music</a>
+                    <br>
+                    <a href="/video" class="btn btn-info btn-lg btn-block" role="button">Video</a>
+                    <br>
+                    <a href="/friends" class="btn btn-info btn-lg btn-block" role="button">Friends</a>
+                    <br>
+                    <a href="/publications" class="btn btn-danger btn-lg btn-block" role="button">Publications</a>
+                    <br>
+
+                </div>
+                <div class="col-md-8">
+
+                    <div th:each="el:${publications}" class="alert alert-info mt-2">
+                        <h5 th:text="${el.localDate}"/>
+                        <h5 th:text="${el.mailingAddress}"/>
+                        <h2 th:text="${el.titleText}"/>
+                        <p th:text="${el.fullText}"/>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </div>
+</div>
+
+</html>

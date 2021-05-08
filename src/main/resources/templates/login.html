@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+</head>
+<div th:insert="blocks/library::library"></div>
+<body>
+<div class="container">
+    <form class="form-sign" method="post" action="/login">
+        <!-- error message -->
+        <div th:if="${param.error}">
+            <div class="alert alert-danger">Помилковий електронроний адрес або секретний код
+            </div>
+        </div>
+        <!-- logout message -->
+        <div th:if="${param.logout}">
+            <div class="alert alert-info">Усіпшно вийшли з особистого кабінету.</div>
+        </div>
+
+        <h2 class="form-sign-heading">Login</h2>
+        <p>
+            <label for="username">Електронна пошта</label>
+            <input type="text" id="username" name="username" class="form-control"
+                   placeholder="Введіть свою електронну пошту" required>
+        </p>
+        <p>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control"
+                   placeholder="Введіть секретний код" required>
+        </p>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Увійти в особистий кабінет</button>
+    </form>
+
+    <div class="form-group">
+        <span>New user? <a href="/registration">Зареєструватись</a></span>
+    </div>
+</div>
+</body>
+<footer th:insert="blocks/footer-first::footer-first"></footer>
+</html>
+
+

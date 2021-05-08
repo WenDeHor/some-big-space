@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+</head>
+<div th:insert="blocks/library::library"></div>
+
+<body>
+
+<h1 class="text-center text-danger">THIS EMAIL IS ALREADY IN USE</h1>
+<br>
+<a href="/registration" class="btn btn-info btn-lg" role="button">RETURN TO REGISTRATION</a>
+<br>
+<a href="/" class="btn btn-info btn-lg" role="button">IN THE MINE MENU</a>
+<br>
+<a href="/login" class="btn btn-info btn-lg" role="button">TO MY HOME</a>
+
+</body>
+</html>

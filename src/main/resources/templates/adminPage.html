@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
+<head>
+    <title th:text="${title}"></title>
+</head>
+<div th:insert="blocks/library::library"></div>
+<header th:insert="blocks/heder-mine::header-mine"></header>
+<br>
+<body>
+<section class="jumbotron text-center" style="background-color: rgba(230,132,55,0.36)">
+    <div class="title mont">
+        <h1>Клієнтський журнал</h1>
+    </div>
+</section>
+
+<!--    <form action="/logout" >-->
+<form action="/logout" method="post">
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Logout</button>
+</form>
+<h3> Перелік користувачів</h3>
+<div class="content mt-5">
+    <div th:each="el:${listUser}" class="alert alert-info mt-2">
+        <h3 th:text="${el.login}"/>
+        <p th:text="${el.email}"/>
+        <!--            <a th:href="'/blog/'+${el.userId}+'/edit'" class="btn btn-warning">Редагувати</a>-->
+        <!--            <a th:href="'/blog/'+${el.userId}+'/remove'" class="btn btn-warning">Видалити</a>-->
+
+    </div>
+</div>
+<h3> Перелік замовлень</h3>
+<div class="content mt-5">
+    <div th:each="el:${listOrder}" class="alert alert-info mt-2">
+        <h3 th:text="${el.text}"/>
+        <p th:text="${el.date}"/>
+        <p th:text="${el.bonus}"/>
+        <p th:text="${el.username}"/>
+        <p th:text="${el.phone}"/>
+    </div>
+</div>
+
+<a href="/blog/add" class="btn btn-lg btn-primary btn-block">Створити пост</a>
+
+<form action="/blog" method="get">
+    <div class="content mt-5">
+        <div th:each="el:${posts}" class="alert alert-info mt-2">
+            <h3 th:text="${el.title}"/>
+            <p th:text="${el.video}"/>
+            <p th:text="${el.anons}"/>
+            <a th:href="'/blog/'+${el.id}" class="btn btn-warning">Детальніше</a>
+        </div>
+    </div>
+</form>
+
+</body>
+<footer th:insert="blocks/footer-first::footer-first"></footer>
+<!--<div th:insert="blocks/footer::footer"></div>-->
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
+<head>
+    <title th:text="${title}"></title>
+   </head>
+<div th:insert="blocks/library::library"></div>
+<header th:insert="blocks/heder-mine::header-mine"></header>
+<br><br>
+
+<body>
+<div class="row col-md-12 mb-12">
+    <div th:each="el:${publicationUser}" class="col-md-12 mb-12">
+        <h3 th:text="${el.title}"/>
+        <form>
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item"
+                        th:src="${el.video}"></iframe>
+            </div>
+        </form>
+        <h3><p th:text="${el.full_text}"/></h3>
+    </div>
+</div>
+
+</body>
+<footer th:insert="blocks/footer-first::footer-first"></footer>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+</head>
+<div th:insert="blocks/library::library"></div>
+<body>
+<div class="container">
+    <form class="form-registration" method="post" action="/registration">
+
+        <!-- error message -->
+        <div th:if="${param.error}">
+            <div class="alert alert-danger">THIS EMAIL IS ALREADY IN USE
+            </div>
+        </div>
+        <!-- logout message -->
+        <div th:if="${param.logout}">
+            <div class="alert alert-info">SEE YOU IN THE FUTURE</div>
+        </div>
+
+        <h2 class="form-signin-heading">REGISTRATION PAGE</h2>
+
+        <p>
+            <label for="login">My NAME</label>
+            <input type="text" id="login" name="login" class="form-control"
+                   placeholder="WHAT IS MY FULL NAME?" required>
+        </p>
+        <p>
+            <label for="email">EMAIL</label>
+            <input type="text" id="email" name="email" class="form-control"
+                   placeholder="WHAT IS MY EMAIL?" required>
+        </p>
+        <p>
+            <label for="password">PASSWORD</label>
+            <input type="password" id="password" name="password" class="form-control"
+                   placeholder="WHAT IS MY PASSWORD?" required>
+        </p>
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">I"M GOING HOME</button>
+    </form>
+</div>
+</body>
+
+</html>
+
+
+
