@@ -1,7 +1,7 @@
 package com.myhome.controllers;
 
-import com.myhome.forms.UserForm;
 import com.myhome.models.*;
+import com.myhome.repository.LetterRepository;
 import com.myhome.repository.PublicationRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
@@ -22,14 +22,87 @@ import java.util.*;
 public class StudyRoomControllers {
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
+    private final LetterRepository letterRepository;
 
-    public StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository) {
+    public StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterRepository letterRepository) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
+        this.letterRepository = letterRepository;
     }
 
-//    /letter-write
+    //TODO LETTER
+    @GetMapping("/study/write-letter")
+    public String studyWriteLetter(Authentication authentication, Model model) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userEmail = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
+        String address = oneByEmail.get().getAddress();
 
+        model.addAttribute("address", address);
+        model.addAttribute("title", "Letter");
+        return "study-write-letter";
+    }
+
+    @PostMapping("/study/write-letter/send")
+    public String LetterSend(Letter letter,
+                            @RequestParam String titleText,
+                            @RequestParam String fullText,
+                            @RequestParam String senderAddress,
+                            @RequestParam String recipientAddress,
+                            Model model, Authentication authentication) {
+
+//        private LocalDate localDate;
+//        private Integer numberOfLetter;
+
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userEmail = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
+        String address = oneByEmail.get().getAddress();
+        String Login = oneByEmail.get().getLogin();
+        System.out.println("mailingAddress  ".toUpperCase() + address + " Login:" + Login);
+
+        LocalDate localDate = LocalDate.now();// получаем текущую дату
+        String date = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
+
+        Letter userSendLetter = Letter.builder()
+                .localDate(localDate)
+                .titleText(titleText)
+                .fullText(fullText)
+                .numberOfLetter(numberOfLetter())
+                .senderAddress(senderAddress)
+                .recipientAddress(recipientAddress)
+                .build();
+        System.out.println(userSendLetter.toString());
+        letterRepository.save(userSendLetter);
+        return "redirect:/user-page";
+    }
+    private Integer numberOfLetter() {
+        List<Letter> allByNumber =  letterRepository.findAll();
+        int size = allByNumber.size();
+        return size + 1;
+    }
+
+    @GetMapping("/study/read-letters")
+    public String studyReadLettersOfUser(Authentication authentication, Model model) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        String address = oneByEmail.get().getAddress();
+        Iterable<Letter> lettersRecipientUser = letterRepository.findAllByRecipientAddress(address);
+        Iterable<Letter> letterSendersUser = letterRepository.findAllBySenderAddress(address);
+        List<Letter>letters=new ArrayList<>();
+        lettersRecipientUser.forEach(letters::add);
+        letterSendersUser.forEach(letters::add);
+
+//        letters.sort(Comparator.comparing(Letter::getNumberOfLetter));
+        letters.sort(Comparator.comparing(Letter::getNumberOfLetter).reversed());
+
+        model.addAttribute("letters", letters);
+        model.addAttribute("title", "letters");
+        return "study-read-letters";
+    }
+
+    //TODO Publications
     @GetMapping("/study/read-publications")
     public String studyReadPublicationsOfUser(Authentication authentication, Model model) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
@@ -41,14 +114,14 @@ public class StudyRoomControllers {
         return "study-read-publications";
     }
 
-    @GetMapping("/publication/{idPublication}/remove")
+    @GetMapping("/study/publication/{idPublication}/remove")
     public String publicationRemove(@PathVariable(value = "idPublication") Long idPublication, Model model) {
         PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
         publicationRepository.delete(publicationUser);
         return "redirect:/study/read-publications";
     }
 
-    @GetMapping("/publication/{idPublication}/edit")
+    @GetMapping("/study/publication/{idPublication}/edit")
     public String publicationEdit(@PathVariable(value = "idPublication") Long idPublication, Model model) {
         if (!publicationRepository.existsById(idPublication)) {
             return "redirect:/study/read-publications";
@@ -61,7 +134,7 @@ public class StudyRoomControllers {
         return "study-edit-publications";
     }
 
-    @PostMapping("/publication/{idPublication}/edit")
+    @PostMapping("/study/publication/{idPublication}/edit")
     public String publicationUpdate(@PathVariable(value = "idPublication") Long idPublication,
                                     @RequestParam String titleText,
                                     @RequestParam String fullText,
@@ -79,7 +152,6 @@ public class StudyRoomControllers {
 
     @GetMapping("/study/write-publication")
     public String studyWritePublication(Model model) {
-
         return "study-write-publication";
     }
 
@@ -96,8 +168,7 @@ public class StudyRoomControllers {
         Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
         String address = oneByEmail.get().getAddress();
         String Login = oneByEmail.get().getLogin();
-        System.out.println("mailingAddress  ".toUpperCase() + address+ "Login:"+Login);
-
+        System.out.println("mailingAddress  ".toUpperCase() + address + "Login:" + Login);
 
         LocalDate localDate = LocalDate.now();// получаем текущую дату
         String date = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
@@ -113,7 +184,6 @@ public class StudyRoomControllers {
         publicationRepository.save(publicationUser);
         return "redirect:/user-page";
     }
-
 
     //TODO ЗРАЗОК з іншого проекту
 

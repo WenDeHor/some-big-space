@@ -16,11 +16,12 @@
         <div class="album col-md-12 bg-light" style="background-color: bisque">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study/read-letters" class="btn btn-info btn-lg btn-block" role="button">My letters</a>
+                    <a href="/study/read-letters" class="btn btn-danger btn-lg btn-block" role="button">My letters</a>
                     <br>
-                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a letter</a>
+                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a
+                        letter</a>
                     <br>
-                    <a href="/study/read-publications" class="btn btn-danger btn-lg btn-block" role="button">My
+                    <a href="/study/read-publications" class="btn btn-info btn-lg btn-block" role="button">My
                         publications</a>
                     <br>
                     <a href="/study/write-publication" class="btn btn-info btn-lg btn-block" role="button">Write a
@@ -32,22 +33,21 @@
                 </div>
                 <div class="col-md-8">
 
-                    <div th:each="el:${publicationUser}" class="alert alert-info mt-2">
-                        <h1 th:text="${el.localDate}"/>
+                    <div th:each="el:${letters}" class="alert alert-info mt-2">
                         <p th:text="${el.titleText}"/>
                         <p th:text="${el.fullText}"/>
-
-                        <a th:href="'/study/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>
-                        <a th:href="'/study/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>
+                        <p th:text="${el.senderAddress}"/>
+                        <p th:text="${el.recipientAddress}"/>
+                        <p th:text="${el.localDate}"/>
+<!--                        <p th:text="${el.numberOfLetter}"/>-->
+                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>-->
+                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>-->
                     </div>
                     <br>
                 </div>
             </div>
         </div>
         <br><br>
-        <!--    <form action="/user-page" method="post">-->
-        <!--        <button class="btn btn-lg btn-info btn-block" type="submit">TO MY HOME</button>-->
-        <!--    </form>-->
 
     </div>
 </div>
