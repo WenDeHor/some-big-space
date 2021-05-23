@@ -39,6 +39,11 @@ public class PagesControllers {
         return "study-write-publication";
     }
 
+    @GetMapping("/kitchen")
+    public String kitchenReadCookbook() {
+        return "kitchen-read-cookbook";
+    }
+
     @GetMapping("/living")
     public String livingReadPublications(Model model) {
         Iterable<PublicationUser> publications = publicationRepository.findAll();
