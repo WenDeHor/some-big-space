@@ -41,7 +41,7 @@ public class PagesControllers {
 
     @GetMapping("/kitchen")
     public String kitchenReadCookbook() {
-        return "kitchen-read-cookbook";
+        return "redirect:/kitchen/read-cookbook";
     }
 
     @GetMapping("/living")

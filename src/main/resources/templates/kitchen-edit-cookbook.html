@@ -38,27 +38,31 @@
 
                 </div>
                 <div class="col-md-8">
+                    <h2 class="form-signin-heading">EDIT OF PRESCRIPTION</h2>
+                    <div th:each="el:${cookBook}">
+                        <form method="post" enctype="multipart/form-data">
+                            <p>
+                                <label>TITLE</label>
+                                <input type="text" th:value="${el.titleText}" name="titleText" class="form-control"
+                                       placeholder="TITLE NAME">
+                            </p>
+                            <br>
 
-                    <div th:each="cookBook, el:${cookBooks}" class="alert alert-info mt-2">
+                            <label>PLACE TO STORY</label>
+                            <label for="fullText"> tell us you story : </label>
+                            <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
+                                      placeholder="WRITE A STORY {character limit up to 3000} "
+                                      th:text="${el.fullText}"></textarea> <br>
+                            <br>
 
-                        <img th:src="@{${'/image/display/'+ cookBook.id}}"
-                             style="width:50%"/>
-                        <br>
-                        <p th:text="${#dates.format({cookBook.localDate}, 'dd-MM-yyyy')}"/>
-
-                        <p th:text="${cookBook.titleText}"/>
-                        <p th:text="${cookBook.fullText}"/>
-
-                        <!--                            <p th:text="${cookBook.address}"/>-->
-                        <!--                            <p th:text="${cookBook.name}"/>-->
-                        <!--                            <p th:text="${cookBook.type}"/>-->
-                        <a th:href="'/kitchen/read-cookbook/'+${cookBook.id}+'/edit'"
-                           class="btn btn-warning">EDIT</a>
-                        <a th:href="'/kitchen/read-cookbook/'+${cookBook.id}+'/remove'"
-                           class="btn btn-warning">REMOVE</a>
-
+                            <div class="custom-file mb-4">
+                                <input type="file" name="file" class="custom-file-input"
+                                       id="customFile"> <label class="custom-file-label"
+                                                               for="customFile">Image</label>
+                            </div>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">UPDATE</button>
+                        </form>
                     </div>
-                    <br><br>
                 </div>
             </div>
         </div>

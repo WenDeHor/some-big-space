@@ -1,41 +1,34 @@
 package com.myhome.controllers;
 
-import com.myhome.forms.ResponseFile;
-import com.myhome.forms.ResponseMessage;
-import com.myhome.models.FileDB;
+import com.myhome.models.CookBook;
+import com.myhome.models.PublicationUser;
 import com.myhome.models.User;
-import com.myhome.repository.FileDBRepository;
+import com.myhome.repository.CookBookRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
-import com.myhome.service.FileStorageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 public class KitchenRoomControllers {
-    @Autowired
-    private FileStorageService storageService;
     private final UserRepository userRepository;
-    private final FileDBRepository fileDBRepository;
+    private final CookBookRepository cookBookRepository;
 
-    public KitchenRoomControllers(UserRepository userRepository, FileDBRepository fileDBRepository) {
+    public KitchenRoomControllers(UserRepository userRepository, CookBookRepository cookBookRepository) {
         this.userRepository = userRepository;
-        this.fileDBRepository = fileDBRepository;
+        this.cookBookRepository = cookBookRepository;
     }
+
 
     @GetMapping("/kitchen/write-prescription")
     public String kitchenWritePrescription(Authentication authentication, Model model) {
@@ -49,69 +42,113 @@ public class KitchenRoomControllers {
         return "kitchen-write-prescription";
     }
 
-    @PostMapping("/kitchen/write-prescription")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
-        String message = "";
-        try {
-            storageService.store(file);
-
-            message = "Uploaded the file successfully: " + file.getOriginalFilename();
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-        } catch (Exception e) {
-            message = "Could not upload the file: " + file.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
-        }
-    }
-
+    @Transactional
     @GetMapping("/kitchen/read-cookbook")
-    public ResponseEntity<List<ResponseFile>> getListFiles() {
-        List<ResponseFile> files = storageService.getAllFiles().map(dbFile -> {
-            String fileDownloadUri = ServletUriComponentsBuilder
-                    .fromCurrentContextPath()
-                    .path("/files/")
-                    .path(dbFile.getId())
-                    .toUriString();
+    public String kitchenReadCookBooks(Authentication authentication, Model model) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        String email = oneByEmail.get().getEmail();
+        List<CookBook> cookBooks = cookBookRepository.findAllByEmail(email);
 
-            return new ResponseFile(
-                    dbFile.getName(),
-                    fileDownloadUri,
-                    dbFile.getType(),
-                    dbFile.getData().length);
-        }).collect(Collectors.toList());
-
-        return ResponseEntity.status(HttpStatus.OK).body(files);
+        //TODO REVERS
+        cookBooks.sort(Comparator.comparing(CookBook::getId).reversed());
+        model.addAttribute("cookBooks", cookBooks);
+        model.addAttribute("title", "Cook Book");
+        return "kitchen-read-cookbook";
     }
-//    public String kitchenWritePrescriptionAdd(Authentication authentication, Model model,
-//                                              MultipartFile file,
-//                                              String titleText,
-//                                              String fullText) throws IOException {
-//
-//        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-//        String userEmail = details.getUsername();
-//        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-//        String address = oneByEmail.get().getAddress();
 
-//        private String titleText;
-//        private String fullText;
-//        private String address;
-//        private String name;
-//        private String type;
-//        private byte[] image;
+    @GetMapping("/image/display/{id}")
+    @ResponseBody
+    void showImage(@PathVariable("id") Long id,
+                   HttpServletResponse response,
+                   Optional<CookBook> cookBook) throws ServletException, IOException {
 
-//        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        cookBook = cookBookRepository.findById(id);
+        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+        response.getOutputStream().write(cookBook.get().getImage());
+        response.getOutputStream().close();
+    }
 
-//        FileDB fileDB = new FileDB();
-//        fileDB.setTitleText(titleText);
-//        fileDB.setFullText(fullText);
-//        fileDB.setAddress(address);
-//        fileDB.setName(fileName);
-//        fileDB.setType(file.getContentType());
-//        fileDB.setImage(file.getBytes());
+    @GetMapping("/kitchen/read-cookbook/{id}/remove")
+    public String cookBookRemove(@PathVariable(value = "id") Long id, Model model) {
+        CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);
+        cookBookRepository.delete(cookBook);
+        return "redirect:/kitchen/read-cookbook";
+    }
 
-//        fileDBRepository.save(fileDB);
-//        System.out.println("good save");
-//        return "redirect:/kitchen/read-cookbook";
+    @GetMapping("/kitchen/read-cookbook/{id}/edit")
+    public String cookBookEdit(@PathVariable(value = "id") Long id, Model model) {
+        if (!cookBookRepository.existsById(id)) {
+            return "redirect:/kitchen/read-cookbook";
+        }
+        Optional<CookBook> post = cookBookRepository.findById(id);
+//        Optional<PublicationUser> post = publicationRepository.findAllByEmailId(idPublication);
+        List<CookBook> res = new ArrayList<>();
+        post.ifPresent(res::add);
+        model.addAttribute("cookBook", res);
+        return "kitchen-edit-cookbook";
+    }
+
+    @PostMapping("/kitchen/read-cookbook/{id}/edit")
+    public String cookBookUpdate(@PathVariable(value = "id") Long id,
+                                 MultipartFile file,
+                                 @RequestParam String titleText,
+                                 @RequestParam String fullText,
+                                 Model model) throws IOException {
+        CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);
+        cookBook.setTitleText(titleText);
+//        String url= "https://www.youtube.com/embed/"+video+"?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
+//        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
+        cookBook.setFullText(fullText);
+        Date date = new Date();
+        cookBook.setLocalDate(date);
+        cookBook.setName(file.getOriginalFilename());
+        cookBook.setType(file.getContentType());
+        cookBook.setImage(file.getBytes());
+        cookBookRepository.save(cookBook);
+        return "redirect:/kitchen/read-cookbook";
+    }
+
+//    private LocalDate localDate;
+    //        private String titleText;
+////        private String fullText;
+////        private String address;
+////        private String name;
+////        private String type;
+////        private byte[] image;
+
+    @PostMapping("/kitchen/write-prescription")
+    public String kitchenWritePrescriptionAdd(Authentication authentication,
+                                              Model model,
+                                              MultipartFile file,
+                                              @RequestParam("titleText") String titleText,
+                                              @RequestParam("fullText") String fullText) throws IOException {
+
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userEmail = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
+        String email = oneByEmail.get().getEmail();
+        Date createDate = new Date();
+        CookBook cookBook = new CookBook();
+        cookBook.setLocalDate(createDate);
+        cookBook.setTitleText(titleText);
+        cookBook.setFullText(fullText);
+        cookBook.setEmail(email);
+        cookBook.setName(file.getOriginalFilename());
+        cookBook.setType(file.getContentType());
+        cookBook.setImage(file.getBytes());
+
+        cookBookRepository.save(cookBook);
+        System.out.println("good save");
+        return "redirect:/kitchen/read-cookbook";
+    }
+
+//    private String encodeToString(MultipartFile file) throws IOException {
+//        String s = file.getBytes().toString();
+//        return s;
 //    }
+
 
 //    @GetMapping("/kitchen/read-cookbook")
 //    public String kitchenReadPrescription(Authentication authentication, Model model) {
