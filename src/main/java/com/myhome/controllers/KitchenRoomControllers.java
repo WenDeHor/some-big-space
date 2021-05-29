@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Consumer;
 
 @Controller
 public class KitchenRoomControllers {
@@ -83,10 +84,10 @@ public class KitchenRoomControllers {
             return "redirect:/kitchen/read-cookbook";
         }
         Optional<CookBook> post = cookBookRepository.findById(id);
-//        Optional<PublicationUser> post = publicationRepository.findAllByEmailId(idPublication);
         List<CookBook> res = new ArrayList<>();
         post.ifPresent(res::add);
         model.addAttribute("cookBook", res);
+        model.addAttribute("cookBooks", res);
         return "kitchen-edit-cookbook";
     }
 
@@ -105,18 +106,17 @@ public class KitchenRoomControllers {
         cookBook.setLocalDate(date);
         cookBook.setName(file.getOriginalFilename());
         cookBook.setType(file.getContentType());
-        cookBook.setImage(file.getBytes());
+        if(file.getContentType().equals("application/octet-stream")){
+            Optional<CookBook> byId = cookBookRepository.findById(id);
+            byte[] image = byId.get().getImage();
+            cookBook.setImage(image);
+        } else {
+            cookBook.setImage(file.getBytes());
+        }
         cookBookRepository.save(cookBook);
         return "redirect:/kitchen/read-cookbook";
     }
 
-//    private LocalDate localDate;
-    //        private String titleText;
-////        private String fullText;
-////        private String address;
-////        private String name;
-////        private String type;
-////        private byte[] image;
 
     @PostMapping("/kitchen/write-prescription")
     public String kitchenWritePrescriptionAdd(Authentication authentication,
@@ -144,30 +144,4 @@ public class KitchenRoomControllers {
         return "redirect:/kitchen/read-cookbook";
     }
 
-//    private String encodeToString(MultipartFile file) throws IOException {
-//        String s = file.getBytes().toString();
-//        return s;
-//    }
-
-
-//    @GetMapping("/kitchen/read-cookbook")
-//    public String kitchenReadPrescription(Authentication authentication, Model model) {
-//        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-//        String userName = details.getUsername();
-//        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-//        String address = oneByEmail.get().getAddress();
-//        Iterable<FileDB> cookBooks = fileDBRepository.findAllByAddress(address);
-//
-//        List<FileDB> fileDBArrayList = new ArrayList<>();
-//        cookBooks.forEach(fileDBArrayList::add);
-//
-//
-////        letters.sort(Comparator.comparing(Letter::getNumberOfLetter));
-//        fileDBArrayList.sort(Comparator.comparing(FileDB::getIdCookBook).reversed());
-//
-//
-//        model.addAttribute("cookbooks", fileDBArrayList);
-//        model.addAttribute("title", "Cook Book");
-//        return "kitchen-read-cookbook";
-//    }
 }

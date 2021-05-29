@@ -41,6 +41,20 @@
                     <h2 class="form-signin-heading">EDIT OF PRESCRIPTION</h2>
                     <div th:each="el:${cookBook}">
                         <form method="post" enctype="multipart/form-data">
+
+                            <div th:each="cookBook, el:${cookBooks}" class="alert alert-info mt-2">
+
+                                <img th:src="@{${'/image/display/'+ cookBook.id}}"
+                                     style="width:50%"/>
+                                <br>
+                            </div>
+
+                            <div class="custom-file mb-4">
+                                <input type="file" name="file" class="custom-file-input"
+                                       id="customFile"> <label class="custom-file-label"
+                                                               for="customFile">Image</label>
+                            </div>
+
                             <p>
                                 <label>TITLE</label>
                                 <input type="text" th:value="${el.titleText}" name="titleText" class="form-control"
@@ -55,11 +69,7 @@
                                       th:text="${el.fullText}"></textarea> <br>
                             <br>
 
-                            <div class="custom-file mb-4">
-                                <input type="file" name="file" class="custom-file-input"
-                                       id="customFile"> <label class="custom-file-label"
-                                                               for="customFile">Image</label>
-                            </div>
+
                             <button class="btn btn-lg btn-primary btn-block" type="submit">UPDATE</button>
                         </form>
                     </div>
