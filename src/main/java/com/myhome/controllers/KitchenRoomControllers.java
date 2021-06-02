@@ -1,9 +1,10 @@
 package com.myhome.controllers;
 
 import com.myhome.models.CookBook;
-import com.myhome.models.PublicationUser;
+import com.myhome.models.Menu;
 import com.myhome.models.User;
 import com.myhome.repository.CookBookRepository;
+import com.myhome.repository.MenuRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
 import org.springframework.security.core.Authentication;
@@ -18,16 +19,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Consumer;
+
 
 @Controller
 public class KitchenRoomControllers {
     private final UserRepository userRepository;
     private final CookBookRepository cookBookRepository;
+    private final MenuRepository menuRepository;
 
-    public KitchenRoomControllers(UserRepository userRepository, CookBookRepository cookBookRepository) {
+    public KitchenRoomControllers(UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository) {
         this.userRepository = userRepository;
         this.cookBookRepository = cookBookRepository;
+        this.menuRepository = menuRepository;
     }
 
 
@@ -106,7 +109,7 @@ public class KitchenRoomControllers {
         cookBook.setLocalDate(date);
         cookBook.setName(file.getOriginalFilename());
         cookBook.setType(file.getContentType());
-        if(file.getContentType().equals("application/octet-stream")){
+        if (file.getContentType().equals("application/octet-stream")) {
             Optional<CookBook> byId = cookBookRepository.findById(id);
             byte[] image = byId.get().getImage();
             cookBook.setImage(image);
@@ -144,4 +147,99 @@ public class KitchenRoomControllers {
         return "redirect:/kitchen/read-cookbook";
     }
 
+    //TODO MENU
+    @GetMapping("/kitchen/write-menu")
+    public String kitchenMenu(Authentication authentication, Model model) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userEmail = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
+        String address = oneByEmail.get().getAddress();
+        List<Menu> allMenuByAddress = menuRepository.findAllByAddress(address);
+
+        model.addAttribute("allMenuByAddress", allMenuByAddress);
+        model.addAttribute("title", "Menu");
+        return "kitchen-write-menu";
+    }
+
+    @PostMapping("/kitchen/write-menu")
+    public String kitchenWriteMenu(Authentication authentication,
+                                   Model model,
+                                   @RequestParam("date") String date,
+                                   @RequestParam("breakfast") String breakfast,
+                                   @RequestParam("dinner") String dinner,
+                                   @RequestParam("supper") String supper) throws IOException {
+
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userEmail = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
+        String address = oneByEmail.get().getAddress();
+
+//        LocalDate localDate = LocalDate.parse(date);
+//        java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
+
+        Menu menu = new Menu();
+        menu.setSupper(supper);
+        menu.setDinner(dinner);
+        menu.setBreakfast(breakfast);
+        menu.setAddress(address);
+        if (date.isEmpty()) {
+            LocalDate localDate = LocalDate.now();
+            java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
+            menu.setDate(dateParse);
+        } else {
+            LocalDate localDate = LocalDate.parse(date);
+            java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
+            menu.setDate(dateParse);
+        }
+        menuRepository.save(menu);
+        System.out.println(menu.toString());
+        return "redirect:/kitchen/write-menu";
+    }
+
+    @GetMapping("/kitchen/write-menu/{id}/remove")
+    public String menuRemove(@PathVariable(value = "id") Long id, Model model) {
+        Menu menu = menuRepository.findById(id).orElseThrow(null);
+        menuRepository.delete(menu);
+        return "redirect:/kitchen/write-menu";
+    }
+
+    @GetMapping("/kitchen/write-menu/{id}/edit")
+    public String menuEdit(@PathVariable(value = "id") Long id, Model model) {
+        if (!menuRepository.existsById(id)) {
+            return "redirect:/kitchen/write-menu";
+        }
+        Optional<Menu> post = menuRepository.findById(id);
+        List<Menu> res = new ArrayList<>();
+        post.ifPresent(res::add);
+        String s = post.get().getDate().toString();
+
+
+        model.addAttribute("menus", res);
+        model.addAttribute("dateString", s);
+
+        return "kitchen-edit-menu";
+    }
+
+
+    @PostMapping("/kitchen/write-menu/{id}/edit")
+    public String menuUpdate(@PathVariable(value = "id") Long id,
+                             @RequestParam("date") String date,
+                             @RequestParam("breakfast") String breakfast,
+                             @RequestParam("dinner") String dinner,
+                             @RequestParam("supper") String supper,
+                             Model model) throws IOException {
+        Menu menu = menuRepository.findById(id).orElseThrow(null);
+        menu.setSupper(supper);
+        menu.setDinner(dinner);
+        menu.setBreakfast(breakfast);
+        if (date.isEmpty()) {
+            menu.setDate(menu.getDate());
+        } else {
+            LocalDate localDate = LocalDate.parse(date);
+            java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
+            menu.setDate(dateParse);
+        }
+        menuRepository.save(menu);
+        return "redirect:/kitchen/write-menu";
+    }
 }
