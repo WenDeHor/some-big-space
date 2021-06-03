@@ -10,9 +10,10 @@
 <div th:insert="blocks/library::library"></div>
 
 <div class="container"><br>
-    <h2 class="text-center text-success">MENU</h2>
+
     <br>
     <div class="row">
+
         <div class="album col-md-12 bg-light" style="background-color: bisque">
             <div class="row col-md-12">
                 <div class="col-md-4">
@@ -25,16 +26,13 @@
                     <a href="/kitchen/write-menu" class="btn btn-danger btn-lg btn-block" role="button">My
                         menu</a>
                     <br>
-                    <a href="/kitchen/write-shop-menu" class="btn btn-info btn-lg btn-block" role="button">Write a
-                        shop menu</a>
-                    <br>
-                    <a href="/kitchen/read-shop-menu" class="btn btn-info btn-lg btn-block" role="button">Read a
-                        shop menu</a>
+                    <a href="/kitchen/write-shop-meals" class="btn btn-info btn-lg btn-block" role="button">Shop menu</a>
                     <br>
                     <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
                     <br>
                 </div>
                 <div class="col-md-8">
+                    <h2 class="text-center text-success">MENU</h2>
                     <table class="table">
                         <thead class="thead-dark">
                         <tr>
@@ -43,13 +41,13 @@
                             <th><h6>Breakfast</h6></th>
                             <th><h6>Dinner</h6></th>
                             <th><h6>Supper</h6></th>
-                            <th><h6>Edit</h6></th>
-                            <th><h6>Delete</h6></th>
+                            <th><h6></h6></th>
+                            <th><h6></h6></th>
                         </tr>
                         </thead>
                         <tbody>
 
-                        <tr th:each="menu, el:${allMenuByAddress}" class="alert alert-info mt-2">
+                        <tr th:each="menu, el:${menus}" class="alert alert-info mt-2">
                             <td><span th:text="${#dates.format({menu.date}, 'dd:MM')}"></span></td>
                             <td><span th:text="${#dates.dayOfWeekName({menu.date})}"></span></td>
                             <td><span th:text="${menu.breakfast}"></span></td>

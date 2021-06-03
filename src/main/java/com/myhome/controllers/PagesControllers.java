@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class PagesControllers {
-
+//    Don't let the sun go down until you keep your promises
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
 
@@ -52,6 +52,13 @@ public class PagesControllers {
         model.addAttribute("title", "LIVING ROOM");
         return "living-read-publications";
     }
+
+    @GetMapping("/safe")
+    public String safeReadCookbook() {
+
+        return "redirect:/safe/read-diary";
+    }
+
 
     @GetMapping("/registration-error")
     public String registrationError(Model model) {
