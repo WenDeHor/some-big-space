@@ -1,15 +1,12 @@
 package com.myhome.models;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDate;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Data
@@ -17,8 +14,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "cook_book")
-public class CookBook {
+@Table(name = "diary")
+public class Diary {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -36,8 +33,8 @@ public class CookBook {
     @Size(min = 0, max = 3000)
     private String fullText;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "name")
     private String name;
@@ -48,5 +45,4 @@ public class CookBook {
     @Lob
     @Column(name = "Image", length = Integer.MAX_VALUE, nullable = true)
     private byte[] image;
-
 }

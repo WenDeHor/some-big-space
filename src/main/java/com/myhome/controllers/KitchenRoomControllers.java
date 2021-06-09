@@ -79,6 +79,8 @@ public class KitchenRoomControllers {
         response.getOutputStream().close();
     }
 
+
+
     @GetMapping("/kitchen/read-cookbook/{id}/remove")
     public String cookBookRemove(@PathVariable(value = "id") Long id, Model model) {
         CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);

@@ -24,7 +24,8 @@
                     <a href="/kitchen/write-menu" class="btn btn-info btn-lg btn-block" role="button">My
                         menu</a>
                     <br>
-                    <a href="/kitchen/write-shop-meals" class="btn btn-info btn-lg btn-block" role="button">Shop menu</a>
+                    <a href="/kitchen/write-shop-meals" class="btn btn-info btn-lg btn-block" role="button">Shop
+                        menu</a>
                     <br>
                     <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
                     <br>
@@ -37,10 +38,10 @@
                         <img th:src="@{${'/image/display/'+ cookBook.id}}"
                              style="width:50%"/>
                         <br>
-                        <p th:text="${#dates.format({cookBook.localDate}, 'dd-MM-yyyy')}"/>
+                        <h6><p th:text="${#dates.format({cookBook.localDate}, 'dd-MM-yyyy')}"/></h6>
 
-                        <p th:text="${cookBook.titleText}"/>
-                        <p th:text="${cookBook.fullText}"/>
+                        <h4><p th:text="${cookBook.titleText}"/></h4>
+                        <h5><p th:text="${cookBook.fullText}"/></h5>
 
                         <!--                            <p th:text="${cookBook.address}"/>-->
                         <!--                            <p th:text="${cookBook.name}"/>-->

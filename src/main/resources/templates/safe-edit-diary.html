@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+    <!--    <title th:text="${user}"></title>-->
+</head>
+
+<div th:insert="blocks/library::library"></div>
+
+<div class="container"><br>
+    <h2 class="text-center text-success">KITCHEN ROOM</h2>
+    <br>
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/safe/read-save-diary" class="btn btn-info btn-lg btn-block" role="button">Read Diary</a>
+                    <br>
+                    <a href="/safe/edit-diary" class="btn btn-danger  btn-lg btn-block" role="button"> Edit a diary</a>
+                    <br>
+                    <a href="safe/read-save-edit-reference" class="btn btn-info btn-lg btn-block" role="button">My
+                        references</a>
+                    <br>
+                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <br>
+
+                </div>
+                <div class="col-md-8">
+
+                    <div th:each="diary, el:${diaryList}" class="alert alert-info mt-2">
+
+                        <img th:src="@{${'/image/display/diary/'+ diary.id}}"
+                             style="width:100%"/>
+                        <br>
+                        <h4><p th:text="${diary.titleText}"/></h4>
+                        <!--                        <h6><p th:text="${#dates.format({diary.localDate}, 'dd-MM-yyyy')}"/></h6>-->
+                        <h5><p th:text="${diary.fullText}"/></h5>
+
+                        <a th:href="'/safe/edit-diary/'+${diary.id}+'/edit'"
+                           class="btn btn-warning">EDIT</a>
+                        <a th:href="'/safe/edit-diary/'+${diary.id}+'/remove'"
+                           class="btn btn-warning">REMOVE</a>
+
+                    </div>
+                    <br>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

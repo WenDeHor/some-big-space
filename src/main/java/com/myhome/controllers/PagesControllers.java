@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class PagesControllers {
-//    Don't let the sun go down until you keep your promises
+    //    Don't let the sun go down until you keep your promises
+    // Картінки підгружати на різні кімнати
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
 
@@ -56,7 +57,7 @@ public class PagesControllers {
     @GetMapping("/safe")
     public String safeReadCookbook() {
 
-        return "redirect:/safe/read-diary";
+        return "redirect:/safe/read-save-diary";
     }
 
 
