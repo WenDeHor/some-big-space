@@ -2,8 +2,10 @@ package com.myhome.controllers;
 
 import com.myhome.models.CookBook;
 import com.myhome.models.Diary;
+import com.myhome.models.Reference;
 import com.myhome.models.User;
 import com.myhome.repository.DiaryRepository;
+import com.myhome.repository.ReferenceRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,12 @@ import java.util.*;
 public class SafeRoomControllers {
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
+    private final ReferenceRepository referenceRepository;
 
-    public SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository) {
+    public SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository) {
         this.userRepository = userRepository;
         this.diaryRepository = diaryRepository;
+        this.referenceRepository = referenceRepository;
     }
 
     @Transactional
@@ -145,6 +149,71 @@ public class SafeRoomControllers {
         return "redirect:/safe/edit-diary";
     }
 
-//diary
-//reference
+    @Transactional
+    @GetMapping("/safe/read-save-edit-reference")
+    public String safeReadAddRemoveReference(Authentication authentication, Model model) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        String address = oneByEmail.get().getAddress();
+        List<Reference> referenceList = referenceRepository.findAllByAddress(address);
+
+        //TODO REVERS
+        referenceList.sort(Comparator.comparing(Reference::getId).reversed());
+        model.addAttribute("referenceList", referenceList);
+        model.addAttribute("title", "referenceList");
+        return "safe-read-save-edit-reference";
+    }
+
+    @PostMapping("/safe/read-save-edit-reference")
+    public String safeSaveReference(Authentication authentication,
+                                    Model model,
+                                    MultipartFile file,
+                                    @RequestParam("titleText") String titleText,
+                                    @RequestParam("url") String url) throws IOException {
+
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userEmail = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
+        String address = oneByEmail.get().getAddress();
+
+        Reference reference = new Reference();
+        reference.setAddress(address);
+        reference.setUrl(url);
+        reference.setTitleText(titleText);
+//        if (file.getContentType().equals("application/octet-stream")) {
+//            Optional<Diary> byId = diaryRepository.findById(id);
+//            byte[] image = byId.get().getImage();
+//            diary.setImage(image);
+//        } else {
+//            diary.setImage(file.getBytes());
+//        }
+        reference.setName(file.getOriginalFilename());
+        reference.setType(file.getContentType());
+        reference.setImage(file.getBytes());
+        referenceRepository.save(reference);
+
+        System.out.println(reference.toString());
+        return "redirect:/safe/read-save-edit-reference";
+    }
+
+    @GetMapping("/image/display/reference/{id}")
+    @ResponseBody
+    void showImageReference(@PathVariable("id") Long id,
+                        HttpServletResponse response,
+                        Optional<Reference> reference) throws ServletException, IOException {
+
+       reference = referenceRepository.findById(id);
+        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+        response.getOutputStream().write(reference.get().getImage());
+        response.getOutputStream().close();
+    }
+
+    @GetMapping("/safe/read-save-edit-reference/{id}/remove")
+    public String referenceRemove(@PathVariable(value = "id") Long id, Model model) {
+        Reference reference = referenceRepository.findById(id).orElseThrow(null);
+        referenceRepository.delete(reference);
+        return "redirect:/safe/read-save-edit-reference";
+    }
+
 }
