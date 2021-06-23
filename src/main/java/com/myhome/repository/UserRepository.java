@@ -17,7 +17,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Integer findOneByCounter(int count);
     Optional<User> findOneByEmail(String email);
     Optional<User> findOneByRole(Role role);
+    Optional<User> findAllByAddress(String addressUser);
     Optional<User> findOneByIdUser(Long email);
     Optional<User> findOneByLogin(String login);
+    Optional<User> findAllByEmail(String email);
+    Optional<User> findAllByLogin(String login);
+
 
 }

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+    <!--    <title th:text="${user}"></title>-->
+</head>
+
+<div th:insert="blocks/library::library"></div>
+
+<div class="container"><br>
+    <h2 class="text-center text-success">STUDY ROOM</h2>
+    <br>
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/living/fireplace" class="btn btn-info btn-lg btn-block" role="button">Fireplace</a>
+                    <br>
+                    <a href="/living/video" class="btn btn-info btn-lg btn-block" role="button">YOUTUBE</a>
+                    <br>
+                    <a href="/living/friends" class="btn btn-danger btn-lg btn-block" role="button">Friends</a>
+                    <br>
+                    <a href="/living/publications" class="btn btn-info btn-lg btn-block"
+                       role="button">Publications</a>
+                    <br>
+                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <br>
+                </div>
+
+                <div class="col-md-8">
+                    <h5 class="text-center">FIND FRIENDS</h5>
+                    <form action="/living/friends/add" method="get" >
+                        <table>
+                            <div class="custom-file mb-4">
+                                <input type="text" name="userNameOrEmail" class="form-control"
+                                       placeholder="Find a user by name or address">
+                            </div>
+                        </table>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">FIND</button>
+                    </form>
+
+                    <div  th:each="user, el:${all}" class="alert alert-info mt-2">
+                        <h5>login</h5>
+                        <h5 th:text="${user.login}"/>
+                        <h5>email</h5>
+                        <h5 th:text="${user.email}"/>
+
+                        <a th:href="'/living/friends/'+${user.idUser}+'/add'"
+                           class="btn btn-warning">ADD TO MY LIST</a>
+                    </div>
+
+                    <br>
+                    <div th:each="myFriends, el:${myFriendsList}" class="alert alert-info mt-2">
+                        <h5 th:text="${myFriends.addressMyFriends}"/>
+                        <a th:href="'/living/friends/'+${myFriends.idMyFriends}+'/remove'"
+                           class="btn btn-warning">REMOVE</a>
+                    </div>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <br><br>
+    </div>
+</div>
+
+</html>
