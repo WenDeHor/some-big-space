@@ -1,9 +1,7 @@
 package com.myhome.controllers;
 
 import com.myhome.models.*;
-import com.myhome.repository.MyFriendsRepository;
-import com.myhome.repository.PublicationRepository;
-import com.myhome.repository.UserRepository;
+import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,9 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.Column;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,11 +24,15 @@ public class LivingRoomControllers {
     private final MyFriendsRepository myFriendsRepository;
     private final UserRepository userRepository;
     private final PublicationRepository publicationRepository;
+    private final NewsBoxRepository newsBoxRepository;
+    private final VideoBoxRepository videoBoxRepository;
 
-    public LivingRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, MyFriendsRepository myFriendsRepository) {
+    public LivingRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, MyFriendsRepository myFriendsRepository, NewsBoxRepository newsBoxRepository, VideoBoxRepository videoBoxRepository) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
         this.myFriendsRepository = myFriendsRepository;
+        this.newsBoxRepository = newsBoxRepository;
+        this.videoBoxRepository = videoBoxRepository;
     }
 
     @GetMapping("/living/publications")
@@ -36,20 +40,22 @@ public class LivingRoomControllers {
         Iterable<PublicationUser> publications = publicationRepository.findAll();
         String userAddress = findUserAddress(authentication);
         Iterable<MyFriends> allByAddressMyFriends = myFriendsRepository.findAllByAddressUser(userAddress);
+
         List<MyFriends> myFriendsList = new ArrayList<>();
         allByAddressMyFriends.forEach(myFriendsList::add);
+
         int size = myFriendsList.size();
 
         List<PublicationUser> publicationUserList = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            MyFriends myFriends = myFriendsList.get(0);
+
+        for (MyFriends myFriends : myFriendsList) {
             String addressMyFriends = myFriends.getAddressMyFriends();
             Iterable<PublicationUser> allByAddress = publicationRepository.findAllByAddress(addressMyFriends);
             allByAddress.forEach(publicationUserList::add);
         }
-        Set<PublicationUser>publicationUserSet=new HashSet<>(publicationUserList);
+        publicationUserList.sort(Comparator.comparing(PublicationUser::getLocalDate).reversed());
 
-        model.addAttribute("publications", publicationUserSet);
+        model.addAttribute("publications", publicationUserList);
         model.addAttribute("title", "LIVING ROOM");
         return "living-read-publications";
     }
@@ -108,6 +114,91 @@ public class LivingRoomControllers {
         MyFriends myFriends = myFriendsRepository.findById(id).orElseThrow(null);
         myFriendsRepository.delete(myFriends);
         return "redirect:/living/friends";
+    }
+
+
+    @GetMapping("/living/news/site")
+    public String livingNewsSite(Authentication authentication, Model model) {
+        String userAddress = findUserAddress(authentication);
+
+        Iterable<NewsBox> allNewsBox = newsBoxRepository.findAllByAddressUser(userAddress);
+        List<NewsBox> newsBoxList = new ArrayList<>();
+        allNewsBox.forEach(newsBoxList::add);
+        newsBoxList.sort(Comparator.comparing(NewsBox::getIdNewsBox).reversed());
+
+        model.addAttribute("newsBoxList", newsBoxList);
+        model.addAttribute("title", "LIVING ROOM");
+        return "living-news-site";
+    }
+
+    @GetMapping("/living/news/site/{idNewsBox}/remove")
+    public String livingNewsSiteRemove(@PathVariable(value = "idNewsBox") Long idNewsBox, Model model) {
+        NewsBox newsBox = newsBoxRepository.findById(idNewsBox).orElseThrow(null);
+        newsBoxRepository.delete(newsBox);
+        return "redirect:/living/news/site";
+    }
+
+    @GetMapping("/living/news/video")
+    public String livingNewVideo(Authentication authentication, Model model) {
+        String userAddress = findUserAddress(authentication);
+
+        Iterable<VideoBox> allVideoBox = videoBoxRepository.findAllByAddressUser(userAddress);
+        List<VideoBox> videoBoxList = new ArrayList<>();
+        allVideoBox.forEach(videoBoxList::add);
+        videoBoxList.sort(Comparator.comparing(VideoBox::getIdVideoBox).reversed());
+
+        model.addAttribute("videoBoxList", videoBoxList);
+        model.addAttribute("title", "LIVING ROOM");
+        return "living-news-video";
+    }
+
+    @GetMapping("/living/news/video/{idVideoBox}/remove")
+    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") Long idVideoBox, Model model) {
+        VideoBox videoBox = videoBoxRepository.findById(idVideoBox).orElseThrow(null);
+        videoBoxRepository.delete(videoBox);
+        return "redirect:/living/news/video";
+    }
+
+    @GetMapping("/living/news/add")
+    public String livingNewsAdd(Model model) {
+        model.addAttribute("title", "LIVING ROOM");
+        return "living-news-add";
+    }
+
+    @PostMapping("/living/news/add/video")
+    public String livingNewsAddVideo(Authentication authentication,
+                                     Model model,
+                                     @RequestParam("linkToVideo") String linkToVideo) throws IOException {
+
+        String userAddress = findUserAddress(authentication);
+        String url = "https://www.youtube.com/embed/" + linkToVideo + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
+
+        LocalDate localDate = LocalDate.now();
+
+        VideoBox videoBox = new VideoBox();
+        videoBox.setAddressUser(userAddress);
+        videoBox.setLinkToVideo(url);
+        videoBox.setLocalDate(localDate);
+
+        videoBoxRepository.save(videoBox);
+        return "redirect:/living/news/video";
+    }
+
+    @PostMapping("/living/news/add/site")
+    public String livingNewsAddSite(Authentication authentication,
+                                    Model model,
+                                    @RequestParam("linkToNews") String linkToNews) throws IOException {
+
+        String userAddress = findUserAddress(authentication);
+        LocalDate localDate = LocalDate.now();
+
+        NewsBox newsBox = new NewsBox();
+        newsBox.setAddressUser(userAddress);
+        newsBox.setLinkToNews(linkToNews);
+        newsBox.setLocalDate(localDate);
+
+        newsBoxRepository.save(newsBox);
+        return "redirect:/living/news/site";
     }
 
     private String findUserAddress(Authentication authentication) {

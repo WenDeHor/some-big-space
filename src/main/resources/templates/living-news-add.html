@@ -22,24 +22,34 @@
                     <br>
                     <a href="/living/news/site" class="btn btn-info btn-lg btn-block" role="button">News Site</a>
                     <br>
-                    <a href="/living/news/add" class="btn btn-info btn-lg btn-block" role="button">Site & Video add</a>
+                    <a href="/living/news/add" class="btn btn-danger btn-lg btn-block" role="button">Site & Video
+                        add</a>
                     <br>
                     <a href="/living/friends" class="btn btn-info btn-lg btn-block" role="button">Friends</a>
                     <br>
-                    <a href="/living/publications" class="btn btn-danger btn-lg btn-block"
+                    <a href="/living/publications" class="btn btn-info btn-lg btn-block"
                        role="button">Publications</a>
                     <br>
                     <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
                     <br>
                 </div>
                 <div class="col-md-8">
+                    <h3>Create link to video</h3>
+                    <form action="/living/news/add/video" method="POST" enctype="multipart/form-data">
+                        <input type="text" name="linkToVideo" class="form-control"
+                               placeholder="Write link to video">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
+                    </form>
+                    <br>
 
-                    <div th:each="publicationUser, el:${publications}" class="alert alert-info mt-2">
-                        <h5 th:text="${publicationUser.localDate}"/>
-                        <h5 th:text="${publicationUser.address}"/>
-                        <h2 th:text="${publicationUser.titleText}"/>
-                        <p th:text="${publicationUser.fullText}"/>
-                    </div>
+                    <h3>Create link to news</h3>
+                    <form action="/living/news/add/site" method="POST">
+                        <table>
+                            <input type="text" name="linkToNews" class="form-control"
+                                   placeholder="Write link to news">
+                        </table>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
+                    </form>
                     <br>
                 </div>
             </div>

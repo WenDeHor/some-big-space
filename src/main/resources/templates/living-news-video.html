@@ -18,7 +18,7 @@
                 <div class="col-md-4">
 <!--                    <a href="/living/fireplace" class="btn btn-info btn-lg btn-block" role="button">Fireplace</a>-->
 <!--                    <br>-->
-                    <a href="/living/news/video" class="btn btn-info btn-lg btn-block" role="button">News Video</a>
+                    <a href="/living/news/video" class="btn btn-danger btn-lg btn-block" role="button">News Video</a>
                     <br>
                     <a href="/living/news/site" class="btn btn-info btn-lg btn-block" role="button">News Site</a>
                     <br>
@@ -26,20 +26,23 @@
                     <br>
                     <a href="/living/friends" class="btn btn-info btn-lg btn-block" role="button">Friends</a>
                     <br>
-                    <a href="/living/publications" class="btn btn-danger btn-lg btn-block"
+                    <a href="/living/publications" class="btn btn-info btn-lg btn-block"
                        role="button">Publications</a>
                     <br>
                     <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
                     <br>
+
                 </div>
                 <div class="col-md-8">
-
-                    <div th:each="publicationUser, el:${publications}" class="alert alert-info mt-2">
-                        <h5 th:text="${publicationUser.localDate}"/>
-                        <h5 th:text="${publicationUser.address}"/>
-                        <h2 th:text="${publicationUser.titleText}"/>
-                        <p th:text="${publicationUser.fullText}"/>
+                        <div th:each="videobox, el:${videoBoxList}" class="alert alert-info mt-2">
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item"
+                                    th:src="${videobox.linkToVideo}"></iframe>
+                        </div>
+                            <a th:href="'/living/news/video/'+${videobox.idVideoBox}+'/remove'"
+                               class="btn btn-warning">REMOVE</a>
                     </div>
+
                     <br>
                 </div>
             </div>

@@ -32,7 +32,7 @@
                     <div th:each="reference, el:${referenceList}" class="alert alert-info mt-2">
 
                         <a th:href="${reference.url}"><img th:src="@{${'/image/display/reference/'+ reference.id}}"
-                             style="width:50%"/></a>
+                             style="width:100%"/></a>
                         <br>
                        <h4><p th:text="${reference.titleText}"/></h4>
                         <a th:href="'/safe/read-save-edit-reference/'+${reference.id}+'/remove'"
@@ -61,6 +61,8 @@
                         <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
 
                     </form>
+                    <br>
+                    <br>
                 </div>
             </div>
         </div>
