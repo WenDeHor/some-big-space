@@ -3,7 +3,6 @@ package com.myhome.controllers;
 import com.myhome.models.*;
 import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.persistence.Column;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,7 +41,7 @@ public class LivingRoomControllers {
         List<MyFriends> myFriendsList = new ArrayList<>();
         allByAddressMyFriends.forEach(myFriendsList::add);
 
-        int size = myFriendsList.size();
+//        int size = myFriendsList.size();
 
         List<PublicationUser> publicationUserList = new ArrayList<>();
 
@@ -53,7 +50,7 @@ public class LivingRoomControllers {
             Iterable<PublicationUser> allByAddress = publicationRepository.findAllByAddress(addressMyFriends);
             allByAddress.forEach(publicationUserList::add);
         }
-        publicationUserList.sort(Comparator.comparing(PublicationUser::getLocalDate).reversed());
+        publicationUserList.sort(Comparator.comparing(PublicationUser::getDate).reversed());
 
         model.addAttribute("publications", publicationUserList);
         model.addAttribute("title", "LIVING ROOM");

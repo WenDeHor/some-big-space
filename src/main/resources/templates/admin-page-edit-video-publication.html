@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+
+    <!--    <title th:text="${user}"></title>-->
+</head>
+
+<div th:insert="blocks/library::library"></div>
+
+<div class="container"><br>
+    <h2 class="text-center text-success">Admin Publications table </h2>
+    <br>
+    <div class="row">
+
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/admin-mine/users" class="btn btn-info btn-lg btn-block" role="button">
+                        Users data</a>
+                    <br>
+                    <a href="/admin-mine/users-publications" class="btn btn-info btn-lg btn-block" role="button">
+                        Users Publications</a>
+                    <br>
+                    <a href="/admin-mine/admin-publications" class="btn btn-info btn-lg btn-block" role="button">
+                        Admin publications</a>
+                    <br>
+                    <a href="/admin-mine/admin-video" class="btn btn-info btn-lg btn-block" role="button">Admin
+                        Video</a>
+                    <br>
+                    <a href="/admin-mine/write-letters/send" class="btn btn-info btn-lg btn-block" role="button">
+                        My letters</a>
+                    <br>
+                    <a href="/admin-mine/write-letter" class="btn btn-info btn-lg btn-block" role="button">
+                        To write a letter</a>
+                    <br>
+                    <form action="/logout" method="post">
+                        <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
+                    </form>
+                </div>
+
+                <div class="col-md-8">
+                    <!--                    model.addAttribute("videoBoxAdminArrayList", videoBoxAdminArrayList);-->
+                    <!--                    <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.idPublication}+'/edit'"-->
+                    <!--                       class="btn btn-outline-dark">EDIT</a>-->
+                    <div th:each="el:${videoBoxAdminArrayList}">
+
+
+                        <form  method="POST" >
+                            <p>
+                                <label>Link to Video</label>
+                                <input type="text" th:value="${el.linkToVideo}" name="linkToVideo" class="form-control"
+                                       placeholder="Link to Video">
+                            </p>
+
+                            <p>
+                                <label>TITLE</label>
+                                <input type="text" th:value="${el.titleText}" name="titleText" class="form-control"
+                                       placeholder="TITLE NAME">
+                            </p>
+                            <br>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">UPDATE</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

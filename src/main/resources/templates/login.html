@@ -4,6 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title th:text="${title}"></title>
+
 </head>
 <div th:insert="blocks/library::library"></div>
 <body>
@@ -11,31 +12,36 @@
     <form class="form-sign" method="post" action="/login">
         <!-- error message -->
         <div th:if="${param.error}">
-            <div class="alert alert-danger">Помилковий електронроний адрес або секретний код
+            <div class="alert alert-danger">Wrong email address or secret code
             </div>
         </div>
         <!-- logout message -->
         <div th:if="${param.logout}">
-            <div class="alert alert-info">Усіпшно вийшли з особистого кабінету.</div>
+            <div class="alert alert-info">Successfully passed from the personal account.</div>
         </div>
 
-        <h2 class="form-sign-heading">Login</h2>
+        <h2 class="form-sign-heading text-center" style="margin-top: 50px">Login</h2>
         <p>
-            <label for="username">Електронна пошта</label>
+            <label for="username">Enter your postbox</label>
             <input type="text" id="username" name="username" class="form-control"
-                   placeholder="Введіть свою електронну пошту" required>
+                   placeholder="Enter your postbox" required>
         </p>
         <p>
             <label for="password">Password</label>
             <input type="password" id="password" name="password" class="form-control"
-                   placeholder="Введіть секретний код" required>
+                   placeholder="Enter the secret code" required>
         </p>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Увійти в особистий кабінет</button>
-    </form>
+        <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top: 50px">
+            Log in to your personal account
+        </button>
+        <a href="/registration" class="btn btn-info btn-lg btn-block" role="button"
+           style="margin-bottom: 50px">Register</a>
 
-    <div class="form-group">
-        <span>New user? <a href="/registration">Зареєструватись</a></span>
-    </div>
+    </form>
+    <!--    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>-->
+    <!--    <div class="form-group">-->
+    <!--        <span>New user? <a href="/registration">Register</a></span>-->
+    <!--    </div>-->
 </div>
 </body>
 <footer th:insert="blocks/footer-first::footer-first"></footer>

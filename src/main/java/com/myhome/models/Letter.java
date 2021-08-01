@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -21,8 +21,9 @@ public class Letter {
     @Column(name = "id_letter")
     private Long idLetter;
 
-    @Column(name = "local_date")
-    private LocalDate localDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "date", nullable = false)
+    private Date date;
 
     @Column(name = "title_text")
     @Size(min = 0, max = 1000)
@@ -32,8 +33,8 @@ public class Letter {
     @Size(min = 0, max = 3000)
     private String fullText;
 
-    @Column(name = "number_of_letter")
-    private Integer numberOfLetter;
+//    @Column(name = "number_of_letter")
+//    private Integer numberOfLetter;
 
     @Column(name = "sender_address")
     private String senderAddress;

@@ -1,15 +1,12 @@
 package com.myhome.models;
 
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 
-import java.time.LocalDate;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Data
@@ -25,8 +22,8 @@ public class CookBook {
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "local_date", nullable = false)
-    private Date localDate;
+    @Column(name = "date", nullable = false)
+    private Date date;
 
     @Column(name = "title_text")
     @Size(min = 0, max = 1000)

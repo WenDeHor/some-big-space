@@ -4,6 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title th:text="${title}"></title>
+
     <!--    <title th:text="${user}"></title>-->
 </head>
 
@@ -35,7 +36,7 @@
                 <div class="col-md-8">
 
                     <div th:each="publicationUser, el:${publications}" class="alert alert-info mt-2">
-                        <h5 th:text="${publicationUser.localDate}"/>
+                        <h5 th:text="${publicationUser.date}"/>
                         <h5 th:text="${publicationUser.address}"/>
                         <h2 th:text="${publicationUser.titleText}"/>
                         <p th:text="${publicationUser.fullText}"/>

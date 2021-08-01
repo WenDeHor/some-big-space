@@ -9,7 +9,6 @@ import com.myhome.repository.MenuRepository;
 import com.myhome.repository.ShopMealsRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,7 +112,7 @@ public class KitchenRoomControllers {
 //        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
         cookBook.setFullText(fullText);
         Date date = new Date();
-        cookBook.setLocalDate(date);
+        cookBook.setDate(date);
         cookBook.setName(file.getOriginalFilename());
         cookBook.setType(file.getContentType());
         if (file.getContentType().equals("application/octet-stream")) {
@@ -141,7 +140,7 @@ public class KitchenRoomControllers {
         String email = oneByEmail.get().getEmail();
         Date createDate = new Date();
         CookBook cookBook = new CookBook();
-        cookBook.setLocalDate(createDate);
+        cookBook.setDate(createDate);
         cookBook.setTitleText(titleText);
         cookBook.setFullText(fullText);
         cookBook.setEmail(email);

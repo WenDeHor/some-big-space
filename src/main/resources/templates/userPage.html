@@ -4,34 +4,41 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title th:text="${title}"></title>
-<!--    <title th:text="${user}"></title>-->
+    <!--    <title th:text="${user}"></title>-->
 </head>
 
 <div th:insert="blocks/library::library"></div>
 
-<div class="container"> <br>
-   <h2 class="text-center text-success">MY HOME</h2>
+<div class="container"><br>
+    <h2 class="text-center text-success">MY HOME</h2>
     <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
-            <div class="row col-md-12">
+        <!--        style="background-color: bisque"-->
+        <div class="album col-md-12 bg-light">
+            <div class="row col-md-12 ">
 
-                <div class="col-md-4">
-                    <img src="img/home_room.png" class="img-my-home" alt="100" width=400px height="400px">
-                    <a href="/study" class="btn btn-info btn-lg" role="button">Study room</a>
-                </div> <br>
-                <div class="col-md-4">
-                    <img src="img/home_room.png" class="img-my-home" alt="100" width=400px height="400px">
-                    <a href="/safe" class="btn btn-info btn-lg" role="button">Safe room</a>
-                </div><br>
-                <div class="col-md-4">
-                    <img src="img/home_room.png" class="img-my-home" alt="100" width=400px height="400px">
-                    <a href="/living" class="btn btn-info btn-lg" role="button">Living room</a>
-                </div><br>
-                <div class="col-md-4">
-                    <img src="img/home_room.png" class="img-my-home" alt="100" width=400px height="400px">
-                    <a href="/kitchen" class="btn btn-info btn-lg" role="button">Kitchen</a>
-                </div><br>
+                <div class="col-md-6 justify-content-md-center text-center ">
+                    <img src="img/home_room.png" class="img-my-home" alt="Study room" width=100%>
+                    <!--                    class="btn btn-info btn-lg btn-on"role="button"-->
+                    <a href="/study" class="btn-on ">Study room</a>
+                    <br>
+                </div>
+                <br>
+                <div class="col-md-6 justify-content-md-center text-center">
+                    <img src="img/home_room.png" class="img-my-home" alt="Safe room" width=100%>
+                    <a href="/safe" class="btn-on ">Safe room</a>
+                </div>
+                <br>
+                <div class="col-md-6 justify-content-md-center text-center">
+                    <img src="img/home_room.png" class="img-my-home" alt="Living room" width=100%>
+                    <a href="/living" class="btn-on ">Living room</a>
+                </div>
+                <br>
+                <div class="col-md-6 justify-content-md-center text-center">
+                    <img src="img/home_room.png" class="img-my-home" alt="Kitchen" width=100%>
+                    <a href="/kitchen" class="btn-on ">Kitchen</a>
+                </div>
+
 
             </div>
         </div>
@@ -40,7 +47,8 @@
     <form action="/logout" method="post">
         <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
     </form>
-
+    <br>
+    <br>
 </div>
 
 </html>

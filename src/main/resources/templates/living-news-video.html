@@ -4,6 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title th:text="${title}"></title>
+
     <!--    <title th:text="${user}"></title>-->
 </head>
 
@@ -34,13 +35,13 @@
 
                 </div>
                 <div class="col-md-8">
-                        <div th:each="videobox, el:${videoBoxList}" class="alert alert-info mt-2">
+                    <div th:each="videobox, el:${videoBoxList}" class="alert alert-info mt-2">
                         <div class="embed-responsive embed-responsive-16by9">
                             <iframe class="embed-responsive-item"
                                     th:src="${videobox.linkToVideo}"></iframe>
                         </div>
-                            <a th:href="'/living/news/video/'+${videobox.idVideoBox}+'/remove'"
-                               class="btn btn-warning">REMOVE</a>
+                        <a th:href="'/living/news/video/'+${videobox.idVideoBox}+'/remove'"
+                           class="btn btn-warning">REMOVE</a>
                     </div>
 
                     <br>

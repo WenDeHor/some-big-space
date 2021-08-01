@@ -5,12 +5,13 @@
 <head>
     <title th:text="${title}"></title>
     <!--    <title th:text="${user}"></title>-->
+
 </head>
 
-<div th:insert="blocks/library::library"></div>
+<head th:insert="blocks/library::library"></head>
 
 <div class="container"><br>
-    <h2 class="text-center text-success">STUDY ROOM</h2>
+    <h2 class="text-center" style="color: #17859b">STUDY ROOM</h2>
     <br>
     <div class="row">
         <div class="album col-md-12 bg-light" style="background-color: bisque">

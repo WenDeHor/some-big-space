@@ -1,11 +1,12 @@
 package com.myhome.controllers;
 
-import com.myhome.models.*;
+import com.myhome.models.Letter;
+import com.myhome.models.PublicationUser;
+import com.myhome.models.User;
 import com.myhome.repository.LetterRepository;
 import com.myhome.repository.PublicationRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,11 +46,11 @@ public class StudyRoomControllers {
 
     @PostMapping("/study/write-letter/send")
     public String LetterSend(Letter letter,
-                            @RequestParam String titleText,
-                            @RequestParam String fullText,
-                            @RequestParam String senderAddress,
-                            @RequestParam String recipientAddress,
-                            Model model, Authentication authentication) {
+                             @RequestParam String titleText,
+                             @RequestParam String fullText,
+                             @RequestParam String senderAddress,
+                             @RequestParam String recipientAddress,
+                             Model model, Authentication authentication) {
 
 //        private LocalDate localDate;
 //        private Integer numberOfLetter;
@@ -62,13 +63,14 @@ public class StudyRoomControllers {
         System.out.println("mailingAddress  ".toUpperCase() + address + " Login:" + Login);
 
         LocalDate localDate = LocalDate.now();// получаем текущую дату
-        String date = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
+        String localdate = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
 
+        Date date = new Date();
         Letter userSendLetter = Letter.builder()
-                .localDate(localDate)
+                .date(date)
                 .titleText(titleText)
                 .fullText(fullText)
-                .numberOfLetter(numberOfLetter())
+//                .numberOfLetter(numberOfLetter())
                 .senderAddress(senderAddress)
                 .recipientAddress(recipientAddress)
                 .build();
@@ -76,11 +78,12 @@ public class StudyRoomControllers {
         letterRepository.save(userSendLetter);
         return "redirect:/user-page";
     }
-    private Integer numberOfLetter() {
-        List<Letter> allByNumber =  letterRepository.findAll();
-        int size = allByNumber.size();
-        return size + 1;
-    }
+
+//    private Integer numberOfLetter() {
+//        List<Letter> allByNumber = letterRepository.findAll();
+//        int size = allByNumber.size();
+//        return size + 1;
+//    }
 
     @GetMapping("/study/read-letters")
     public String studyReadLettersOfUser(Authentication authentication, Model model) {
@@ -90,12 +93,12 @@ public class StudyRoomControllers {
         String address = oneByEmail.get().getAddress();
         Iterable<Letter> lettersRecipientUser = letterRepository.findAllByRecipientAddress(address);
         Iterable<Letter> letterSendersUser = letterRepository.findAllBySenderAddress(address);
-        List<Letter>letters=new ArrayList<>();
+        List<Letter> letters = new ArrayList<>();
         lettersRecipientUser.forEach(letters::add);
         letterSendersUser.forEach(letters::add);
 
 //        letters.sort(Comparator.comparing(Letter::getNumberOfLetter));
-        letters.sort(Comparator.comparing(Letter::getNumberOfLetter).reversed());
+        letters.sort(Comparator.comparing(Letter::getDate).reversed());
 
         model.addAttribute("letters", letters);
         model.addAttribute("title", "letters");
@@ -105,11 +108,15 @@ public class StudyRoomControllers {
     //TODO Publications
     @GetMapping("/study/read-publications")
     public String studyReadPublicationsOfUser(Authentication authentication, Model model) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Iterable<PublicationUser> publicationUser = publicationRepository.findAllByEmail(userName);
 
-        model.addAttribute("publicationUser", publicationUser);
+        String userAddress = findUserAddress(authentication);
+        List<PublicationUser> publicationUser = publicationRepository.findAllByAddress(userAddress);
+
+        List<PublicationUser> publicationList = new ArrayList<>(publicationUser);
+        publicationList.sort(Comparator.comparing(PublicationUser::getIdPublication).reversed());
+
+
+        model.addAttribute("publicationUser", publicationList);
         model.addAttribute("title", "Publication of User");
         return "study-read-publications";
     }
@@ -144,8 +151,8 @@ public class StudyRoomControllers {
 //        String url= "https://www.youtube.com/embed/"+video+"?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
 //        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
         publicationUser.setFullText(fullText);
-        LocalDate localDate = LocalDate.now();
-        publicationUser.setLocalDate(localDate);
+        Date date = new Date();
+        publicationUser.setDate(date);
         publicationRepository.save(publicationUser);
         return "redirect:/study/read-publications";
     }
@@ -170,19 +177,27 @@ public class StudyRoomControllers {
         String Login = oneByEmail.get().getLogin();
         System.out.println("mailingAddress  ".toUpperCase() + address + "Login:" + Login);
 
-        LocalDate localDate = LocalDate.now();// получаем текущую дату
-        String date = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
+        LocalDate localDateNow = LocalDate.now();// получаем текущую дату
+        String localDate = localDateNow.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
 
+        Date date = new Date();
         PublicationUser publicationUser = PublicationUser.builder()
                 .address(address)
                 .email(userEmail)
-                .localDate(localDate)
+                .date(date)
                 .titleText(titleText)
                 .fullText(fullText)
                 .build();
         System.out.println(publicationUser.toString());
         publicationRepository.save(publicationUser);
-        return "redirect:/user-page";
+        return "redirect:/study/read-publications";
+    }
+
+    private String findUserAddress(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        return oneByEmail.get().getAddress();
     }
 
     //TODO ЗРАЗОК з іншого проекту

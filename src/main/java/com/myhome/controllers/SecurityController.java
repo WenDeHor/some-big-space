@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -43,7 +41,6 @@ public class SecurityController {
         Optional<User> userPresent = userRepository.findOneByEmail(userForm.getEmail());
 
         if (request.getParameterMap().containsKey("error") || userPresent.isPresent()) {
-            System.out.println("error");
             model.addAttribute("error", true);
             model.addAttribute("title", "registration page");
             return "registration-error";
@@ -70,19 +67,11 @@ public class SecurityController {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userRole = details.getAuthorities().toString();
         if (userRole.equals("[ADMIN]") || userRole.equals("ADMIN")) {
-
-            List<User> listUser = userRepository.findAll();
-            model.addAttribute("listUser", listUser);
-
-
-            System.out.println(userRole + details.getUsername() + details.getAuthorities() + " is enter us ADMIN");
-            return "adminPage";
+            return "redirect:/admin-page";
         }
         if (userRole.equals("[USER]") || userRole.equals("USER")) {
-            System.out.println(userRole + details.getUsername() + details.getAuthorities() + " is enter us USER");
-            return "userPage";
+            return "redirect:/user-page";
         } else {
-            System.out.println(userRole + details.getUsername() + details.getAuthorities() + " is not  enter");
             return "redirect:/";
         }
     }
@@ -91,6 +80,5 @@ public class SecurityController {
     public String postLogout(Model model) {
         return "redirect:/";
     }
-
 
 }

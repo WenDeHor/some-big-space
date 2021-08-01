@@ -5,12 +5,13 @@
 <head>
     <title th:text="${title}"></title>
     <!--    <title th:text="${user}"></title>-->
-</head>
+<!--    <link rel="stylesheet" href="css/mine.css">-->
 
+</head>
 <div th:insert="blocks/library::library"></div>
 
 <div class="container"><br>
-    <h2 class="text-center text-success">STUDY ROOM</h2>
+    <h2 class="text-center" style="color: #17859b">STUDY ROOM</h2>
     <br>
     <div class="row">
         <div class="album col-md-12 bg-light" style="background-color: bisque">
@@ -18,7 +19,8 @@
                 <div class="col-md-4">
                     <a href="/study/read-letters" class="btn btn-info btn-lg btn-block" role="button">My letters</a>
                     <br>
-                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a letter</a>
+                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a
+                        letter</a>
                     <br>
                     <a href="/study/read-publications" class="btn btn-danger btn-lg btn-block" role="button">My
                         publications</a>
@@ -32,13 +34,19 @@
                 </div>
                 <div class="col-md-8">
 
-                    <div th:each="el:${publicationUser}" class="alert alert-info mt-2">
-                        <h1 th:text="${el.localDate}"/>
-                        <p th:text="${el.titleText}"/>
-                        <p th:text="${el.fullText}"/>
+                    <div th:each="publicationUser, el:${publicationUser}" class="alert alert-info mt-2">
 
-                        <a th:href="'/study/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>
-                        <a th:href="'/study/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>
+                        <h4 th:text="${publicationUser.titleText}" class=" text-center"/>
+                        <p th:text="${publicationUser.fullText}" class="text-justify text-muted"></p>
+<!--                        <h6 th:text="${el.date}" class="text-right"/>-->
+                        <h6><p class="text-right" th:text="${#dates.format({publicationUser.date}, 'dd:MM:yyyy')}"/></h6>
+                        <br>
+                        <div class="text-right">
+                            <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/edit'"
+                               class="btn btn-outline-dark ">Edit</a>
+                            <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/remove'"
+                               class="btn btn-outline-danger ">Delete</a>
+                        </div>
                     </div>
                     <br>
                 </div>

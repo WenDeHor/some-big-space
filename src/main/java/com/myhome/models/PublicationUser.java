@@ -4,14 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -26,8 +22,11 @@ public class PublicationUser {
     private Long idPublication;
 
     //idUser+date+id_publication
-    @Column(name = "local_date")
-    private LocalDate localDate;
+//    @Column(name = "local_date")
+//    private LocalDate localDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "date", nullable = false)
+    private Date date;
 
     @Column(name = "title_text")
     @Size(min = 0, max = 1000)

@@ -5,12 +5,13 @@
 <head>
     <title th:text="${title}"></title>
     <!--    <title th:text="${user}"></title>-->
+
 </head>
 
 <div th:insert="blocks/library::library"></div>
 
 <div class="container"><br>
-    <h2 class="text-center text-success">STUDY ROOM</h2>
+    <h2 class="text-center" style="color: #17859b">STUDY ROOM</h2>
     <br>
     <div class="row">
         <div class="album col-md-12 bg-light" style="background-color: bisque">
@@ -34,7 +35,7 @@
                 <div class="col-md-8">
                     <form action="/study/write-letter/send" method="post">
 
-                        <h2 class="form-signin-heading">WRITE LETTER</h2>
+
                         <p>
                             <label>RECIPIENT</label>
                             <input type="text" name="recipientAddress" class="form-control"

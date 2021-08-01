@@ -4,6 +4,7 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
     <title th:text="${title}"></title>
+
 </head>
 <div th:insert="blocks/library::library"></div>
 <body>
@@ -20,22 +21,22 @@
             <div class="alert alert-info">SEE YOU IN THE FUTURE</div>
         </div>
 
-        <h2 class="form-signin-heading">REGISTRATION PAGE</h2>
+        <h2 class="form-signin-heading text-center" style="margin-top: 50px">REGISTRATION PAGE</h2>
 
         <p>
-            <label for="login">My NAME</label>
+            <label for="login">My full name</label>
             <input type="text" id="login" name="login" class="form-control"
-                   placeholder="WHAT IS MY FULL NAME?" required>
+                   placeholder="Enter your full name. How would you like to be addressed?" required>
         </p>
         <p>
-            <label for="email">EMAIL</label>
+            <label for="email">Post name</label>
             <input type="text" id="email" name="email" class="form-control"
-                   placeholder="WHAT IS MY EMAIL?" required>
+                   placeholder="Come up with a key for your mailing address or enter an address" required>
         </p>
         <p>
-            <label for="password">PASSWORD</label>
+            <label for="password">Password</label>
             <input type="password" id="password" name="password" class="form-control"
-                   placeholder="WHAT IS MY PASSWORD?" required>
+                   placeholder="Come up with a password to log in to the service" required>
         </p>
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">I"M GOING HOME</button>

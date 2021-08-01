@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title th:text="${title}"></title>
+
+    <!--    <title th:text="${user}"></title>-->
+</head>
+
+<div th:insert="blocks/library::library"></div>
+
+<div class="container"><br>
+    <h2 class="text-center text-success">User Publications table </h2>
+    <br>
+    <div class="row">
+
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/admin-mine/users" class="btn btn-info btn-lg btn-block" role="button">
+                        Users data</a>
+                    <br>
+                    <a href="/admin-mine/users-publications" class="btn btn-info btn-lg btn-block" role="button">
+                        Users Publications</a>
+                    <br>
+                    <a href="/admin-mine/admin-publications" class="btn btn-info btn-lg btn-block" role="button">
+                        Admin publications</a>
+                    <br>
+                    <a href="/admin-mine/admin-video" class="btn btn-info btn-lg btn-block" role="button">Admin
+                        Video</a>
+                    <br>
+                    <a href="/admin-mine/read-letters" class="btn btn-danger btn-lg btn-block" role="button">
+                        My letters</a>
+                    <br>
+                    <a href="/admin-mine/write-letters/send" class="btn btn-info btn-lg btn-block" role="button">
+                        To write a letter</a>
+                    <br>
+                    <form action="/logout" method="post">
+                        <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
+                    </form>
+                </div>
+
+                <div class="col-md-8">
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th></th>
+                            <th><h6>date</h6></th>
+                            <th><h6>recipientAddress</h6></th>
+                            <th><h6>senderAddress</h6></th>
+                            <th><h6>titleText</h6></th>
+                            <th></th>
+                            <th></th>
+
+                            <!--                            private Long idLetter;-->
+                            <!--                            private Date date;-->
+                            <!--                            private String titleText;-->
+                            <!--                            private String fullText;-->
+                            <!--                            private String senderAddress;-->
+                            <!--                            private String recipientAddress;-->
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!--                        userLetters-->
+<!--                        <tr th:each="letter, iterator:${userLetters}" class="alert alert-info mt-2">-->
+<!--                            <td th:text="${iterator.index+1}"></td>-->
+<!--                            <td><span th:text="${#dates.format({letter.localDate}, 'dd:MM')}"></span></td>-->
+<!--                            <td><span th:text="${letter.recipientAddress}"></span></td>-->
+<!--                            <td><span th:text="${letter.senderAddress}"></span></td>-->
+<!--                            <td><span th:text="${letter.titleText}"></span></td>-->
+<!--                            <td><a th:href="'/admin-mine/read-letters/'+${letter.idLetter}+'/read'"-->
+<!--                                   class="btn btn-warning">fullText</a></td>-->
+<!--                            <td><a th:href="'/admin-mine/read-letters/'+${letter.idLetter}+'/answer'"-->
+<!--                                   class="btn btn-warning">answer</a></td>-->
+<!--                        </tr>-->
+
+                        <!--                        adminLetters-->
+                        <tr th:each="adminLetter, iterator:${adminLetters}" class="alert alert-info mt-2">
+                            <td th:text="${iterator.index+1}"></td>
+                            <td><span th:text="${#dates.format({adminLetter.date}, 'dd:MM')}"></span></td>
+                            <td><span th:text="${adminLetter.recipientAddress}"></span></td>
+                            <td><span th:text="${adminLetter.senderAddress}"></span></td>
+                            <td><span th:text="${adminLetter.titleText}"></span></td>
+                            <td><a th:href="'/admin-mine/read-letters/'+${adminLetter.idLetter}+'/read'"
+                                   class="btn btn-warning">fullText</a></td>
+                            <td><a th:href="'/admin-mine/write-letters/'+${adminLetter.idLetter}+'/answer'"
+                                   class="btn btn-warning">answer</a></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            <br><br>
+        </div>
+    </div>
+</div>
+</html>
