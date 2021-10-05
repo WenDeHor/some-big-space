@@ -11,13 +11,13 @@
 <div th:insert="blocks/library::library"></div>
 
 <div class="container"><br>
-    <h2 class="text-center text-success">KITCHEN ROOM</h2>
-    <br>
+    <h5 class="text-center alert alert-info" >KITCHEN ROOM</h5>
+     <br>
     <div class="row">
         <div class="album col-md-12 bg-light" style="background-color: bisque">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/kitchen/read-cookbook" class="btn btn-danger btn-lg btn-block" role="button">Cook Book</a>
+                    <a href="/kitchen/read-cookbook" class="btn btn-warning btn-lg btn-block disabled"  role="button">Cook Book</a>
                     <br>
                     <a href="/kitchen/write-prescription" class="btn btn-info btn-lg btn-block" role="button">To write a
                         prescription</a>
@@ -37,7 +37,7 @@
                     <div th:each="cookBook, el:${cookBooks}" class="alert alert-info mt-2">
 
                         <img th:src="@{${'/image/display/'+ cookBook.id}}"
-                             style="width:50%"/>
+                             style="width:100%"/>
                         <br>
                         <h6><p class="text-right" th:text="${#dates.format({cookBook.date}, 'dd:MM:yyyy')}"/></h6>
 

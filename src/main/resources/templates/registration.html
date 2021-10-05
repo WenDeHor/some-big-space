@@ -28,10 +28,16 @@
             <input type="text" id="login" name="login" class="form-control"
                    placeholder="Enter your full name. How would you like to be addressed?" required>
         </p>
+
+        <p>
+            <label for="settlement">Settlement</label>
+            <input type="text" id="settlement" name="settlement" class="form-control"
+                   placeholder="Describe in one word your locality. This is a virtual world, the address is also virtual" required>
+        </p>
         <p>
             <label for="email">Post name</label>
             <input type="text" id="email" name="email" class="form-control"
-                   placeholder="Come up with a key for your mailing address or enter an address" required>
+                   placeholder="The original key. The key is the original name. It is your personal. It can be a number or a word." required>
         </p>
         <p>
             <label for="password">Password</label>
@@ -43,7 +49,7 @@
     </form>
 </div>
 </body>
-
+<footer th:insert="blocks/footer-first::footer-first"></footer>
 </html>
 
 

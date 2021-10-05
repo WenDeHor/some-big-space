@@ -11,7 +11,7 @@
 <div th:insert="blocks/library::library"></div>
 
 <div class="container"><br>
-    <h2 class="text-center text-success">Admin Publications table </h2>
+    <h5 class="text-center alert alert-info">Admin Publications table </h5>
     <br>
     <div class="row">
 
@@ -27,7 +27,7 @@
                     <a href="/admin-mine/admin-publications" class="btn btn-info btn-lg btn-block" role="button">
                         Admin publications</a>
                     <br>
-                    <a href="/admin-mine/admin-video" class="btn btn-danger btn-lg btn-block" role="button">Admin
+                    <a href="/admin-mine/admin-video" class="btn btn-warning btn-lg btn-block disabled" role="button">Admin
                         Video</a>
                     <br>
                     <a href="/admin-mine/read-letters" class="btn btn-info btn-lg btn-block" role="button">
@@ -35,6 +35,9 @@
                     <br>
                     <a href="/admin-mine/write-letters/send" class="btn btn-info btn-lg btn-block" role="button">
                         To write a letter</a>
+                    <br>
+                    <a href="/admin-mine/add-services" class="btn btn-info btn-lg btn-block">
+                        Add services</a>
                     <br>
                     <form action="/logout" method="post">
                         <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>

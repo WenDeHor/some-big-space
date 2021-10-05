@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,14 +20,23 @@ public class User {
     @Column(name = "user_id")
     private Long idUser;
 
-    @Column(name = "password")
-    private String password;
-
     @Column(name = "login")
-    private String login;
+    private String login;//REGISTRATION PAGE
+
+    @Column(name = "settlement")
+    private String settlement;//REGISTRATION PAGE
 
     @Column(name = "email")
-    private String email;
+    private String email;//REGISTRATION PAGE
+
+    @Column(name = "password")
+    private String password;//REGISTRATION PAGE
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "currency_code")
+    private String currencyCode;
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "role")
@@ -41,9 +49,11 @@ public class User {
     @Column(name = "counter")
     private Integer counter;
 
-    @Column(name = "address")
-    private String address;
 
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "date")
+    private Date date;
 
 
 //    @OneToMany( mappedBy = "user", fetch = FetchType.EAGER)

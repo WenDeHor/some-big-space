@@ -11,24 +11,26 @@
 <div th:insert="blocks/library::library"></div>
 
 <div class="container"><br>
-    <h2 class="text-center" style="color: #17859b">STUDY ROOM</h2>
+    <h5 class="text-center alert alert-info">STUDY ROOM</h5>
     <br>
+
+
     <div class="row">
         <div class="album col-md-12 bg-light" style="background-color: bisque">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study/read-letters" class="btn btn-info btn-lg btn-block" role="button">My letters</a>
+                    <a href="/study/read-letters" class="btn btn-info btn-lg btn-block" >My letters</a>
                     <br>
-                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a
+                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" >To write a
                         letter</a>
                     <br>
-                    <a href="/study/read-publications" class="btn btn-danger btn-lg btn-block" role="button">My
+                    <a href="/study/read-publications" class="btn btn-warning btn-lg btn-block disabled" >My
                         publications</a>
                     <br>
-                    <a href="/study/write-publication" class="btn btn-info btn-lg btn-block" role="button">Write a
+                    <a href="/study/write-publication" class="btn btn-info btn-lg btn-block" >Write a
                         publication</a>
                     <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <a href="/user-page" class="btn btn-info btn-lg btn-block" >TO MY HOME</a>
                     <br>
 
                 </div>
@@ -43,9 +45,9 @@
                         <br>
                         <div class="text-right">
                             <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/edit'"
-                               class="btn btn-outline-dark ">Edit</a>
+                               class="btn btn-warning">Edit</a>
                             <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/remove'"
-                               class="btn btn-outline-danger ">Delete</a>
+                               class="btn btn-warning">Delete</a>
                         </div>
                     </div>
                     <br>

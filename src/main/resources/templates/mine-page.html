@@ -9,27 +9,40 @@
 <br>
 
 
-<div class="container" style="background: rgba(13,255,167,0.09)">
-    <div class="text-center" >
-        <div class="row col-md-12">
-            <div class="col-md-2">
+<div class="container font-family-sans-serif" style="background: rgba(13,255,167,0.09)">
+
+    <!--        <div class="row col-md-12">-->
+    <!--            <div class="col-md-2">-->
+    <!--            </div>-->
+    <div class="col-md-12">
+        <div th:each="videoBoxAdmin, el:${videoBoxAdmin}">
+            <div class="embed-responsive embed-responsive-16by9 ">
+                <iframe class="embed-responsive-item "
+                        th:src="${videoBoxAdmin.linkToVideo}"></iframe>
             </div>
-            <div class="col-md-8">
-                <div th:each="videoBoxAdmin, el:${videoBoxAdmin}">
-                    <div class="embed-responsive embed-responsive-16by9 ">
-                        <iframe class="embed-responsive-item "
-                                th:src="${videoBoxAdmin.linkToVideo}"></iframe>
-                    </div>
-                    <h6 th:text="${videoBoxAdmin.titleText}"></h6>
-                    <br>
-                    <a href="/login" class="btn btn-info btn-lg " role="button left"
-                       style="margin-top: 20px"> My home</a>
-                </div>
-            </div>
-            <div class="col-md-2">
+            <br>
+            <h5 class="text-center text-uppercase fw-bold lh-base font-family-sans-serif alert alert-info"
+                th:text="${videoBoxAdmin.titleText}"></h5>
+            <br>
+            <div class="text-center">
+                <a href="/login" class="btn btn-info btn-lg " role="button left"
+                   style="margin-top: 20px"> My home</a>
             </div>
         </div>
+        <br>
+        <div th:each="publicationPostAdmin, el:${publications}" class="alert alert-info mt-2 lh-lg">
+
+            <!--                    <img th:src="@{${'/image/display/publications/'+ publicationPostAdmin.idPublication}}"/>-->
+            <!--                    <br>-->
+            <h6><p class="text-right" th:text="${#dates.format({publicationPostAdmin.date}, 'dd:MM:yyyy')}"></p>
+            </h6>
+            <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
+                   th:text="${publicationPostAdmin.titleText}"></p></h4>
+            <h5><p class=" lh-lg " th:text="${publicationPostAdmin.fullText}"></p></h5>
+        </div>
     </div>
+    <!--        </div>-->
+    <!--    </div>-->
 
 </div>
 <br>
