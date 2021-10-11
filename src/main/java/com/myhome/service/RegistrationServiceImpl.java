@@ -5,10 +5,15 @@ import com.myhome.forms.UserForm;
 import com.myhome.models.Role;
 import com.myhome.models.State;
 import com.myhome.models.User;
+import com.myhome.models.UserPhoto;
+import com.myhome.repository.UserPhotoRepository;
 import com.myhome.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -17,11 +22,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private final UserRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserPhotoRepository userPhotoRepository;
     private final static Integer counter = 100;
 
-    public RegistrationServiceImpl(UserRepository usersRepository, PasswordEncoder passwordEncoder) {
+    public RegistrationServiceImpl(UserRepository usersRepository, PasswordEncoder passwordEncoder, UserPhotoRepository userPhotoRepository) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userPhotoRepository = userPhotoRepository;
     }
 
     @Override
@@ -72,8 +79,29 @@ public class RegistrationServiceImpl implements RegistrationService {
                     .build();
             System.out.println(user.toString());
             usersRepository.save(user);
+            createUserPhotoOnMinePage(address);
+
+
         }
     }
+
+    private void createUserPhotoOnMinePage(String address) {
+        byte[] inputBytes = new byte[0];
+        try {
+            inputBytes = Files.readAllBytes(Paths.get("src/main/resources/static/img/mine-photo.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        UserPhoto userFirst = new UserPhoto();
+        userFirst.setFullText("Tell us about yourself and your family");
+        userFirst.setImage(inputBytes);
+        userFirst.setAddress(address);
+        userFirst.setType("image/jpg");
+        userFirst.setName("mine-photo.jpg");
+        userPhotoRepository.save(userFirst);
+    }
+
 
     private Integer counter() {
         List<User> allByCounter = usersRepository.findAll();

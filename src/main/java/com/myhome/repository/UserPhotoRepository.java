@@ -7,4 +7,5 @@ import java.util.Optional;
 @Repository
 public interface UserPhotoRepository extends JpaRepository<UserPhoto, Long> {
     Optional<UserPhoto> findOneByAddress(String address);
+    void deleteByAddress(String address);
 }

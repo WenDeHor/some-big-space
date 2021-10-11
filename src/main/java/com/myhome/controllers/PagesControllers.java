@@ -17,9 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Controller
 public class PagesControllers {
@@ -80,33 +79,33 @@ public class PagesControllers {
         return "redirect:/admin-mine/users";
     }
 
+//    @Transactional
+//    @GetMapping("/user-page")
+//    public String userFirstLoad(Authentication authentication, Model model, MultipartFile file) throws IOException {
+//
+//        String userAddress = findUserAddress(authentication);
+//        Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
+//        final byte[] inputBytes = Files.readAllBytes(Paths.get("src/main/resources/static/img/mine-photo.jpg"));
+//
+//        if (!userPhotoFind.isPresent()) {
+//            UserPhoto userFirst = new UserPhoto();
+//            userFirst.setFullText("Tell us about yourself and your family");
+//            userFirst.setImage(inputBytes);
+//            userFirst.setAddress(userAddress);
+//            userFirst.setType("image/jpg");
+//            userFirst.setName("mine-photo.jpg");
+//            userPhotoRepository.save(userFirst);
+//        }
+//        return "redirect:/load";
+//
+//    }
+
     @Transactional
     @GetMapping("/user-page")
-    public String userFirstLoad(Authentication authentication, Model model, MultipartFile file) throws IOException {
-
-        String userAddress = findUserAddress(authentication);
-        Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
-        final byte[] inputBytes = Files.readAllBytes(Paths.get("src/main/resources/static/img/mine-photo.jpg"));
-
-        if (!userPhotoFind.isPresent()) {
-            UserPhoto userFirst = new UserPhoto();
-            userFirst.setFullText("Tell us about yourself and your family");
-            userFirst.setImage(inputBytes);
-            userFirst.setAddress(userAddress);
-            userFirst.setType("image/jpg");
-            userFirst.setName("mine-photo.jpg");
-            userPhotoRepository.save(userFirst);
-        }
-        return "redirect:/load";
-
-    }
-
-    @Transactional
-    @GetMapping("/load")
     public String userSecondLoad(Authentication authentication, Model model, MultipartFile file) throws IOException {
         String userAddress = findUserAddress(authentication);
         Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
-        List<UserPhoto> photos = new ArrayList<>();
+        List<UserPhoto> photos = new CopyOnWriteArrayList<>();
         userPhotoFind.ifPresent(photos::add);
 
         model.addAttribute("photos", photos);
@@ -136,15 +135,19 @@ public class PagesControllers {
         userPhoto.setName(file.getOriginalFilename());
         userPhoto.setType(file.getContentType());
         userPhoto.setFullText(fullText);
-        if (userPhotoRepository.getClass().getName().equals("mine-photo.jpg") && !(file.getBytes() == null)) {
-            userPhotoRepository.deleteAll();
-            userPhotoRepository.save(userPhoto);
-        }
+        System.out.println(userPhoto.toString());
+        userPhotoRepository.deleteByAddress(userAddress);
+        userPhotoRepository.save(userPhoto); //Dell
 
-        if (!(file.getBytes() == null) && !Objects.equals(file.getContentType(), "application/octet-stream")) {
-            userPhotoRepository.deleteAll();
-            userPhotoRepository.save(userPhoto);
-        }
+//        if (userPhotoRepository.getClass().getName().equals("mine-photo.jpg") && !(file.getBytes() == null)) {
+//            userPhotoRepository.deleteAll();
+//            userPhotoRepository.save(userPhoto);
+//        }
+
+//        if (!(file.getBytes() == null) && !Objects.equals(file.getContentType(), "application/octet-stream")) {
+//            userPhotoRepository.deleteAll();
+//            userPhotoRepository.save(userPhoto);
+//        }
         return "redirect:/user-page";
     }
 
