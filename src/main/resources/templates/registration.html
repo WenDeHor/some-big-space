@@ -9,7 +9,7 @@
 <div th:insert="blocks/library::library"></div>
 <body>
 <div class="container">
-    <form class="form-registration" method="post" action="/registration">
+    <form class="form-sign" method="post" action="/registration">
 
         <!-- error message -->
         <div th:if="${param.error}">
@@ -28,16 +28,24 @@
             <input type="text" id="login" name="login" class="form-control"
                    placeholder="Enter your full name. How would you like to be addressed?" required>
         </p>
-
         <p>
+<!--            <label for="settlement">Settlement</label>-->
+<!--            <input type="text" id="settlement" name="settlement" class="form-control"-->
+<!--                   placeholder="Describe in one word your locality. This is a virtual world, the address is also virtual"-->
+<!--                   required>-->
             <label for="settlement">Settlement</label>
-            <input type="text" id="settlement" name="settlement" class="form-control"
-                   placeholder="Describe in one word your locality. This is a virtual world, the address is also virtual" required>
+            <select class="form-control" id="settlement" name="settlement">
+                <option>New_Apple</option>
+                <option>Oxilion</option>
+                <option>Old_Horogat</option>
+                <option>Mooterey</option>
+            </select>
         </p>
         <p>
             <label for="email">Post name</label>
             <input type="text" id="email" name="email" class="form-control"
-                   placeholder="The original key. The key is the original name. It is your personal. It can be a number or a word." required>
+                   placeholder="The original key. The key is the original name. It is your personal. It can be a number or a word."
+                   required>
         </p>
         <p>
             <label for="password">Password</label>

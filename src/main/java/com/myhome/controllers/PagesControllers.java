@@ -40,18 +40,16 @@ public class PagesControllers {
         this.publicationPostAdminRepository = publicationPostAdminRepository;
     }
 
-
     @GetMapping("/")
     public String home(Model model) {
 
-        Iterable<VideoBoxAdmin> firstByDate = videoBoxAdminRepository.findAll();
-        List<VideoBoxAdmin> video = new ArrayList<>((Collection<? extends VideoBoxAdmin>) firstByDate);
+        List<VideoBoxAdmin> firstByDate = videoBoxAdminRepository.findAll();
+        List<VideoBoxAdmin> video = new ArrayList<>(firstByDate);
         int size = video.size();
         VideoBoxAdmin videoBoxAdmin = video.get(size - 1);
 
-        Iterable<PublicationPostAdmin> publications = publicationPostAdminRepository.findAll();
-        List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>();
-        publications.forEach(publicationPostAdminList::add);
+        List<PublicationPostAdmin> publications = publicationPostAdminRepository.findAll();
+        List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>(publications);
         publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
 
         model.addAttribute("videoBoxAdmin", videoBoxAdmin);
@@ -60,49 +58,14 @@ public class PagesControllers {
         return "mine-page";
     }
 
-//    @Transactional
-//    @GetMapping("/image/display/publications/{id}")
-//    @ResponseBody
-//    void minePagePublications(@PathVariable("id") Long id,
-//                              HttpServletResponse response,
-//                              Optional<PublicationPostAdmin> adminPhoto) throws ServletException, IOException {
-//
-//        Optional<PublicationPostAdmin> byId = publicationPostAdminRepository.findByIdPublication(id);
-//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-//        response.getOutputStream().write(byId.get().getImage());
-//        response.getOutputStream().close();
-//    }
-
-
     @GetMapping("/admin-page")
     public String userPage() {
         return "redirect:/admin-mine/users";
     }
 
-//    @Transactional
-//    @GetMapping("/user-page")
-//    public String userFirstLoad(Authentication authentication, Model model, MultipartFile file) throws IOException {
-//
-//        String userAddress = findUserAddress(authentication);
-//        Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
-//        final byte[] inputBytes = Files.readAllBytes(Paths.get("src/main/resources/static/img/mine-photo.jpg"));
-//
-//        if (!userPhotoFind.isPresent()) {
-//            UserPhoto userFirst = new UserPhoto();
-//            userFirst.setFullText("Tell us about yourself and your family");
-//            userFirst.setImage(inputBytes);
-//            userFirst.setAddress(userAddress);
-//            userFirst.setType("image/jpg");
-//            userFirst.setName("mine-photo.jpg");
-//            userPhotoRepository.save(userFirst);
-//        }
-//        return "redirect:/load";
-//
-//    }
-
     @Transactional
     @GetMapping("/user-page")
-    public String userSecondLoad(Authentication authentication, Model model, MultipartFile file) throws IOException {
+    public String userSecondLoad(Authentication authentication, Model model) {
         String userAddress = findUserAddress(authentication);
         Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
         List<UserPhoto> photos = new CopyOnWriteArrayList<>();
@@ -113,7 +76,6 @@ public class PagesControllers {
         return "userPage";
     }
 
-
     @GetMapping("/change/photo")
     public String userPageChangePhotoEdit() {
 
@@ -123,11 +85,9 @@ public class PagesControllers {
     @Transactional
     @PostMapping("/change/photo")
     public String userPageChangePhoto(Authentication authentication,
-                                      Model model,
                                       MultipartFile file,
                                       @RequestParam("fullText") String fullText) throws IOException {
         String userAddress = findUserAddress(authentication);
-//        Optional<UserPhoto> oneByAddress = userPhotoRepository.findOneByAddress(userAddress);
 
         UserPhoto userPhoto = new UserPhoto();
         userPhoto.setAddress(userAddress);
@@ -135,28 +95,16 @@ public class PagesControllers {
         userPhoto.setName(file.getOriginalFilename());
         userPhoto.setType(file.getContentType());
         userPhoto.setFullText(fullText);
-        System.out.println(userPhoto.toString());
         userPhotoRepository.deleteByAddress(userAddress);
-        userPhotoRepository.save(userPhoto); //Dell
-
-//        if (userPhotoRepository.getClass().getName().equals("mine-photo.jpg") && !(file.getBytes() == null)) {
-//            userPhotoRepository.deleteAll();
-//            userPhotoRepository.save(userPhoto);
-//        }
-
-//        if (!(file.getBytes() == null) && !Objects.equals(file.getContentType(), "application/octet-stream")) {
-//            userPhotoRepository.deleteAll();
-//            userPhotoRepository.save(userPhoto);
-//        }
+        userPhotoRepository.save(userPhoto);
         return "redirect:/user-page";
     }
 
     @GetMapping("/user/page/photo/display/{id}")
     @ResponseBody
-    void showUserPageCPhoto(@PathVariable("id") Long id,
-                            HttpServletResponse response,
-                            Optional<UserPhoto> userPhoto) throws ServletException, IOException {
-
+    void showUserPagePhoto(@PathVariable("id") Long id,
+                           HttpServletResponse response,
+                           Optional<UserPhoto> userPhoto) throws ServletException, IOException {
         userPhoto = userPhotoRepository.findById(id);
         response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
         response.getOutputStream().write(userPhoto.get().getImage());
@@ -175,17 +123,6 @@ public class PagesControllers {
 
     @GetMapping("/living")
     public String livingReadPublications(Authentication authentication, Model model) {
-//        Iterable<PublicationUser> publications = publicationRepository.findAll();
-//        String userAddress = findUserAddress(authentication);
-//       Optional<MyFriends> allByAddressUser = myFriendsRepository.findAllByAddressUser(userAddress);
-//        List<MyFriends> myFriendsList = new ArrayList<>();
-//        allByAddressUser.ifPresent(myFriendsList::add);
-
-//        //TODO make class iterable MyFriendsRepository . ERROR
-//        Iterable<PublicationUser> allByAddress = publicationRepository.findAllByAddress(allByAddressUser);
-//        List<PublicationUser> publicationUserList = new ArrayList<>();
-//        allByAddress.forEach(publicationUserList::add);
-//        model.addAttribute("publications", publications);
         model.addAttribute("title", "LIVING ROOM");
         return "redirect:/living/publications";
     }

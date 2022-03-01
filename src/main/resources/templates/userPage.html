@@ -33,11 +33,8 @@
                 </div>
                 <div class="col-md-8 text-center">
                     <div th:each="userPhoto, el:${photos}" class="alert alert-info mt-2">
-                        <!--                        /user/page/photo/display/{id}-->
-
                         <img th:src="@{${'/user/page/photo/display/'+ userPhoto.id}}" style="width: 100%"/>
                         <br>
-
                         <h5><p th:text="${userPhoto.fullText}" class="font-weight-bold "/></h5>
                         <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Change photo</a>
 

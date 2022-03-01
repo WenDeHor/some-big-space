@@ -34,21 +34,14 @@ public class LivingRoomControllers {
 
     @GetMapping("/living/publications")
     public String livingReadPublications(Authentication authentication, Model model) {
-        Iterable<PublicationUser> publications = publicationRepository.findAll();
         String userAddress = findUserAddress(authentication);
-        Iterable<MyFriends> allByAddressMyFriends = myFriendsRepository.findAllByAddressUser(userAddress);
-
-        List<MyFriends> myFriendsList = new ArrayList<>();
-        allByAddressMyFriends.forEach(myFriendsList::add);
-
-//        int size = myFriendsList.size();
-
+        List<MyFriends> allByAddressMyFriends = myFriendsRepository.findAllByAddressUser(userAddress);
+//        List<MyFriends> myFriendsList = new ArrayList<>(allByAddressMyFriends);
         List<PublicationUser> publicationUserList = new ArrayList<>();
-
-        for (MyFriends myFriends : myFriendsList) {
+        for (MyFriends myFriends : allByAddressMyFriends) {
             String addressMyFriends = myFriends.getAddressMyFriends();
-            Iterable<PublicationUser> allByAddress = publicationRepository.findAllByAddress(addressMyFriends);
-            allByAddress.forEach(publicationUserList::add);
+            List<PublicationUser> allByAddress = publicationRepository.findAllByAddress(addressMyFriends);
+            publicationUserList.addAll(allByAddress);
         }
         publicationUserList.sort(Comparator.comparing(PublicationUser::getDate).reversed());
 
@@ -60,9 +53,7 @@ public class LivingRoomControllers {
     @GetMapping("/living/friends")
     public String livingFriends(Authentication authentication, Model model) {
         String userAddress = findUserAddress(authentication);
-        Iterable<MyFriends> allByAddressMyFriends = myFriendsRepository.findAllByAddressUser(userAddress);
-        List<MyFriends> myFriendsList = new ArrayList<>();
-        allByAddressMyFriends.forEach(myFriendsList::add);
+        List<MyFriends> myFriendsList = myFriendsRepository.findAllByAddressUser(userAddress);
         model.addAttribute("myFriendsList", myFriendsList);
         model.addAttribute("title", "LIVING ROOM");
         return "living-friends";
@@ -70,7 +61,7 @@ public class LivingRoomControllers {
 
     @GetMapping("/living/friends/add")
     public String cookBookUpdate(@RequestParam String userNameOrEmail,
-                                 Model model) throws IOException {
+                                 Model model) {
         List<User> all = userRepository.findAll();
         List<User> collectLogin = all.stream()
                 .filter(p -> p.getLogin().equals(userNameOrEmail))
@@ -79,18 +70,17 @@ public class LivingRoomControllers {
                 .filter(p -> p.getEmail().equals(userNameOrEmail))
                 .collect(Collectors.toList());
 
-        List<User> userList = new ArrayList<>();
-        userList.addAll(collectLogin);
-        userList.addAll(collectEmail);
-        Set<User> userSetUsers = new HashSet<>(userList);
+        Set<User> userSetUsers = new HashSet<>();
+        userSetUsers.addAll(collectLogin);
+        userSetUsers.addAll(collectEmail);
+//        Set<User> userSetUsers = new HashSet<>(userList);
         model.addAttribute("all", userSetUsers);
-
         model.addAttribute("title", "LIVING ROOM");
         return "living-friends";
     }
 
     @GetMapping("/living/friends/{id}/add")
-    public String livingFriendsAdd(@PathVariable(value = "id") Long id, Authentication authentication, Model model) {
+    public String livingFriendsAdd(@PathVariable(value = "id") Long id, Authentication authentication) {
         Optional<User> oneByIdUser = userRepository.findOneByIdUser(id);
         String addressMyFriends = oneByIdUser.get().getAddress();
         String userAddress = findUserAddress(authentication);

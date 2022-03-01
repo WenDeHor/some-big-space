@@ -30,6 +30,6 @@ public class Address {
     String currencyCode; //settlement+number
 
     @Column(name = "user_id")
-    private Long idUser;
+       private Long idUser;
 
 }

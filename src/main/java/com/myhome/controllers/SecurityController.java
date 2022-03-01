@@ -17,15 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Controller
-//@RequestMapping
 public class SecurityController {
-
     private final RegistrationService service;
     private final UserRepository userRepository;
 
-
     public SecurityController(UserRepository userRepository, RegistrationService service) {
-
         this.userRepository = userRepository;
         this.service = service;
     }
@@ -39,7 +35,6 @@ public class SecurityController {
     @PostMapping("/registration")
     public String registration(UserForm userForm, Model model, HttpServletRequest request) {
         Optional<User> userPresent = userRepository.findOneByEmail(userForm.getEmail());
-
         if (request.getParameterMap().containsKey("error") || userPresent.isPresent()) {
             model.addAttribute("error", true);
             model.addAttribute("title", "registration page");
@@ -80,5 +75,4 @@ public class SecurityController {
     public String postLogout(Model model) {
         return "redirect:/";
     }
-
 }

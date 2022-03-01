@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Controller
-//@RequestMapping
 public class AdminBlogControllers {
     private final UserRepository userRepository;
     private final PublicationRepository publicationRepository;
@@ -186,7 +185,7 @@ public class AdminBlogControllers {
 
         String userAddress = findUserAddress(authentication);
         String url = "https://www.youtube.com/embed/" + linkToVideo + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-
+//        https://www.youtube.com/embed/ZV9qvauLlmo&t?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
         VideoBoxAdmin videoBox = new VideoBoxAdmin();
         videoBox.setAddressAdmin(userAddress);
         videoBox.setLinkToVideo(url);
