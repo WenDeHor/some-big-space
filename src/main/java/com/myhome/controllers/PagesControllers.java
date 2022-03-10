@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
+import javax.sound.sampled.*;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -137,6 +139,57 @@ public class PagesControllers {
     public String registrationError(Model model) {
         model.addAttribute("title", "Registration-error");
         return "registration-error";
+    }
+
+    private TargetDataLine microphone;
+    private SourceDataLine speakers;
+
+    @GetMapping("/call")
+    public String startUserVolume() {
+        for (int i = 0; i < 100; i++) {
+            AudioFormat format = new AudioFormat(8000.0f, 8, 2, true, true);
+
+            try {
+                microphone = AudioSystem.getTargetDataLine(format);
+
+                DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+                microphone = (TargetDataLine) AudioSystem.getLine(info);
+                microphone.open(format);
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                int numBytesRead;
+                int CHUNK_SIZE = 1024;
+                byte[] data = new byte[microphone.getBufferSize() / 5];
+                microphone.start();
+
+                int bytesRead = 0;
+                DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
+                speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
+                speakers.open(format);
+                speakers.start();
+                while (bytesRead < 100000) {
+                    numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
+                    bytesRead += numBytesRead;
+                    // write the mic data to a stream for use later
+                    out.write(data, 0, numBytesRead);
+                    // write mic data to stream for immediate playback
+                    speakers.write(data, 0, numBytesRead);
+                }
+                speakers.drain();
+                speakers.close();
+                microphone.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "redirect:/user-page";
+    }
+
+    @GetMapping("/stop")
+    public String stopUserVolume() {
+        speakers.close();
+        microphone.close();
+        return "redirect:/user-page";
     }
 
     private String findUserAddress(Authentication authentication) {

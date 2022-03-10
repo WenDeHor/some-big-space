@@ -79,11 +79,11 @@ public class AdminBlogControllers {
 
     @Transactional
     @PostMapping("/admin-mine/admin-publications")
-    public String safeSaveDiary(Authentication authentication,
-                                Model model,
-                                MultipartFile file,
-                                @RequestParam("titleText") String titleText,
-                                @RequestParam("fullText") String fullText) throws IOException {
+    public String saveAdminPublications(Authentication authentication,
+                                        Model model,
+                                        MultipartFile file,
+                                        @RequestParam("titleText") String titleText,
+                                        @RequestParam("fullText") String fullText) throws IOException {
 
         String address = findUserAddress(authentication);
         Date date = new Date();
@@ -101,18 +101,29 @@ public class AdminBlogControllers {
         return "redirect:/admin-mine/admin-publications";
     }
 
-    @Transactional
-    @GetMapping("/image/display/admin/{id}")
+    //    @Transactional
+    @GetMapping("/image/display/admin/{idPublication}")
     @ResponseBody
-    void showImageAdmin(@PathVariable("id") Long id,
+    void showImageAdmin(@PathVariable("idPublication") Long idPublication,
                         HttpServletResponse response,
                         Optional<PublicationPostAdmin> publicationPostAdmin) throws ServletException, IOException {
 
-        Optional<PublicationPostAdmin> byId = publicationPostAdminRepository.findById(id);
+        publicationPostAdmin = publicationPostAdminRepository.findById(idPublication);
         response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-        response.getOutputStream().write(byId.get().getImage());
+        response.getOutputStream().write(publicationPostAdmin.get().getImage());
         response.getOutputStream().close();
     }
+
+//    @GetMapping("/user/page/photo/display/{id}")
+//    @ResponseBody
+//    void showUserPagePhoto(@PathVariable("id") Long id,
+//                           HttpServletResponse response,
+//                           Optional<UserPhoto> userPhoto) throws ServletException, IOException {
+//        userPhoto = userPhotoRepository.findById(id);
+//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+//        response.getOutputStream().write(userPhoto.get().getImage());
+//        response.getOutputStream().close();
+//    }
 
     @Transactional
     @GetMapping("/admin-mine/admin-publications/{id}/remove")
@@ -321,11 +332,11 @@ public class AdminBlogControllers {
 
     @PostMapping("/admin-mine/write-letters/answer")
     public String adminAnswerLetterSend(Letter letter,
-                                  @RequestParam String titleText,
-                                  @RequestParam String fullText,
-                                  @RequestParam String senderAddress,
-                                  @RequestParam String recipientAddress,
-                                  Model model, Authentication authentication) {
+                                        @RequestParam String titleText,
+                                        @RequestParam String fullText,
+                                        @RequestParam String senderAddress,
+                                        @RequestParam String recipientAddress,
+                                        Model model, Authentication authentication) {
 
         String adminAddress = findUserAddress(authentication);
         Date date = new Date();
