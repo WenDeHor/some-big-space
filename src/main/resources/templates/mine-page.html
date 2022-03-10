@@ -31,7 +31,7 @@
         </div>
         <br>
         <div th:each="publicationPostAdmin, el:${publications}" class="alert alert-info mt-2">
-            <img th:src="@{${'/image/display/admin/'+ publicationPostAdmin.idPublication}}" style="width:100%"/>
+<!--            <img th:src="@{${'/image/display/admin/'+ publicationPostAdmin.idPublication}}" style="width:100%"/>-->
             <br>
             <h6><p class="text-right" th:text="${#dates.format({publicationPostAdmin.date}, 'dd:MM:yyyy')}"></p>
             </h6>
