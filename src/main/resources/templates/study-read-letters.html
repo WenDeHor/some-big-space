@@ -36,7 +36,7 @@
 
                     <div th:each="el:${letters}" class="alert alert-info mt-2">
                         <p th:text="${el.titleText}"/>
-                        <p th:text="${el.fullText}"/>
+                        <p th:utext="${el.fullText}"/>
                         <p th:text="${el.senderAddress}"/>
                         <p th:text="${el.recipientAddress}"/>
                         <p th:text="${el.date}"/>

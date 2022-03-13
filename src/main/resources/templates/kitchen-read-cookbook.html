@@ -41,8 +41,8 @@
                         <br>
                         <h6><p class="text-right" th:text="${#dates.format({cookBook.date}, 'dd:MM:yyyy')}"/></h6>
 
-                        <h4><p th:text="${cookBook.titleText}"/></h4>
-                        <h5><p th:text="${cookBook.fullText}"/></h5>
+                        <h4><p th:text="${cookBook.titleText}"></p></h4>
+                        <h5><p th:utext="${cookBook.fullText}"></p></h5>
 
                         <!--                            <p th:text="${cookBook.address}"/>-->
                         <!--                            <p th:text="${cookBook.name}"/>-->

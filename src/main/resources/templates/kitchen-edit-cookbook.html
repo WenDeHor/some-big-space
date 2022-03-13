@@ -29,10 +29,9 @@
                     <br>
                     <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
                     <br>
-
                 </div>
                 <div class="col-md-8">
-                    <h2 class="form-signin-heading">EDIT OF PRESCRIPTION</h2>
+                    <h3 class="form-signin-heading">EDIT OF PRESCRIPTION</h3>
                     <div th:each="el:${cookBook}">
                         <form method="post" enctype="multipart/form-data">
 
@@ -60,9 +59,8 @@
                             <label for="fullText"> tell us you story : </label>
                             <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
                                       placeholder="WRITE A STORY {character limit up to 3000} "
-                                      th:text="${el.fullText}"></textarea> <br>
+                                      th:utext="${el.fullText}"></textarea> <br>
                             <br>
-
 
                             <button class="btn btn-lg btn-primary btn-block" type="submit">UPDATE</button>
                         </form>

@@ -35,9 +35,9 @@
                         <img th:src="@{${'/image/display/diary/'+ diary.id}}"
                              style="width:100%"/>
                         <br>
-                        <h4><p th:text="${diary.titleText}"/></h4>
+                        <h4><p th:ytext="${diary.titleText}"></p></h4>
                         <!--                        <h6><p th:text="${#dates.format({diary.localDate}, 'dd-MM-yyyy')}"/></h6>-->
-                        <h5><p th:text="${diary.fullText}"/></h5>
+                        <h5><p th:utext="${diary.fullText}"></p></h5>
 
                         <a th:href="'/safe/edit-diary/'+${diary.id}+'/edit'"
                            class="btn btn-warning">EDIT</a>

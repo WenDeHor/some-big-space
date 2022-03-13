@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class StudyRoomControllers {
@@ -52,9 +54,6 @@ public class StudyRoomControllers {
                              @RequestParam String recipientAddress,
                              Model model, Authentication authentication) {
 
-//        private LocalDate localDate;
-//        private Integer numberOfLetter;
-
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userEmail = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
@@ -69,8 +68,7 @@ public class StudyRoomControllers {
         Letter userSendLetter = Letter.builder()
                 .date(date)
                 .titleText(titleText)
-                .fullText(fullText)
-//                .numberOfLetter(numberOfLetter())
+                .fullText(convertTextWithFormatToSave(fullText))
                 .senderAddress(senderAddress)
                 .recipientAddress(recipientAddress)
                 .build();
@@ -79,11 +77,10 @@ public class StudyRoomControllers {
         return "redirect:/user-page";
     }
 
-//    private Integer numberOfLetter() {
-//        List<Letter> allByNumber = letterRepository.findAll();
-//        int size = allByNumber.size();
-//        return size + 1;
-//    }
+    private String convertTextWithFormatToSave(String fullText) {
+        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text1);
+    }
 
     @GetMapping("/study/read-letters")
     public String studyReadLettersOfUser(Authentication authentication, Model model) {
@@ -97,7 +94,6 @@ public class StudyRoomControllers {
         lettersRecipientUser.forEach(letters::add);
         letterSendersUser.forEach(letters::add);
 
-//        letters.sort(Comparator.comparing(Letter::getNumberOfLetter));
         letters.sort(Comparator.comparing(Letter::getDate).reversed());
 
         model.addAttribute("letters", letters);
@@ -114,7 +110,6 @@ public class StudyRoomControllers {
 
         List<PublicationUser> publicationList = new ArrayList<>(publicationUser);
         publicationList.sort(Comparator.comparing(PublicationUser::getIdPublication).reversed());
-
 
         model.addAttribute("publicationUser", publicationList);
         model.addAttribute("title", "Publication of User");
@@ -137,8 +132,20 @@ public class StudyRoomControllers {
 //        Optional<PublicationUser> post = publicationRepository.findAllByEmailId(idPublication);
         List<PublicationUser> res = new ArrayList<>();
         post.ifPresent(res::add);
-        model.addAttribute("publication", res);
+        model.addAttribute("publication", convertTextWithFormatPublicationEdit(res));
         return "study-edit-publications";
+    }
+
+    private List<PublicationUser> convertTextWithFormatPublicationEdit(List<PublicationUser> publicationPostAdminList) {
+        List<PublicationUser> list = new ArrayList<>();
+        for (PublicationUser publicationPostAdmin : publicationPostAdminList) {
+            String fullText = publicationPostAdmin.getFullText();
+            String trim1 = fullText.replace("&#160&#160 ", "");
+            String trim2 = trim1.replace("<br>", "");
+            publicationPostAdmin.setFullText(trim2);
+            list.add(publicationPostAdmin);
+        }
+        return list;
     }
 
     @PostMapping("/study/publication/{idPublication}/edit")
@@ -150,7 +157,7 @@ public class StudyRoomControllers {
         publicationUser.setTitleText(titleText);
 //        String url= "https://www.youtube.com/embed/"+video+"?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
 //        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
-        publicationUser.setFullText(fullText);
+        publicationUser.setFullText(convertTextWithFormatToSave(fullText));
         Date date = new Date();
         publicationUser.setDate(date);
         publicationRepository.save(publicationUser);
@@ -186,7 +193,7 @@ public class StudyRoomControllers {
                 .email(userEmail)
                 .date(date)
                 .titleText(titleText)
-                .fullText(fullText)
+                .fullText(convertTextWithFormatToSave(fullText))
                 .build();
         System.out.println(publicationUser.toString());
         publicationRepository.save(publicationUser);
@@ -200,52 +207,10 @@ public class StudyRoomControllers {
         return oneByEmail.get().getAddress();
     }
 
-    //TODO ЗРАЗОК з іншого проекту
-
-    //    @GetMapping("/publication/add")
-//    public String publication(Model model) {
-//
-//        return "publication-add";
-//    }
-//    @GetMapping("/blog/user/{id}")
-//    public String blogUserDetails(@PathVariable(value = "id") Long id, Model model) {
-//        Optional<PublicationUser> post = publicationRepository.findById(id);
-//        List<PublicationUser> userpost = new ArrayList<>();
-//        post.ifPresent(userpost::add);
-//        model.addAttribute("title", "user page");
-//        model.addAttribute("post", userpost);
-//        return "blogUserDetails";
-//    }
-
-//    @PostMapping("/blog/{id}/edit")
-//    public String blogPostUpdate(@PathVariable(value = "id") Long id,
-//                                 @RequestParam String title,
-//                                 @RequestParam String video,
-//                                 @RequestParam String anons,
-//                                 @RequestParam String full_text,
-//                                 Model model) {
-//        PublicationUser publicationUser = publicationRepository.findById(id).orElseThrow(null);
-//        publicationUser.setTitle(title);
-////        String url= "https://www.youtube.com/embed/"+video+"?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-////        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
-//        publicationUser.setVideo(video);
-//        publicationUser.setAnons(anons);
-//        publicationUser.setFull_text(full_text);
-//        publicationRepository.save(publicationUser);
-//        return "redirect:/blog";
-//    }
-
-//    @GetMapping("/blog/{id}")
-//    public String blogDetails(@PathVariable(value = "id") Long id, Model model) {
-//
-//        if (!publicationRepository.existsById(id)) {
-//            return "redirect:/blog";
-//        }
-//
-//        Optional<PublicationUser> post = publicationRepository.findById(id);
-//        List<PublicationUser> res = new ArrayList<>();
-//        post.ifPresent(res::add);
-//        model.addAttribute("post", res);
-//        return "blog-details";
-//    }
+    //TODO REGEX
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
+    }
 }

@@ -50,18 +50,48 @@
                         <thead class="thead-dark">
                         <tr th:each="adminLetter, el:${letter}">
                             <th><span th:text="${adminLetter.titleText}"></span></th>
+                            <th class="col-md-2"></th>
                         </tr>
                         </thead>
-                        <tbody>
 
+                        <tbody>
                         <tr th:each="adminLetter, el:${letter}" class="alert alert-info mt-2">
-                            <td><span th:text="${adminLetter.fullText}"></span>
-                           <a th:href="'/admin-mine/write-letters/'+${adminLetter.idLetter}+'/answer'"
+                            <td><span th:utext="${adminLetter.fullText}"></span></td>
+                            <td><a th:href="'/admin-mine/write-letters/'+${adminLetter.idLetter}+'/answer'"
                                    class="btn btn-warning ">answer</a></td>
                         </tr>
-
                         </tbody>
                     </table>
+
+<!--                        <div class="col-md-8">-->
+<!--                            <table class="table">-->
+<!--                                <thead class="thead-dark">-->
+<!--                                <tr>-->
+<!--                                    <th></th>-->
+<!--                                    <th><h6>date</h6></th>-->
+<!--                                    <th><h6>recipientAddress</h6></th>-->
+<!--                                    <th><h6>senderAddress</h6></th>-->
+<!--                                    <th><h6>titleText</h6></th>-->
+<!--                                    <th></th>-->
+<!--                                    <th></th>-->
+<!--                                </tr>-->
+<!--                                </thead>-->
+<!--                                <tbody>-->
+<!--                                <tr th:each="adminLetter, iterator:${adminLetters}" class="alert alert-info mt-2">-->
+<!--                                    <td th:text="${iterator.index+1}"></td>-->
+<!--                                    <td><span th:text="${#dates.format({adminLetter.date}, 'dd:MM')}"></span></td>-->
+<!--                                    <td><span th:text="${adminLetter.recipientAddress}"></span></td>-->
+<!--                                    <td><span th:text="${adminLetter.senderAddress}"></span></td>-->
+<!--                                    <td><span th:text="${adminLetter.titleText}"></span></td>-->
+<!--                                    <td><a th:href="'/admin-mine/read-letters/'+${adminLetter.idLetter}+'/read'"-->
+<!--                                           class="btn btn-warning">fullText</a></td>-->
+<!--                                    <td><a th:href="'/admin-mine/write-letters/'+${adminLetter.idLetter}+'/answer'"-->
+<!--                                           class="btn btn-warning">answer</a></td>-->
+<!--                                </tr>-->
+<!--                                </tbody>-->
+<!--                            </table>-->
+
+
 
                 </div>
             </div>

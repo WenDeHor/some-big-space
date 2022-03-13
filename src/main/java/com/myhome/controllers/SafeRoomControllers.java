@@ -1,6 +1,5 @@
 package com.myhome.controllers;
 
-import com.myhome.models.CookBook;
 import com.myhome.models.Diary;
 import com.myhome.models.Reference;
 import com.myhome.models.User;
@@ -8,7 +7,6 @@ import com.myhome.repository.DiaryRepository;
 import com.myhome.repository.ReferenceRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class SafeRoomControllers {
@@ -77,7 +77,7 @@ public class SafeRoomControllers {
         Diary diary = new Diary();
         diary.setLocalDate(date);
         diary.setTitleText(titleText);
-        diary.setFullText(fullText);
+        diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
         diary.setAddress(address);
         diary.setName(file.getOriginalFilename());
         diary.setType(file.getContentType());
@@ -87,6 +87,11 @@ public class SafeRoomControllers {
         System.out.println(diary.toString());
         System.out.println("good save");
         return "redirect:/safe/read-save-diary";
+    }
+
+    private String convertTextWithFormatToDiarySaveAndEdit(String fullText) {
+        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
     @GetMapping("/safe/edit-diary/{id}/remove")
@@ -121,9 +126,21 @@ public class SafeRoomControllers {
         Optional<Diary> diary = diaryRepository.findById(id);
         List<Diary> diaryList = new ArrayList<>();
         diary.ifPresent(diaryList::add);
-        model.addAttribute("diaryList", diaryList);
-        model.addAttribute("diaryList", diaryList);
+//        model.addAttribute("diaryList", diaryList);
+        model.addAttribute("diaryList", convertTextWithFormatEditDiary(diaryList));
         return "safe-edit-diary-one-element";
+    }
+
+        private List<Diary> convertTextWithFormatEditDiary(List<Diary> publicationPostAdminList) {
+        List<Diary> list = new ArrayList<>();
+        for (Diary publicationPostAdmin : publicationPostAdminList) {
+            String fullText = publicationPostAdmin.getFullText();
+            String trim1 = fullText.replace("&#160&#160 ", "");
+            String trim2 = trim1.replace("<br>", "");
+            publicationPostAdmin.setFullText(trim2);
+            list.add(publicationPostAdmin);
+        }
+        return list;
     }
 
     @PostMapping("/safe/edit-diary/{id}/edit")
@@ -134,7 +151,7 @@ public class SafeRoomControllers {
                               Model model) throws IOException {
         Diary diary = diaryRepository.findById(id).orElseThrow(null);
         diary.setTitleText(titleText);
-        diary.setFullText(fullText);
+        diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
         diary.setLocalDate(diary.getLocalDate());
         diary.setName(file.getOriginalFilename());
         diary.setType(file.getContentType());
@@ -148,6 +165,7 @@ public class SafeRoomControllers {
         diaryRepository.save(diary);
         return "redirect:/safe/edit-diary";
     }
+
 
     @Transactional
     @GetMapping("/safe/read-save-edit-reference")
@@ -200,10 +218,10 @@ public class SafeRoomControllers {
     @GetMapping("/image/display/reference/{id}")
     @ResponseBody
     void showImageReference(@PathVariable("id") Long id,
-                        HttpServletResponse response,
-                        Optional<Reference> reference) throws ServletException, IOException {
+                            HttpServletResponse response,
+                            Optional<Reference> reference) throws ServletException, IOException {
 
-       reference = referenceRepository.findById(id);
+        reference = referenceRepository.findById(id);
         response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
         response.getOutputStream().write(reference.get().getImage());
         response.getOutputStream().close();
@@ -214,6 +232,13 @@ public class SafeRoomControllers {
         Reference reference = referenceRepository.findById(id).orElseThrow(null);
         referenceRepository.delete(reference);
         return "redirect:/safe/read-save-edit-reference";
+    }
+
+    //TODO REGEX
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
     }
 
 }

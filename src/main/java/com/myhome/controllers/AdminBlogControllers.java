@@ -14,6 +14,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class AdminBlogControllers {
@@ -84,14 +86,12 @@ public class AdminBlogControllers {
                                         MultipartFile file,
                                         @RequestParam("titleText") String titleText,
                                         @RequestParam("fullText") String fullText) throws IOException {
-
         String address = findUserAddress(authentication);
         Date date = new Date();
-
         PublicationPostAdmin publicationPostAdmin = new PublicationPostAdmin();
         publicationPostAdmin.setDate(date);
         publicationPostAdmin.setTitleText(titleText);
-        publicationPostAdmin.setFullText(fullText);
+        publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
         publicationPostAdmin.setAddress(address);
         publicationPostAdmin.setName(file.getOriginalFilename());
         publicationPostAdmin.setType(file.getContentType());
@@ -99,6 +99,12 @@ public class AdminBlogControllers {
 
         publicationPostAdminRepository.save(publicationPostAdmin);
         return "redirect:/admin-mine/admin-publications";
+    }
+
+    //TODO SAVE
+    private String convertTextWithFormatToSave(String fullText) {
+        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
     //    @Transactional
@@ -113,17 +119,6 @@ public class AdminBlogControllers {
         response.getOutputStream().write(publicationPostAdmin.get().getImage());
         response.getOutputStream().close();
     }
-
-//    @GetMapping("/user/page/photo/display/{id}")
-//    @ResponseBody
-//    void showUserPagePhoto(@PathVariable("id") Long id,
-//                           HttpServletResponse response,
-//                           Optional<UserPhoto> userPhoto) throws ServletException, IOException {
-//        userPhoto = userPhotoRepository.findById(id);
-//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-//        response.getOutputStream().write(userPhoto.get().getImage());
-//        response.getOutputStream().close();
-//    }
 
     @Transactional
     @GetMapping("/admin-mine/admin-publications/{id}/remove")
@@ -143,9 +138,22 @@ public class AdminBlogControllers {
         List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>();
         byIdPublication.ifPresent(publicationPostAdminList::add);
         publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
-        model.addAttribute("publicationPostAdminList", publicationPostAdminList);
+        model.addAttribute("publicationPostAdminList", convertTextWithFormatEdit(publicationPostAdminList));
 
         return "admin-page-admin-edit-publication";
+    }
+
+    //TODO READ EDIT
+    private List<PublicationPostAdmin> convertTextWithFormatEdit(List<PublicationPostAdmin> publicationPostAdminList) {
+        List<PublicationPostAdmin> list = new ArrayList<>();
+        for (PublicationPostAdmin publicationPostAdmin : publicationPostAdminList) {
+            String fullText = publicationPostAdmin.getFullText();
+            String trim1 = fullText.replace("&#160&#160 ", "");
+            String trim2 = trim1.replace("<br>", "");
+            publicationPostAdmin.setFullText(trim2);
+            list.add(publicationPostAdmin);
+        }
+        return list;
     }
 
     @Transactional
@@ -157,7 +165,7 @@ public class AdminBlogControllers {
                                          Model model) throws IOException {
         PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findByIdPublication(id).orElseThrow(null);
         publicationPostAdmin.setTitleText(titleText);
-        publicationPostAdmin.setFullText(fullText);
+        publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
         Date date = new Date();
         publicationPostAdmin.setDate(date);
         publicationPostAdmin.setName(file.getOriginalFilename());
@@ -287,7 +295,7 @@ public class AdminBlogControllers {
         Letter adminLetter = Letter.builder()
                 .date(date)
                 .titleText(titleText)
-                .fullText(fullText)
+                .fullText(convertTextWithFormatToSave(fullText))
                 .senderAddress(adminAddress)
                 .recipientAddress(recipientAddress)
                 .build();
@@ -296,8 +304,6 @@ public class AdminBlogControllers {
         return "redirect:/admin-mine/read-letters";
     }
 
-    //  <td><a th:href="'/admin-mine/read-letters/'+${adminLetter.fullText}+'/read'"
-//    class="btn btn-warning">fullText</a></td>
     @GetMapping("/admin-mine/read-letters/{id}/read")
     public String adminReadLetter(@PathVariable(value = "id") Long id, Model model) {
         if (!letterRepository.existsById(id)) {
@@ -310,9 +316,7 @@ public class AdminBlogControllers {
         return "admin-page-read-user-letters-fulltext";
     }
 
-    //     <td><a th:href="'/admin-mine/read-letters/'+${adminLetter.idLetter}+'/answer'"
-//    class="btn btn-warning">answer</a></td>
-//TODO answer
+    //TODO answer
     @GetMapping("/admin-mine/write-letters/{id}/answer")
     public String adminAnswerWriteLetter(Authentication authentication,
                                          @PathVariable(value = "id") Long id,
@@ -343,13 +347,20 @@ public class AdminBlogControllers {
         Letter adminLetter = Letter.builder()
                 .date(date)
                 .titleText(titleText)
-                .fullText(fullText)
+                .fullText(convertTextWithFormatToSave(fullText))
                 .senderAddress(adminAddress)
                 .recipientAddress(recipientAddress)
                 .build();
 
         letterRepository.save(adminLetter);
         return "redirect:/admin-mine/read-letters";
+    }
+
+    //TODO REGEX
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
     }
 
     private String findUserAddress(Authentication authentication) {

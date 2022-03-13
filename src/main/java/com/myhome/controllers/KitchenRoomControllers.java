@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class KitchenRoomControllers {
@@ -37,15 +38,8 @@ public class KitchenRoomControllers {
         this.shopMealsRepository = shopMealsRepository;
     }
 
-
     @GetMapping("/kitchen/write-prescription")
     public String kitchenWritePrescription(Authentication authentication, Model model) {
-//        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-//        String userEmail = details.getUsername();
-//        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-//        String address = oneByEmail.get().getAddress();
-
-//        model.addAttribute("address", address);
         model.addAttribute("title", "Prescription");
         return "kitchen-write-prescription";
     }
@@ -78,8 +72,6 @@ public class KitchenRoomControllers {
         response.getOutputStream().close();
     }
 
-
-
     @GetMapping("/kitchen/read-cookbook/{id}/remove")
     public String cookBookRemove(@PathVariable(value = "id") Long id, Model model) {
         CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);
@@ -95,9 +87,21 @@ public class KitchenRoomControllers {
         Optional<CookBook> post = cookBookRepository.findById(id);
         List<CookBook> res = new ArrayList<>();
         post.ifPresent(res::add);
-        model.addAttribute("cookBook", res);
-        model.addAttribute("cookBooks", res);
+        model.addAttribute("cookBook", convertTextWithFormatCookBookEdit(res));
+        model.addAttribute("cookBooks", convertTextWithFormatCookBookEdit(res));
         return "kitchen-edit-cookbook";
+    }
+
+    private List<CookBook> convertTextWithFormatCookBookEdit(List<CookBook> publicationPostAdminList) {
+        List<CookBook> list = new ArrayList<>();
+        for (CookBook publicationPostAdmin : publicationPostAdminList) {
+            String fullText = publicationPostAdmin.getFullText();
+            String trim1 = fullText.replace("&#160&#160 ", "");
+            String trim2 = trim1.replace("<br>", "");
+            publicationPostAdmin.setFullText(trim2);
+            list.add(publicationPostAdmin);
+        }
+        return list;
     }
 
     @PostMapping("/kitchen/read-cookbook/{id}/edit")
@@ -110,7 +114,7 @@ public class KitchenRoomControllers {
         cookBook.setTitleText(titleText);
 //        String url= "https://www.youtube.com/embed/"+video+"?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
 //        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
-        cookBook.setFullText(fullText);
+        cookBook.setFullText(convertTextWithFormatToCookBookUpdateAndSave(fullText));
         Date date = new Date();
         cookBook.setDate(date);
         cookBook.setName(file.getOriginalFilename());
@@ -124,6 +128,10 @@ public class KitchenRoomControllers {
         }
         cookBookRepository.save(cookBook);
         return "redirect:/kitchen/read-cookbook";
+    }
+    private String convertTextWithFormatToCookBookUpdateAndSave(String fullText) {
+        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
 
@@ -142,7 +150,7 @@ public class KitchenRoomControllers {
         CookBook cookBook = new CookBook();
         cookBook.setDate(createDate);
         cookBook.setTitleText(titleText);
-        cookBook.setFullText(fullText);
+        cookBook.setFullText(convertTextWithFormatToCookBookUpdateAndSave(fullText));
         cookBook.setEmail(email);
         cookBook.setName(file.getOriginalFilename());
         cookBook.setType(file.getContentType());
@@ -180,10 +188,6 @@ public class KitchenRoomControllers {
         String userEmail = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
         String address = oneByEmail.get().getAddress();
-
-//        LocalDate localDate = LocalDate.parse(date);
-//        java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
-
         Menu menu = new Menu();
         menu.setSupper(supper);
         menu.setDinner(dinner);
@@ -219,11 +223,8 @@ public class KitchenRoomControllers {
         List<Menu> res = new ArrayList<>();
         post.ifPresent(res::add);
         String s = post.get().getDate().toString();
-
-
         model.addAttribute("menus", res);
         model.addAttribute("dateString", s);
-
         return "kitchen-edit-menu";
     }
 
@@ -249,7 +250,6 @@ public class KitchenRoomControllers {
         menuRepository.save(menu);
         return "redirect:/kitchen/write-menu";
     }
-
     //TODO  Shop Menu
 
     @Transactional
@@ -267,7 +267,6 @@ public class KitchenRoomControllers {
         return "kitchen-write-shop-meals";
     }
 
-
     @PostMapping("/kitchen/write-shop-meal")
     public String kitchenWriteShopMeal(Authentication authentication,
                                        Model model,
@@ -277,14 +276,11 @@ public class KitchenRoomControllers {
         String userEmail = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
         String address = oneByEmail.get().getAddress();
-
         LocalDate localDate = LocalDate.now();
         java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
-
         ShopMeals meal = new ShopMeals();
         meal.setAddress(address);
         meal.setDate(dateParse);
-
         if (fullText.isEmpty()) {
             meal.setFullText("No Meal");
         } else {
@@ -300,5 +296,12 @@ public class KitchenRoomControllers {
        ShopMeals meal = shopMealsRepository.findById(id).orElseThrow(null);
         shopMealsRepository.delete(meal);
         return "redirect:/kitchen/write-shop-meals";
+    }
+
+    //TODO REGEX
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
     }
 }

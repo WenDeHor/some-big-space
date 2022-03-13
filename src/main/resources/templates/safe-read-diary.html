@@ -17,7 +17,8 @@
         <div class="album col-md-12 bg-light" style="background-color: bisque">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/safe/read-save-diary" class="btn btn-warning btn-lg btn-block disabled" role="button">Read Diary</a>
+                    <a href="/safe/read-save-diary" class="btn btn-warning btn-lg btn-block disabled" role="button">Read
+                        Diary</a>
                     <br>
                     <a href="/safe/edit-diary" class="btn btn-info btn-lg btn-block" role="button"> Edit a diary</a>
                     <br>
@@ -37,14 +38,23 @@
                                        id="customFile"> <label class="custom-file-label"
                                                                for="customFile">Image</label>
                             </div>
-                            <h1>
+
+                            <h3>
                                 <input type="text" name="titleText" class="form-control"
                                        placeholder="Tell us about the event">
-                            </h1>
-                            <h1>
-                                <input type="text" name="fullText" class="form-control"
-                                       placeholder="Your impressions and emotions">
-                            </h1>
+                            </h3>
+                            <br>
+
+                            <!--                                <input type="text" name="fullText" class="form-control"-->
+                            <!--                                       placeholder="Your impressions and emotions">-->
+
+                            <!--                            <label>PLACE TO PRESCRIPTION</label>-->
+                            <label for="fullText"> Story time : </label>
+                            <textarea id="fullText" name="fullText" class="form-control" rows="10" cols="20"
+                                      placeholder="Your impressions and emotions {character limit up to 3000} "></textarea>
+
+                            <br>
+
                         </table>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
                     </form>
@@ -53,8 +63,8 @@
                         <img th:src="@{${'/image/display/diary/'+ diary.id}}"
                              style="width:100%"/>
                         <br>
-                        <h4><p th:text="${diary.titleText}"/></h4>
-                        <h5><p th:text="${diary.fullText}"/></h5>
+                        <h4><p th:text="${diary.titleText}"></p></h4>
+                        <h5><p th:utext="${diary.fullText}"></p></h5>
                     </div>
                 </div>
             </div>

@@ -55,30 +55,9 @@
                             <th><h6>titleText</h6></th>
                             <th></th>
                             <th></th>
-
-                            <!--                            private Long idLetter;-->
-                            <!--                            private Date date;-->
-                            <!--                            private String titleText;-->
-                            <!--                            private String fullText;-->
-                            <!--                            private String senderAddress;-->
-                            <!--                            private String recipientAddress;-->
                         </tr>
                         </thead>
                         <tbody>
-                        <!--                        userLetters-->
-<!--                        <tr th:each="letter, iterator:${userLetters}" class="alert alert-info mt-2">-->
-<!--                            <td th:text="${iterator.index+1}"></td>-->
-<!--                            <td><span th:text="${#dates.format({letter.localDate}, 'dd:MM')}"></span></td>-->
-<!--                            <td><span th:text="${letter.recipientAddress}"></span></td>-->
-<!--                            <td><span th:text="${letter.senderAddress}"></span></td>-->
-<!--                            <td><span th:text="${letter.titleText}"></span></td>-->
-<!--                            <td><a th:href="'/admin-mine/read-letters/'+${letter.idLetter}+'/read'"-->
-<!--                                   class="btn btn-warning">fullText</a></td>-->
-<!--                            <td><a th:href="'/admin-mine/read-letters/'+${letter.idLetter}+'/answer'"-->
-<!--                                   class="btn btn-warning">answer</a></td>-->
-<!--                        </tr>-->
-
-                        <!--                        adminLetters-->
                         <tr th:each="adminLetter, iterator:${adminLetters}" class="alert alert-info mt-2">
                             <td th:text="${iterator.index+1}"></td>
                             <td><span th:text="${#dates.format({adminLetter.date}, 'dd:MM')}"></span></td>
@@ -90,7 +69,6 @@
                             <td><a th:href="'/admin-mine/write-letters/'+${adminLetter.idLetter}+'/answer'"
                                    class="btn btn-warning">answer</a></td>
                         </tr>
-
                         </tbody>
                     </table>
 

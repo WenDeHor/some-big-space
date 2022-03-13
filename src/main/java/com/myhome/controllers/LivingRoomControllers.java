@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.sound.sampled.*;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -189,10 +187,6 @@ public class LivingRoomControllers {
         newsBoxRepository.save(newsBox);
         return "redirect:/living/news/site";
     }
-
-
-
-
 
     private String findUserAddress(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();

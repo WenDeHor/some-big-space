@@ -68,16 +68,16 @@
                     </form>
                     <div th:each="publicationPostAdmin, el:${publicationPostAdminRepositoryAll}"
                          class="alert alert-info mt-2">
-                        <div class="text-center">
-                            <img class="rounded"
-                                 th:src="@{${'/image/display/admin/'+ publicationPostAdmin.idPublication}}"
-                                 style="width:80%" alt="myhome.com"/>
-                        </div>
+<!--                        <div class="text-center">-->
+<!--                            <img class="rounded"-->
+<!--                                 th:src="@{${'/image/display/admin/'+ publicationPostAdmin.idPublication}}"-->
+<!--                                 style="width:80%" alt="myhome.com"/>-->
+<!--                        </div>-->
 
                         <h6 th:text="${#dates.format({publicationPostAdmin.date}, 'dd:MM:YYYY')}"
                             class="text-right"></h6>
                         <h5 class="text-center" th:text="${publicationPostAdmin.titleText}"></h5>
-                        <h6 th:text="${publicationPostAdmin.fullText}"></h6>
+                        <h6 th:utext="${publicationPostAdmin.fullText}"></h6>
                         <div class="text-right">
                             <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.idPublication}+'/edit'"
                                class="btn btn-outline-dark">EDIT</a>

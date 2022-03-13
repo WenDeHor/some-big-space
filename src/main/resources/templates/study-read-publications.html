@@ -39,7 +39,7 @@
                     <div th:each="publicationUser, el:${publicationUser}" class="alert alert-info mt-2">
 
                         <h4 th:text="${publicationUser.titleText}" class=" text-center"/>
-                        <p th:text="${publicationUser.fullText}" class="text-justify text-muted"></p>
+                        <p th:utext="${publicationUser.fullText}" ></p>
 <!--                        <h6 th:text="${el.date}" class="text-right"/>-->
                         <h6><p class="text-right" th:text="${#dates.format({publicationUser.date}, 'dd:MM:yyyy')}"/></h6>
                         <br>
