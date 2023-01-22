@@ -49,35 +49,31 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         Date date = new Date();
         if (!adminPresent.isPresent()) {
-            User user = User.builder()
-                    .login(userForm.getLogin())
-                    .settlement(userForm.getSettlement())
-                    .email(userForm.getEmail())
-                    .counter(counter)
-                    .password(hashPassword)
-                    .currencyCode(currency.getCurrencyCode())
-                    .address(address)
-                    .role(Role.ADMIN)
-                    .state(State.ACTIVE)
-                    .date(date)
-                    .build();
-            System.out.println(user.toString());
+            User user = new User();
+            user.setLogin(userForm.getLogin());
+            user.setSettlement(userForm.getSettlement());
+            user.setEmail(userForm.getEmail());
+            user.setCounter(counter);
+            user.setPassword(hashPassword);
+            user.setCurrencyCode(currency.getCurrencyCode());
+            user.setAddress(address);
+            user.setRole(Role.ADMIN);
+            user.setState(State.ACTIVE);
+            user.setDate(date);
             usersRepository.save(user);
 
         } else {
-            User user = User.builder()
-                    .login(userForm.getLogin())
-                    .settlement(userForm.getSettlement())
-                    .email(userForm.getEmail())
-                    .password(hashPassword)
-                    .counter(counter())
-                    .address(address)
-                    .currencyCode(currency.getCurrencyCode())
-                    .date(date)
-                    .role(Role.USER)
-                    .state(State.ACTIVE)
-                    .build();
-            System.out.println(user.toString());
+            User user=new User();
+            user.setLogin(userForm.getLogin());
+            user.setSettlement(userForm.getSettlement());
+            user.setEmail(userForm.getEmail());
+            user.setCounter(counter());
+            user.setPassword(hashPassword);
+            user.setCurrencyCode(currency.getCurrencyCode());
+            user.setAddress(address);
+            user.setRole(Role.USER);
+            user.setState(State.ACTIVE);
+            user.setDate(date);
             usersRepository.save(user);
             createUserPhotoOnMinePage(address);
 

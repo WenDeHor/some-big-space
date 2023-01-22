@@ -33,6 +33,7 @@ public class PagesControllers {
     private final VideoBoxAdminRepository videoBoxAdminRepository;
     private final UserPhotoRepository userPhotoRepository;
     private final PublicationPostAdminRepository publicationPostAdminRepository;
+    private final String LINK_BASE="https://www.youtube.com/embed/GYrwebcKoxE?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
 
     public PagesControllers(PublicationRepository publicationRepository, UserRepository userRepository, MyFriendsRepository myFriendsRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository) {
         this.publicationRepository = publicationRepository;
@@ -45,11 +46,20 @@ public class PagesControllers {
 
     @GetMapping("/")
     public String home(Model model) {
-
+        VideoBoxAdmin videoBoxAdmin;
         List<VideoBoxAdmin> firstByDate = videoBoxAdminRepository.findAll();
         List<VideoBoxAdmin> video = new ArrayList<>(firstByDate);
         int size = video.size();
-        VideoBoxAdmin videoBoxAdmin = video.get(size - 1);
+        if (video.size() >= 2) {
+            videoBoxAdmin = video.get(size - 1);
+        }  else {
+            videoBoxAdmin = new VideoBoxAdmin();
+            videoBoxAdmin.setLinkToVideo(LINK_BASE);
+            videoBoxAdmin.setIdVideoBox(1L);
+            videoBoxAdmin.setTitleText("First video");
+            videoBoxAdmin.setAddressAdmin("111");
+        }
+
 
         List<PublicationPostAdmin> publications = publicationPostAdminRepository.findAll();
         List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>(publications);

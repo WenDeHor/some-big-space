@@ -292,14 +292,12 @@ public class AdminBlogControllers {
 
         String adminAddress = findUserAddress(authentication);
         Date date = new Date();
-        Letter adminLetter = Letter.builder()
-                .date(date)
-                .titleText(titleText)
-                .fullText(convertTextWithFormatToSave(fullText))
-                .senderAddress(adminAddress)
-                .recipientAddress(recipientAddress)
-                .build();
-
+        Letter adminLetter=new Letter();
+        adminLetter.setDate(date);
+        adminLetter.setTitleText(titleText);
+        adminLetter.setFullText(convertTextWithFormatToSave(fullText));
+        adminLetter.setSenderAddress(adminAddress);
+        adminLetter.setRecipientAddress(recipientAddress);
         letterRepository.save(adminLetter);
         return "redirect:/admin-mine/read-letters";
     }
@@ -344,14 +342,12 @@ public class AdminBlogControllers {
 
         String adminAddress = findUserAddress(authentication);
         Date date = new Date();
-        Letter adminLetter = Letter.builder()
-                .date(date)
-                .titleText(titleText)
-                .fullText(convertTextWithFormatToSave(fullText))
-                .senderAddress(adminAddress)
-                .recipientAddress(recipientAddress)
-                .build();
-
+        Letter adminLetter=new Letter();
+        adminLetter.setDate(date);
+        adminLetter.setTitleText(titleText);
+        adminLetter.setFullText(convertTextWithFormatToSave(fullText));
+        adminLetter.setSenderAddress(adminAddress);
+        adminLetter.setRecipientAddress(recipientAddress);
         letterRepository.save(adminLetter);
         return "redirect:/admin-mine/read-letters";
     }

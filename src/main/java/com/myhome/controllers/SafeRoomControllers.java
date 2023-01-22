@@ -94,7 +94,7 @@ public class SafeRoomControllers {
         return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
-    @GetMapping("/safe/edit-diary/{id}/remove")
+    @DeleteMapping("/safe/edit-diary/{id}/remove")
     public String diaryRemove(@PathVariable(value = "id") Long id, Model model) {
         Diary diary = diaryRepository.findById(id).orElseThrow(null);
         diaryRepository.delete(diary);
@@ -131,7 +131,7 @@ public class SafeRoomControllers {
         return "safe-edit-diary-one-element";
     }
 
-        private List<Diary> convertTextWithFormatEditDiary(List<Diary> publicationPostAdminList) {
+    private List<Diary> convertTextWithFormatEditDiary(List<Diary> publicationPostAdminList) {
         List<Diary> list = new ArrayList<>();
         for (Diary publicationPostAdmin : publicationPostAdminList) {
             String fullText = publicationPostAdmin.getFullText();

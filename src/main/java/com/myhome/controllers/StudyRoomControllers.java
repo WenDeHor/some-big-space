@@ -65,14 +65,13 @@ public class StudyRoomControllers {
         String localdate = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
 
         Date date = new Date();
-        Letter userSendLetter = Letter.builder()
-                .date(date)
-                .titleText(titleText)
-                .fullText(convertTextWithFormatToSave(fullText))
-                .senderAddress(senderAddress)
-                .recipientAddress(recipientAddress)
-                .build();
-        System.out.println(userSendLetter.toString());
+
+        Letter userSendLetter = new Letter();
+        userSendLetter.setDate(date);
+        userSendLetter.setTitleText(titleText);
+        userSendLetter.setFullText(convertTextWithFormatToSave(fullText));
+        userSendLetter.setSenderAddress(senderAddress);
+        userSendLetter.setRecipientAddress(recipientAddress);
         letterRepository.save(userSendLetter);
         return "redirect:/user-page";
     }
@@ -188,14 +187,12 @@ public class StudyRoomControllers {
         String localDate = localDateNow.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
 
         Date date = new Date();
-        PublicationUser publicationUser = PublicationUser.builder()
-                .address(address)
-                .email(userEmail)
-                .date(date)
-                .titleText(titleText)
-                .fullText(convertTextWithFormatToSave(fullText))
-                .build();
-        System.out.println(publicationUser.toString());
+        PublicationUser publicationUser = new PublicationUser();
+        publicationUser.setAddress(address);
+        publicationUser.setEmail(userEmail);
+        publicationUser.setDate(date);
+        publicationUser.setTitleText(titleText);
+        publicationUser.setTitleText(convertTextWithFormatToSave(fullText));
         publicationRepository.save(publicationUser);
         return "redirect:/study/read-publications";
     }
