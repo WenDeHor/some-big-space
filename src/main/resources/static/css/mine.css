@@ -1,66 +1,66 @@
-* {
-    padding: 0;
-    margin: 0;
-    border: 0;
-}
+/** {*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*    border: 0;*/
+/*}*/
 
-*, *:before, *:after {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
+/**, *:before, *:after {*/
+/*    -moz-box-sizing: border-box;*/
+/*    -webkit-box-sizing: border-box;*/
+/*    box-sizing: border-box;*/
+/*}*/
 
-:focus, :active {
-    outline: none;
-}
+/*:focus, :active {*/
+/*    outline: none;*/
+/*}*/
 
-a:focus, a:active {
-    outline: none;
-}
+/*a:focus, a:active {*/
+/*    outline: none;*/
+/*}*/
 
-nav, footer, header, aside {
-    display: block;
-}
+/*nav, footer, header, aside {*/
+/*    display: block;*/
+/*}*/
 
-html, body {
-    height: 100%;
-    width: 100%;
-    font-size: 100%;
-    line-height: 1;
-    font-size: 14px;
-    -ms-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
-}
+/*html, body {*/
+/*    height: 100%;*/
+/*    width: 100%;*/
+/*    font-size: 100%;*/
+/*    line-height: 1;*/
+/*    font-size: 14px;*/
+/*    -ms-text-size-adjust: 100%;*/
+/*    -moz-text-size-adjust: 100%;*/
+/*    -webkit-text-size-adjust: 100%;*/
+/*}*/
 
-input::-ms-clear {
-    display: none;
-}
+/*input::-ms-clear {*/
+/*    display: none;*/
+/*}*/
 
-button {
-    cursor: pointer;
-}
+/*button {*/
+/*    cursor: pointer;*/
+/*}*/
 
 /*button::-moz-focus-inner {*/
 /*    padding: 0;*/
 /*    border: 0;*/
 /*}*/
 
-a, a:visited {
-    text-decoration: none;
-}
+/*a, a:visited {*/
+/*    text-decoration: none;*/
+/*}*/
 
-a:hover {
-    text-decoration: none;
-}
+/*a:hover {*/
+/*    text-decoration: none;*/
+/*}*/
 
-ul li {
-    list-style: none;
-}
+/*ul li {*/
+/*    list-style: none;*/
+/*}*/
 
-img {
-    vertical-align: top;
-}
+/*img {*/
+/*    vertical-align: top;*/
+/*}*/
 
 /*input, button, textarea, a, p, h1, h2, h3, h4, h5, h6, div {*/
 /*    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;*/
@@ -133,13 +133,13 @@ img {
 }
 
 
-.btn-off {
-    color: #ffb400;
+/*.btn-off {*/
+/*    color: #ffb400;*/
 
-}
+/*}*/
 
-.img-my-home {
-    margin: 20px;
-}
+/*.img-my-home {*/
+/*    margin: 20px;*/
+/*}*/
 
 

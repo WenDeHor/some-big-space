@@ -1,8 +1,11 @@
 package com.myhome.controllers;
 
+import com.myhome.controllers.compresor.CompressorImgToJpg;
+import com.myhome.forms.ConvertFile;
 import com.myhome.models.*;
 import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
+import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Controller
 public class AdminBlogControllers {
@@ -23,15 +27,27 @@ public class AdminBlogControllers {
     private final PublicationRepository publicationRepository;
     private final PublicationPostAdminRepository publicationPostAdminRepository;
     private final VideoBoxAdminRepository videoBoxAdminRepository;
-    private final LetterRepository letterRepository;
+    private final LetterToUSERRepository letterToUSERRepository;
+    private final CompositionRepository compositionRepository;
+    private final ImageRepository imageRepository;
+    private final LetterToADMINRepository letterToADMINRepository;
+    private final MetricsService metricsService;
+    private final CompressorImgToJpg compressorImgToJpg;
+
+    private final String YOUTUBE = "https://www.youtube.com/embed/";
 
 
-    public AdminBlogControllers(UserRepository userRepository, PublicationRepository publicationRepository, PublicationPostAdminRepository publicationPostAdminRepository, VideoBoxAdminRepository videoBoxAdminRepository, LetterRepository letterRepository) {
+    public AdminBlogControllers(UserRepository userRepository, PublicationRepository publicationRepository, PublicationPostAdminRepository publicationPostAdminRepository, VideoBoxAdminRepository videoBoxAdminRepository, LetterToUSERRepository letterToUSERRepository, CompositionRepository compositionRepository, ImageRepository imageRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
         this.userRepository = userRepository;
         this.publicationRepository = publicationRepository;
         this.publicationPostAdminRepository = publicationPostAdminRepository;
         this.videoBoxAdminRepository = videoBoxAdminRepository;
-        this.letterRepository = letterRepository;
+        this.letterToUSERRepository = letterToUSERRepository;
+        this.compositionRepository = compositionRepository;
+        this.imageRepository = imageRepository;
+        this.letterToADMINRepository = letterToADMINRepository;
+        this.metricsService = metricsService;
+        this.compressorImgToJpg = compressorImgToJpg;
     }
 
     @GetMapping("/admin-mine/users")
@@ -44,6 +60,181 @@ public class AdminBlogControllers {
         return "admin-page";
     }
 
+//    @GetMapping("/admin-mine/users")
+//    public String adminMain() {
+//        return "redirect:/admin-mine/users-registry";
+//    }
+//
+//    @GetMapping("/admin-mine/users-registry")
+//    public String adminUsers(Model model) {
+//        List<User> sortedUsers = userRepository.findAll().stream()
+//                .sorted(Comparator.comparing(User::getDate).reversed())
+//                .collect(Collectors.toList());
+//        long countUsers = userRepository.count();
+//        model.addAttribute("countUsers", countUsers);
+//        model.addAttribute("allUsers", sortedUsers);
+//        model.addAttribute("title", "Admin Page");
+//        return "admin-page";
+//    }
+//
+//    @GetMapping("/admin-mine/users/{id}/block")
+//    public String userLock(@PathVariable(value = "id") Long id) {
+//        Optional<User> oneByIdUser = userRepository.findOneByIdUser(id);
+//        if (oneByIdUser.isPresent() && oneByIdUser.get().getRole().equals(Role.USER)) {
+//            User user = oneByIdUser.get();
+//            user.setState(State.BANNED);
+//            userRepository.save(user);
+//        }
+//        return "redirect:/admin-mine/users-registry";
+//    }
+//
+//    @GetMapping("/admin-mine/users/{id}/unlock")
+//    public String userUnLock(@PathVariable(value = "id") Long id) {
+//        Optional<User> oneByIdUser = userRepository.findOneByIdUser(id);
+//        if (oneByIdUser.isPresent() && oneByIdUser.get().getRole().equals(Role.USER)) {
+//            User user = oneByIdUser.get();
+//            user.setState(State.ACTIVE);
+//            userRepository.save(user);
+//        }
+//        return "redirect:/admin-mine/users-registry";
+//    }
+
+
+    //TODO competitive
+    @Transactional
+    @GetMapping("/admin-mine/users-competitive")
+    public String adminUsersCompetitive(Model model) {
+        List<Composition> compositionList = compositionRepository
+                .findAllByPublicationType(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN).stream()
+                .sorted(Comparator.comparing(Composition::getLocalDate).reversed())
+                .collect(Collectors.toList());
+        long countComposition = compositionList.size();
+        model.addAttribute("countComposition", countComposition);
+        model.addAttribute("compositionList", compositionList);
+        model.addAttribute("title", "Competitive Composition");
+        return "admin-competitive";
+    }
+
+    @Transactional
+    @GetMapping("/admin-mine/users-competitive/{id}/competitive")
+    public String userCompetitiveOK(@PathVariable(value = "id") Long id) {
+        Optional<Composition> oneById = compositionRepository.findOneById(id);
+        if (oneById.isPresent()) {
+            Composition composition = oneById.get();
+            composition.setPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE);
+            compositionRepository.save(composition);
+        }
+        return "redirect:/admin-mine/users-competitive";
+    }
+
+    @Transactional
+    @GetMapping("/admin-mine/users-competitive/{id}/delete")
+    public String userCompetitiveDelete(@PathVariable(value = "id") Long id) {
+        Optional<Composition> oneById = compositionRepository.findOneById(id);
+        if (oneById.isPresent()) {
+            Composition composition = oneById.get();
+            composition.setPublicationType(PublicationType.PUBLIC_TO_DELETE);
+            compositionRepository.save(composition);
+        }
+        return "redirect:/admin-mine/users-competitive";
+    }
+
+    @Transactional
+    @GetMapping("/admin-mine/users-competitive/{id}/read")
+    public String competitiveReadOne(@PathVariable(value = "id") Long id,
+                                     Model model) {
+        Optional<Composition> compositionOne = compositionRepository.findOneById(id);
+        if (!compositionOne.isPresent()) {
+            return "redirect:/admin-mine/users-competitive";
+        }
+        model.addAttribute("compositionOne", compositionOne.get());
+        return "admin-read-one-composition";
+    }
+
+
+    //TODO USER Composition
+    @Transactional
+    @GetMapping("/admin-mine/users-composition")
+    public String adminUsersComposition(Model model) {
+        List<Composition> compositionList = compositionRepository.findAll();
+        long countComposition = compositionList.size();
+        model.addAttribute("countComposition", countComposition);
+        model.addAttribute("compositionList", compositionList);
+        model.addAttribute("title", "All Composition");
+        return "admin-read-all-user-composition";
+    }
+
+    @Transactional
+    @GetMapping("/admin-mine/users-publication/{id}/read")
+    public String publicationReadOne(@PathVariable(value = "id") Long id,
+                                     Model model) {
+        Optional<Composition> compositionOne = compositionRepository.findOneById(id);
+        if (!compositionOne.isPresent()) {
+            return "redirect:/admin-mine/users-competitive";
+        }
+        model.addAttribute("compositionOne", compositionOne.get());
+        return "admin-read-one-composition";
+    }
+
+    @Transactional
+    @PostMapping("/admin-mine/admin-publications")
+    public String saveAdminPublications(Authentication authentication,
+                                        MultipartFile file,
+                                        @RequestParam("titleText") String titleText,
+                                        @RequestParam("fullText") String fullText) throws IOException {
+        String userEmail = getUserEmail(authentication);
+        int count = compositionRepository.findAllByEmail(userEmail).size();
+        ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
+        Date date = new Date();
+        PublicationPostAdmin publicationPostAdmin = new PublicationPostAdmin();
+        publicationPostAdmin.setDate(date);
+        publicationPostAdmin.setTitleText(titleText);
+        publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
+        publicationPostAdmin.setAddress(userEmail);
+        publicationPostAdmin.setName(file.getOriginalFilename());
+        publicationPostAdmin.setType(file.getContentType());
+//        publicationPostAdmin.setImage(file.getBytes());
+        publicationPostAdmin.setImage(convert.img);
+        publicationPostAdminRepository.save(publicationPostAdmin);
+        compressorImgToJpg.deleteImage(convert.nameStart);
+        compressorImgToJpg.deleteImage(convert.nameEnd);
+        return "redirect:/admin-mine/admin-publications";
+    }
+
+    private int countId(int count) {
+        return ++count;
+    }
+
+    @Transactional
+    @GetMapping("/admin-mine/admin-publications/{id}/edit")
+    public String adminPublicationEditOne(@PathVariable(value = "id") Long id,
+                                          Model model) {
+        if (!publicationPostAdminRepository.existsById(id)) {
+            return "redirect:/admin-mine/admin-publications";
+        }
+        Optional<PublicationPostAdmin> byIdPublication = publicationPostAdminRepository.findByIdPublication(id);
+        List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>();
+        byIdPublication.ifPresent(publicationPostAdminList::add);
+        publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
+        model.addAttribute("publicationPostAdminList", convertTextWithFormatEdit(publicationPostAdminList));
+
+        return "admin-page-admin-edit-publication";
+    }
+
+    //TODO img
+    @GetMapping("/image/display/admin/{id}")
+    @ResponseBody
+    void showImageComposition(@PathVariable("id") Long id,
+                              HttpServletResponse response,
+                              Optional<Composition> composition) throws IOException {
+        Optional<PublicationPostAdmin> composition2 = publicationPostAdminRepository.findById(id);
+        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+        response.getOutputStream().write(composition2.get().getImage());
+        response.getOutputStream().close();
+    }
+
+
+    //TODO UserPublications
     @GetMapping("/admin-mine/users-publications")
     public String adminUserPublications(Model model) {
         List<PublicationUser> allPublications = publicationRepository.findAll();
@@ -66,6 +257,8 @@ public class AdminBlogControllers {
         return "admin-mine-read-user-publication";
     }
 
+
+    //TODO adminPublications
     @Transactional
     @GetMapping("/admin-mine/admin-publications")
     public String adminPublications(Model model) {
@@ -77,28 +270,6 @@ public class AdminBlogControllers {
         model.addAttribute("publicationPostAdminRepositoryAll", publicationPostAdminRepositoryAll);
         model.addAttribute("title", "Admin Page");
         return "admin-page-admin-publication";
-    }
-
-    @Transactional
-    @PostMapping("/admin-mine/admin-publications")
-    public String saveAdminPublications(Authentication authentication,
-                                        Model model,
-                                        MultipartFile file,
-                                        @RequestParam("titleText") String titleText,
-                                        @RequestParam("fullText") String fullText) throws IOException {
-        String address = findUserAddress(authentication);
-        Date date = new Date();
-        PublicationPostAdmin publicationPostAdmin = new PublicationPostAdmin();
-        publicationPostAdmin.setDate(date);
-        publicationPostAdmin.setTitleText(titleText);
-        publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
-        publicationPostAdmin.setAddress(address);
-        publicationPostAdmin.setName(file.getOriginalFilename());
-        publicationPostAdmin.setType(file.getContentType());
-        publicationPostAdmin.setImage(file.getBytes());
-
-        publicationPostAdminRepository.save(publicationPostAdmin);
-        return "redirect:/admin-mine/admin-publications";
     }
 
     //TODO SAVE
@@ -126,21 +297,6 @@ public class AdminBlogControllers {
         PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findByIdPublication(id).orElseThrow(null);
         publicationPostAdminRepository.delete(publicationPostAdmin);
         return "redirect:/admin-mine/admin-publications";
-    }
-
-    @Transactional
-    @GetMapping("/admin-mine/admin-publications/{id}/edit")
-    public String adminPublicationEdit(@PathVariable(value = "id") Long id, Model model) {
-        if (!publicationPostAdminRepository.existsById(id)) {
-            return "redirect:/admin-mine/admin-publications";
-        }
-        Optional<PublicationPostAdmin> byIdPublication = publicationPostAdminRepository.findByIdPublication(id);
-        List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>();
-        byIdPublication.ifPresent(publicationPostAdminList::add);
-        publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
-        model.addAttribute("publicationPostAdminList", convertTextWithFormatEdit(publicationPostAdminList));
-
-        return "admin-page-admin-edit-publication";
     }
 
     //TODO READ EDIT
@@ -183,8 +339,40 @@ public class AdminBlogControllers {
         return "redirect:/admin-mine/admin-publications";
     }
 
+    //    @Transactional
+//    @PostMapping("/admin-mine/admin-publications/{id}/edit")
+//    public String adminPublicationUpdate(@PathVariable(value = "id") Long id,
+//                                         MultipartFile file,
+//                                         Authentication authentication,
+//                                         @RequestParam String titleText,
+//                                         @RequestParam String fullText) throws IOException {
+//        PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findByIdPublication(id).orElseThrow(null);
+//        publicationPostAdmin.setTitleText(titleText);
+//        publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
+//        Date date = new Date();
+//        publicationPostAdmin.setDate(date);
+//        publicationPostAdmin.setName(file.getOriginalFilename());
+//        publicationPostAdmin.setType(file.getContentType());
+//
+//        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
+//            Optional<PublicationPostAdmin> byId = publicationPostAdminRepository.findById(id);
+//            byId.ifPresent(postAdmin -> publicationPostAdmin.setImage(postAdmin.getImage()));
+//        } else {
+//            String userEmail = getUserEmail(authentication);
+//            int count = compositionRepository.findAllByEmail(userEmail).size();
+//            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
+//            publicationPostAdmin.setImage(convert.img);
+////            publicationPostAdmin.setImage(file.getBytes());
+//            compressorImgToJpg.deleteImage(convert.nameStart);
+//            compressorImgToJpg.deleteImage(convert.nameEnd);
+//        }
+//        publicationPostAdminRepository.save(publicationPostAdmin);
+//
+//        return "redirect:/admin-mine/admin-publications";
+//    }
+
     @GetMapping("/admin-mine/admin-video")
-    public String adminNewVideo(Authentication authentication, Model model) {
+    public String adminNewsGetVideo(Authentication authentication, Model model) {
         String userAddress = findUserAddress(authentication);
         Iterable<VideoBoxAdmin> allByAddressAdmin = videoBoxAdminRepository.findAllByAddressAdmin(userAddress);
         List<VideoBoxAdmin> videoBoxAdminList = new ArrayList<>();
@@ -203,8 +391,7 @@ public class AdminBlogControllers {
                                     @RequestParam("titleText") String titleText) throws IOException {
 
         String userAddress = findUserAddress(authentication);
-        String url = "https://www.youtube.com/embed/" + linkToVideo + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-//        https://www.youtube.com/embed/ZV9qvauLlmo&t?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
+        String url = createURL(parseNormalURL(linkToVideo));
         VideoBoxAdmin videoBox = new VideoBoxAdmin();
         videoBox.setAddressAdmin(userAddress);
         videoBox.setLinkToVideo(url);
@@ -213,6 +400,26 @@ public class AdminBlogControllers {
         videoBox.setDate(date);
         videoBoxAdminRepository.save(videoBox);
         return "redirect:/admin-mine/admin-video";
+    }
+
+    private String createURL(String nameURL) {
+        return YOUTUBE + nameURL + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
+    }
+
+    private String parseUpdateURL(String url) {
+        String[] cutLink = url.split(YOUTUBE);
+        String[] cutName = cutLink[1].split("\\?");
+        return cutName[0];
+    }
+
+    private String parseNormalURL(String url) {
+        String[] split = url.split("=");
+        StringBuilder sb = new StringBuilder();
+        char[] chars = split[1].trim().toCharArray();
+        for (int i = 0; i < 11; i++) {
+            sb.append(chars[i]);
+        }
+        return sb.toString();
     }
 
     @GetMapping("/admin-mine/admin-video/{idVideoBox}/remove")
@@ -256,22 +463,53 @@ public class AdminBlogControllers {
         return "redirect:/admin-mine/admin-video";
     }
 
+//    @Transactional
+//    @PostMapping("/admin-mine/admin-video/{id}/edit")
+//    public String adminVideoUpdate(@PathVariable(value = "id") Long id,
+//                                   @RequestParam String titleText,
+//                                   @RequestParam String linkToVideo) {
+//        VideoBoxAdmin videoBoxAdmin = videoBoxAdminRepository.findByIdVideoBox(id).orElseThrow(null);
+//        videoBoxAdmin.setTitleText(titleText);
+//        String url;
+//        if (linkToVideo.split("=").length > 3) {
+//            url = createURL(parseUpdateURL(linkToVideo));
+//        } else {
+//            url = createURL(parseNormalURL(linkToVideo));
+//        }
+//
+//        videoBoxAdmin.setLinkToVideo(url);
+//        videoBoxAdminRepository.save(videoBoxAdmin);
+//        return "redirect:/admin-mine/admin-video";
+//    }
+
     //TODO LETTER
     @GetMapping("/admin-mine/read-letters")
     public String adminReadLettersOfUser(Authentication authentication, Model model) {
         String adminAddress = findUserAddress(authentication);
 
-        Iterable<Letter> allByRecipientAddress = letterRepository.findAllByRecipientAddress(adminAddress);
-        Iterable<Letter> allBySenderAddress = letterRepository.findAllBySenderAddress(adminAddress);
-        ArrayList<Letter> adminLetters = new ArrayList<>();
-        allByRecipientAddress.forEach(adminLetters::add);
-        allBySenderAddress.forEach(adminLetters::add);
-        adminLetters.sort(Comparator.comparing(Letter::getDate).reversed());
+        Iterable<LetterToUSER> allByRecipientAddress = letterToUSERRepository.findAllByRecipientAddress(adminAddress);
+        Iterable<LetterToUSER> allBySenderAddress = letterToUSERRepository.findAllBySenderAddress(adminAddress);
+        ArrayList<LetterToUSER> adminLetterToUSERS = new ArrayList<>();
+        allByRecipientAddress.forEach(adminLetterToUSERS::add);
+        allBySenderAddress.forEach(adminLetterToUSERS::add);
+        adminLetterToUSERS.sort(Comparator.comparing(LetterToUSER::getDate).reversed());
 
-        model.addAttribute("adminLetters", adminLetters);
+        model.addAttribute("adminLetters", adminLetterToUSERS);
         model.addAttribute("title", "Admin Page");
         return "admin-page-read-user-letters";
     }
+
+//    @GetMapping("/admin-mine/read-users-letters")
+//    public String adminReadUsersLetters(Model model) {
+//        List<LetterToADMIN> sortedLetterToADMINS = letterToADMINRepository.findAll().stream()
+//                .sorted(Comparator.comparing(LetterToADMIN::getLocalDate).reversed())
+//                .collect(Collectors.toList());
+//        long countLetters = letterToADMINRepository.count();
+//        model.addAttribute("countLetters", countLetters);
+//        model.addAttribute("sortedLetters", sortedLetterToADMINS);
+//        model.addAttribute("title", "Read Letters");
+//        return "admin-read-users-letters";
+//    }
 
     @GetMapping("/admin-mine/write-letters/send")
     public String adminWriteLetter(Authentication authentication, Model model) {
@@ -283,7 +521,7 @@ public class AdminBlogControllers {
     }
 
     @PostMapping("/admin-mine/write-letters/send")
-    public String adminLetterSend(Letter letter,
+    public String adminLetterSend(LetterToUSER letterToUSER,
                                   @RequestParam String titleText,
                                   @RequestParam String fullText,
                                   @RequestParam String senderAddress,
@@ -292,23 +530,23 @@ public class AdminBlogControllers {
 
         String adminAddress = findUserAddress(authentication);
         Date date = new Date();
-        Letter adminLetter=new Letter();
-        adminLetter.setDate(date);
-        adminLetter.setTitleText(titleText);
-        adminLetter.setFullText(convertTextWithFormatToSave(fullText));
-        adminLetter.setSenderAddress(adminAddress);
-        adminLetter.setRecipientAddress(recipientAddress);
-        letterRepository.save(adminLetter);
+        LetterToUSER adminLetterToUSER = new LetterToUSER();
+        adminLetterToUSER.setDate(date);
+        adminLetterToUSER.setTitleText(titleText);
+        adminLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+        adminLetterToUSER.setSenderAddress(adminAddress);
+        adminLetterToUSER.setRecipientAddress(recipientAddress);
+        letterToUSERRepository.save(adminLetterToUSER);
         return "redirect:/admin-mine/read-letters";
     }
 
     @GetMapping("/admin-mine/read-letters/{id}/read")
     public String adminReadLetter(@PathVariable(value = "id") Long id, Model model) {
-        if (!letterRepository.existsById(id)) {
+        if (!letterToUSERRepository.existsById(id)) {
             return "redirect:/admin-mine/read-letters";
         }
-        Optional<Letter> letter = letterRepository.findById(id);
-        List<Letter> res = new ArrayList<>();
+        Optional<LetterToUSER> letter = letterToUSERRepository.findById(id);
+        List<LetterToUSER> res = new ArrayList<>();
         letter.ifPresent(res::add);
         model.addAttribute("letter", res);
         return "admin-page-read-user-letters-fulltext";
@@ -320,10 +558,10 @@ public class AdminBlogControllers {
                                          @PathVariable(value = "id") Long id,
                                          Model model) {
         String adminAddress = findUserAddress(authentication);
-        if (!letterRepository.existsById(id)) {
+        if (!letterToUSERRepository.existsById(id)) {
             return "redirect:/admin-mine/read-letters";
         }
-        Optional<Letter> byId = letterRepository.findById(id);
+        Optional<LetterToUSER> byId = letterToUSERRepository.findById(id);
         String senderAddress = byId.get().getSenderAddress();
 
         model.addAttribute("senderAddress", senderAddress);
@@ -333,7 +571,7 @@ public class AdminBlogControllers {
     }
 
     @PostMapping("/admin-mine/write-letters/answer")
-    public String adminAnswerLetterSend(Letter letter,
+    public String adminAnswerLetterSend(LetterToUSER letterToUSER,
                                         @RequestParam String titleText,
                                         @RequestParam String fullText,
                                         @RequestParam String senderAddress,
@@ -342,14 +580,43 @@ public class AdminBlogControllers {
 
         String adminAddress = findUserAddress(authentication);
         Date date = new Date();
-        Letter adminLetter=new Letter();
-        adminLetter.setDate(date);
-        adminLetter.setTitleText(titleText);
-        adminLetter.setFullText(convertTextWithFormatToSave(fullText));
-        adminLetter.setSenderAddress(adminAddress);
-        adminLetter.setRecipientAddress(recipientAddress);
-        letterRepository.save(adminLetter);
+        LetterToUSER adminLetterToUSER = new LetterToUSER();
+        adminLetterToUSER.setDate(date);
+        adminLetterToUSER.setTitleText(titleText);
+        adminLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+        adminLetterToUSER.setSenderAddress(adminAddress);
+        adminLetterToUSER.setRecipientAddress(recipientAddress);
+        letterToUSERRepository.save(adminLetterToUSER);
         return "redirect:/admin-mine/read-letters";
+    }
+
+    @GetMapping("/admin-mine/read-users-letters/{idLetter}/delete")
+    public String adminDeleteLetter(@PathVariable(value = "idLetter") Long idLetter) {
+        Optional<LetterToADMIN> byId = letterToADMINRepository.findById(idLetter);
+        byId.ifPresent(letterToADMINRepository::delete);
+        return "redirect:/admin-mine/read-users-letters";
+    }
+
+    @Transactional
+    @GetMapping("/admin-mine/read-users-letters/{idLetter}/read")
+    public String adminReadOneLetter(@PathVariable(value = "idLetter") Long idLetter,
+                                     Model model) {
+        Optional<LetterToADMIN> letterOptional = letterToADMINRepository.findById(idLetter);
+        letterOptional.ifPresent(letterToADMIN -> model.addAttribute("letterReadOne", letterToADMIN));
+        model.addAttribute("title", "Read User Letter");
+        return "admin-read-one-letter";
+    }
+
+    //TODO METRICS
+    @GetMapping("/admin-mine/read-metrics")
+    public String getMetricsData(Model model) {
+        metricsService.filterDays();
+        List<MetricsDTO> allMetricsDTOs = metricsService.findAllMetricsDTOs().stream()
+                .sorted(Comparator.comparing(MetricsDTO::getDate).reversed())
+                .collect(Collectors.toList());
+        model.addAttribute("metrics", allMetricsDTOs);
+        model.addAttribute("title", "Metrics");
+        return "admin-page-metrics";
     }
 
     //TODO REGEX
@@ -364,6 +631,14 @@ public class AdminBlogControllers {
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getAddress();
+    }
+
+    private String getUserEmail(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+
+        return oneByEmail.map(User::getEmail).orElse(null);
     }
 
 }

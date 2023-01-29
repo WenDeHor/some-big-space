@@ -10,12 +10,12 @@ import java.util.Objects;
 //@NoArgsConstructor
 //@Builder
 @Entity
-@Table(name = "letter")
-public class Letter {
-    public Letter() {
+@Table(name = "letter_user")
+public class LetterToUSER {
+    public LetterToUSER() {
     }
 
-    public Letter(Date date, @Size(min = 0, max = 1000) String titleText, @Size(min = 0, max = 3000) String fullText, String senderAddress, String recipientAddress) {
+    public LetterToUSER(Date date, @Size(min = 0, max = 1000) String titleText, @Size(min = 0, max = 3000) String fullText, String senderAddress, String recipientAddress) {
         this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
@@ -101,13 +101,13 @@ public class Letter {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Letter letter = (Letter) o;
-        return Objects.equals(idLetter, letter.idLetter) &&
-                Objects.equals(date, letter.date) &&
-                Objects.equals(titleText, letter.titleText) &&
-                Objects.equals(fullText, letter.fullText) &&
-                Objects.equals(senderAddress, letter.senderAddress) &&
-                Objects.equals(recipientAddress, letter.recipientAddress);
+        LetterToUSER letterToUSER = (LetterToUSER) o;
+        return Objects.equals(idLetter, letterToUSER.idLetter) &&
+                Objects.equals(date, letterToUSER.date) &&
+                Objects.equals(titleText, letterToUSER.titleText) &&
+                Objects.equals(fullText, letterToUSER.fullText) &&
+                Objects.equals(senderAddress, letterToUSER.senderAddress) &&
+                Objects.equals(recipientAddress, letterToUSER.recipientAddress);
     }
 
     @Override

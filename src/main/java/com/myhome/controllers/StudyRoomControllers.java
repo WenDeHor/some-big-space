@@ -1,9 +1,9 @@
 package com.myhome.controllers;
 
-import com.myhome.models.Letter;
+import com.myhome.models.LetterToUSER;
 import com.myhome.models.PublicationUser;
 import com.myhome.models.User;
-import com.myhome.repository.LetterRepository;
+import com.myhome.repository.LetterToUSERRepository;
 import com.myhome.repository.PublicationRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
@@ -25,15 +25,14 @@ import java.util.regex.Pattern;
 public class StudyRoomControllers {
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
-    private final LetterRepository letterRepository;
+    private final LetterToUSERRepository letterToUSERRepository;
 
-    public StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterRepository letterRepository) {
+    public StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
-        this.letterRepository = letterRepository;
+        this.letterToUSERRepository = letterToUSERRepository;
     }
 
-    //TODO LETTER
     @GetMapping("/study/write-letter")
     public String studyWriteLetter(Authentication authentication, Model model) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
@@ -47,7 +46,7 @@ public class StudyRoomControllers {
     }
 
     @PostMapping("/study/write-letter/send")
-    public String LetterSend(Letter letter,
+    public String LetterSend(LetterToUSER letterToUSER,
                              @RequestParam String titleText,
                              @RequestParam String fullText,
                              @RequestParam String senderAddress,
@@ -66,13 +65,13 @@ public class StudyRoomControllers {
 
         Date date = new Date();
 
-        Letter userSendLetter = new Letter();
-        userSendLetter.setDate(date);
-        userSendLetter.setTitleText(titleText);
-        userSendLetter.setFullText(convertTextWithFormatToSave(fullText));
-        userSendLetter.setSenderAddress(senderAddress);
-        userSendLetter.setRecipientAddress(recipientAddress);
-        letterRepository.save(userSendLetter);
+        LetterToUSER userSendLetterToUSER = new LetterToUSER();
+        userSendLetterToUSER.setDate(date);
+        userSendLetterToUSER.setTitleText(titleText);
+        userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+        userSendLetterToUSER.setSenderAddress(senderAddress);
+        userSendLetterToUSER.setRecipientAddress(recipientAddress);
+        letterToUSERRepository.save(userSendLetterToUSER);
         return "redirect:/user-page";
     }
 
@@ -87,15 +86,15 @@ public class StudyRoomControllers {
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         String address = oneByEmail.get().getAddress();
-        Iterable<Letter> lettersRecipientUser = letterRepository.findAllByRecipientAddress(address);
-        Iterable<Letter> letterSendersUser = letterRepository.findAllBySenderAddress(address);
-        List<Letter> letters = new ArrayList<>();
-        lettersRecipientUser.forEach(letters::add);
-        letterSendersUser.forEach(letters::add);
+        Iterable<LetterToUSER> lettersRecipientUser = letterToUSERRepository.findAllByRecipientAddress(address);
+        Iterable<LetterToUSER> letterSendersUser = letterToUSERRepository.findAllBySenderAddress(address);
+        List<LetterToUSER> letterToUSERS = new ArrayList<>();
+        lettersRecipientUser.forEach(letterToUSERS::add);
+        letterSendersUser.forEach(letterToUSERS::add);
 
-        letters.sort(Comparator.comparing(Letter::getDate).reversed());
+        letterToUSERS.sort(Comparator.comparing(LetterToUSER::getDate).reversed());
 
-        model.addAttribute("letters", letters);
+        model.addAttribute("letters", letterToUSERS);
         model.addAttribute("title", "letters");
         return "study-read-letters";
     }

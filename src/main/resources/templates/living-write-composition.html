@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
+
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+
+<div class="container"><br>
+    <h5 class="text-center alert ">Написати історію</h5>
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/users/competitive/read-all-competitive-composition" class="btn btn-info btn-lg btn-block">Публікації</a>
+                    <br>
+                    <a href="/users/my-stories/read-all-my-composition" class="btn btn-info btn-lg btn-block">Мої історії</a>
+                    <br>
+                    <a href="/users/friend-composition/read-friends-composition" class="btn btn-info btn-lg btn-block">Історії моїх друзів</a>
+                    <br>
+                    <a href="/users/wright-story/wright-composition" class="btn btn-warning btn-lg btn-block">Написати історію</a>
+                    <br>
+                    <a href="/users/find-friends/find-friends" class="btn btn-info btn-lg btn-block">Знайти друзів</a>
+                    <br>
+                    <form action="/logout" method="post">
+                        <button class="btn btn-lg btn-secondary btn-block" type="submit">LOGOUT</button>
+                    </form>
+                </div>
+                <div class="col-md-8">
+                    <form action="/users/save-composition" method="post" enctype="multipart/form-data">
+                        <table>
+                            <div class="custom-file mb-4">
+                                <input type="file" name="file" class="custom-file-input"
+                                       id="customFile"> <label class="custom-file-label"
+                                                               for="customFile">Завантажити картинку до 2MB</label>
+                            </div>
+                            <br>
+                            <label for="titleText"> Заголовок </label>
+                            <textarea id="titleText" name="titleText" class="form-control" rows="2" cols="20"
+                                      placeholder="Заголовок історії. Розмір до 150 символів" required></textarea>
+                            <br>
+                            <p>
+                                <label for="genre">Жанр літератури</label>
+                                <select class="form-control" id="genre" name="genre">
+                                    <option>FANTASY</option>
+                                    <option>NOVEL</option>
+                                    <option>TALE</option>
+                                    <option>STORIES</option>
+                                </select>
+                            </p>
+                            <br>
+                            <label for="shortText"> Короткий зміст </label>
+                            <textarea id="shortText" name="shortText" class="form-control" rows="10" cols="20"
+                                      placeholder="Коротко опишіть зміст історії. Розмір до 1_000 символів " required></textarea>
+                            <br>
+                            <label for="fullText"> Сама історія </label>
+                            <textarea id="fullText" name="fullText" class="form-control" rows="20" cols="20"
+                                      placeholder="Місце для Вашої історії. Розмір до 20_000 символів " required></textarea>
+                            <br>
+                        </table>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
+                    </form>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

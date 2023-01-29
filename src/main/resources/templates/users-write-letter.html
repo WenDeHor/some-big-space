@@ -45,65 +45,36 @@ AADgBwAA+B8AAA==" rel="icon" type="image/x-icon"/>
             crossorigin="anonymous"></script>
     <!--    <script type="text/javascript" src="blocks/js/script.js"></script>-->
 </head>
-
-<!--<div th:insert="blocks/library::library"></div>-->
 <body>
 <div th:insert="blocks/heder-mine::header-mine"></div>
-
-<div class="container">
-    <form class="form-sign" method="post" action="/registration">
-
-        <!-- error message -->
-        <div th:if="${param.error}">
-            <div class="alert alert-danger">Дана пошта уже зареєстрована.
-                Використайте будь ласка іньшу поштову адресу для реєстрації.
-            </div>
-        </div>
-        <!-- logout message -->
-        <div th:if="${param.logout}">
-            <div class="alert alert-info">До зустрічі в майбутньому на просторах сервісу</div>
-        </div>
-
-        <h2 class="form-signin-heading text-center" style="margin-top: 50px">Реєстрація</h2>
-
-        <p>
-            <label for="login">My full name</label>
-            <input type="text" id="login" name="login" class="form-control"
-                   placeholder="Enter your full name. How would you like to be addressed?" required>
-        </p>
-        <p>
-<!--            <label for="settlement">Settlement</label>-->
-<!--            <input type="text" id="settlement" name="settlement" class="form-control"-->
-<!--                   placeholder="Describe in one word your locality. This is a virtual world, the address is also virtual"-->
-<!--                   required>-->
-            <label for="settlement">Settlement</label>
-            <select class="form-control" id="settlement" name="settlement">
-                <option>New_Apple</option>
-                <option>Oxilion</option>
-                <option>Old_Horogat</option>
-                <option>Monterey</option>
-            </select>
-        </p>
-        <p>
-            <label for="email">Post name</label>
-            <input type="text" id="email" name="email" class="form-control"
-                   placeholder="The original key. The key is the original name. It is your personal. It can be a number or a word."
-                   required>
-        </p>
-        <p>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control"
-                   placeholder="Come up with a password to log in to the service" required>
-        </p>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">I"M GOING HOME</button>
-    </form>
+<div class="container ">
+    <div class="col-md-12">
+        <br>
+        <form action="/users/send-letter" method="post">
+            <table>
+                <h3 class="text-center">Лист до компанії STORY FLOW</h3>
+                <br>
+                <label for="userPost">Пошта </label>
+                <textarea id="userPost" name="userPost" class="form-control" rows="2" cols="20"
+                          placeholder="Вкажіть електронну пошту по якій компанія зможе з Вами зв'язатися. Розмір до 100 символів"></textarea>
+                <br>
+                <label for="titleText">Тема листа </label>
+                <textarea id="titleText" name="titleText" class="form-control" rows="10" cols="20"
+                          placeholder="Коротко опишіть зміст листа. Розмір до 100 символів "></textarea>
+                <br>
+                <label for="fullText">Текст листа </label>
+                <textarea id="fullText" name="fullText" class="form-control" rows="20" cols="20"
+                          placeholder="Місце для тексту Вашого листа. Розмір до 20_000 символів "></textarea>
+                <br>
+            </table>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Надіслати</button>
+        </form>
+        <br>
+        <br>
+    </div>
 </div>
-
-<footer th:insert="blocks/footer-first::footer-first"></footer>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
 </body>
-
 </html>
-
-
-

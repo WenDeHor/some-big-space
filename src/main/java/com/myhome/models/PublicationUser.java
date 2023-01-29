@@ -5,10 +5,6 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "publication_user")
 public class PublicationUser {
@@ -28,9 +24,6 @@ public class PublicationUser {
     @Column(name = "id_publication")
     private Long idPublication;
 
-    //idUser+date+id_publication
-//    @Column(name = "local_date")
-//    private LocalDate localDate;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
     private Date date;

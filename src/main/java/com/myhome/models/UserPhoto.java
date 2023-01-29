@@ -5,11 +5,7 @@ import javax.validation.constraints.Size;
 import java.util.Arrays;
 import java.util.Objects;
 
-//@Data
-////@RequiredArgsConstructor
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
+
 @Entity
 @Table(name = "user_photo")
 public class UserPhoto {

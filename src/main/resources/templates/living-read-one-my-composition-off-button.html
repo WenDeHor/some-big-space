@@ -43,67 +43,46 @@ AADgBwAA+B8AAA==" rel="icon" type="image/x-icon"/>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
             integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
             crossorigin="anonymous"></script>
-    <!--    <script type="text/javascript" src="blocks/js/script.js"></script>-->
+<!--    <script type="text/javascript" src="blocks/js/script.js"></script>-->
 </head>
 
-<!--<div th:insert="blocks/library::library"></div>-->
-<body>
-<div th:insert="blocks/heder-mine::header-mine"></div>
-
-<div class="container">
-    <form class="form-sign" method="post" action="/registration">
-
-        <!-- error message -->
-        <div th:if="${param.error}">
-            <div class="alert alert-danger">Дана пошта уже зареєстрована.
-                Використайте будь ласка іньшу поштову адресу для реєстрації.
+<div class="container"><br>
+    <h5 class="text-center alert">Одна із моїх історій</h5>
+    <div class="row">
+        <div class="album col-md-12 bg-light" style="background-color: bisque">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/users/competitive/read-all-competitive-composition" class="btn btn-info btn-lg btn-block">Публікації</a>
+                    <br>
+                    <a href="/users/my-stories/read-all-my-composition" class="btn btn-warning btn-lg btn-block">Мої
+                        історії</a>
+                    <br>
+                    <a href="/users/friend-composition/read-friends-composition" class="btn btn-info btn-lg btn-block">Історії
+                        моїх друзів</a>
+                    <br>
+                    <a href="/users/wright-story/wright-composition" class="btn btn-info btn-lg btn-block">Написати
+                        історію</a>
+                    <br>
+                    <a href="/users/find-friends/find-friends" class="btn btn-info btn-lg btn-block">Знайти друзів</a>
+                    <br>
+                    <form action="/logout" method="post">
+                        <button class="btn btn-lg btn-secondary btn-block" type="submit">LOGOUT</button>
+                    </form>
+                </div>
+                <div class="col-md-8">
+                    <div th:each="composition, el:${compositionOne}" class="alert mt-2">
+                        <img th:src="@{${'/image/display/composition/'+ composition.id}}" style="width:100%"/>
+                        <br>
+                        <h5><p th:utext="${composition.titleText}"></p></h5>
+                        <h5><p th:utext="${composition.fullText}"></p></h5>
+                        <a th:href="'/users/edit-composition/'+${composition.id}+'/edit'"
+                           class="btn btn-warning">РЕДАГУВАТИ</a>
+                        <a th:href="'/users/edit-composition/'+${composition.id}+'/remove'"
+                           class="btn btn-warning">ВИДАЛИТИ</a>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- logout message -->
-        <div th:if="${param.logout}">
-            <div class="alert alert-info">До зустрічі в майбутньому на просторах сервісу</div>
-        </div>
-
-        <h2 class="form-signin-heading text-center" style="margin-top: 50px">Реєстрація</h2>
-
-        <p>
-            <label for="login">My full name</label>
-            <input type="text" id="login" name="login" class="form-control"
-                   placeholder="Enter your full name. How would you like to be addressed?" required>
-        </p>
-        <p>
-<!--            <label for="settlement">Settlement</label>-->
-<!--            <input type="text" id="settlement" name="settlement" class="form-control"-->
-<!--                   placeholder="Describe in one word your locality. This is a virtual world, the address is also virtual"-->
-<!--                   required>-->
-            <label for="settlement">Settlement</label>
-            <select class="form-control" id="settlement" name="settlement">
-                <option>New_Apple</option>
-                <option>Oxilion</option>
-                <option>Old_Horogat</option>
-                <option>Monterey</option>
-            </select>
-        </p>
-        <p>
-            <label for="email">Post name</label>
-            <input type="text" id="email" name="email" class="form-control"
-                   placeholder="The original key. The key is the original name. It is your personal. It can be a number or a word."
-                   required>
-        </p>
-        <p>
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control"
-                   placeholder="Come up with a password to log in to the service" required>
-        </p>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit">I"M GOING HOME</button>
-    </form>
+    </div>
 </div>
-
-<footer th:insert="blocks/footer-first::footer-first"></footer>
-</body>
-
 </html>
-
-
-

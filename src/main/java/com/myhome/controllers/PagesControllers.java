@@ -1,12 +1,10 @@
 package com.myhome.controllers;
 
 
-import com.myhome.models.PublicationPostAdmin;
-import com.myhome.models.User;
-import com.myhome.models.UserPhoto;
-import com.myhome.models.VideoBoxAdmin;
+import com.myhome.models.*;
 import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
+import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,60 +13,106 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Controller
 public class PagesControllers {
     //    Don't let the sun go down until you keep your promises
     // Картінки підгружати на різні кімнати
     private final PublicationRepository publicationRepository;
+    private final CompositionRepository compositionRepository;
     private final UserRepository userRepository;
     private final MyFriendsRepository myFriendsRepository;
     private final VideoBoxAdminRepository videoBoxAdminRepository;
     private final UserPhotoRepository userPhotoRepository;
     private final PublicationPostAdminRepository publicationPostAdminRepository;
     private final String LINK_BASE="https://www.youtube.com/embed/GYrwebcKoxE?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
+    private final LetterToADMINRepository letterToADMINRepository;
+    private final MetricsService metricsService;
 
-    public PagesControllers(PublicationRepository publicationRepository, UserRepository userRepository, MyFriendsRepository myFriendsRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository) {
+    public PagesControllers(PublicationRepository publicationRepository, CompositionRepository compositionRepository, UserRepository userRepository, MyFriendsRepository myFriendsRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService) {
         this.publicationRepository = publicationRepository;
+        this.compositionRepository = compositionRepository;
         this.userRepository = userRepository;
         this.myFriendsRepository = myFriendsRepository;
         this.videoBoxAdminRepository = videoBoxAdminRepository;
         this.userPhotoRepository = userPhotoRepository;
         this.publicationPostAdminRepository = publicationPostAdminRepository;
+        this.letterToADMINRepository = letterToADMINRepository;
+        this.metricsService = metricsService;
     }
 
     @GetMapping("/")
-    public String home(Model model) {
-        VideoBoxAdmin videoBoxAdmin;
-        List<VideoBoxAdmin> firstByDate = videoBoxAdminRepository.findAll();
-        List<VideoBoxAdmin> video = new ArrayList<>(firstByDate);
-        int size = video.size();
-        if (video.size() >= 2) {
-            videoBoxAdmin = video.get(size - 1);
-        }  else {
-            videoBoxAdmin = new VideoBoxAdmin();
-            videoBoxAdmin.setLinkToVideo(LINK_BASE);
-            videoBoxAdmin.setIdVideoBox(1L);
-            videoBoxAdmin.setTitleText("First video");
-            videoBoxAdmin.setAddressAdmin("111");
+    public String home(Model model, HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, "/");
+        List<VideoBoxAdmin> videoBoxAdmins = videoBoxAdminRepository.findAll();
+        int sizeVideoList = videoBoxAdmins.size();
+        List<Composition> compositionWithComments = getCompositionWithComments();
+        List<PublicationPostAdmin> publications = publicationPostAdminRepository.findAll();
+        List<PublicationPostAdmin> publicationPostAdminListTreeElements = getPublicationPostAdminList(publications);
+
+        if (publicationPostAdminListTreeElements.isEmpty()) {
+            model.addAttribute("publications", new ArrayList<>());
+        } else {
+            model.addAttribute("publications", publicationPostAdminListTreeElements);
         }
 
+        if (compositionWithComments.isEmpty()) {
+            model.addAttribute("compositionWithComments", new ArrayList<>());
+        } else {
+            model.addAttribute("compositionWithComments", compositionWithComments);
+        }
 
-        List<PublicationPostAdmin> publications = publicationPostAdminRepository.findAll();
-        List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>(publications);
-        publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
+        if (videoBoxAdmins.isEmpty()) {
+            model.addAttribute("videoBoxAdmin", new ArrayList<>());
+        } else {
+            model.addAttribute("videoBoxAdmin", videoBoxAdmins.get(sizeVideoList - 1));
+        }
 
-        model.addAttribute("videoBoxAdmin", videoBoxAdmin);
-        model.addAttribute("publications", publicationPostAdminList);
-        model.addAttribute("title", "MYHOME");
+        model.addAttribute("title", "STORY FLOW");
         return "mine-page";
+    }
+
+    private List<PublicationPostAdmin> getPublicationPostAdminList(List<PublicationPostAdmin> publicationList) {
+        return publicationList.stream()
+                .map(el -> new PublicationPostAdmin(
+                        el.getIdPublication(),
+                        el.getDate(),
+                        el.getTitleText(),
+                        el.getFullText(),
+                        el.getAddress(),
+                        el.getName(),
+                        el.getType(),
+                        el.getImage(),
+                        Base64.getMimeEncoder().encodeToString(el.getImage())))
+                .sorted(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<Composition> getCompositionWithComments() {
+        return compositionRepository.findAllByPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE).stream()
+                .map(el -> new Composition(
+                        el.getId(),
+                        el.getLocalDate(),
+                        el.getGenre(),
+                        el.getPublicationType(),
+                        el.getTitleText(),
+                        el.getShortText(),
+                        el.getFullText(),
+                        el.getEmail(),
+                        el.getName(),
+                        el.getType(),
+                        Base64.getMimeEncoder().encodeToString(el.getImage())))
+                .sorted(Comparator.comparing(Composition::getLocalDate).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/admin-page")
@@ -144,6 +188,31 @@ public class PagesControllers {
     public String safeReadCookbook() {
         return "redirect:/safe/read-save-diary";
     }
+
+    @Transactional
+    @GetMapping("/users/write/letter")
+    public String userWriteLetter(HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, "/users/write/letter");
+        return "users-write-letter";
+    }
+
+    @PostMapping("/users/send-letter")
+    public String sendLetter(@RequestParam("userPost") String userPost,
+                             @RequestParam("titleText") String titleText,
+                             @RequestParam("fullText") String fullText) {
+        if (userPost.toCharArray().length > 100 || titleText.toCharArray().length > 100 || fullText.toCharArray().length > 20000) {
+            return "redirect:/error-letter";
+        } else {
+            LetterToADMIN letterToADMIN = new LetterToADMIN();
+            letterToADMIN.setLocalDate(new Date());
+            letterToADMIN.setEmail(userPost);
+            letterToADMIN.setTitleText(titleText);
+            letterToADMIN.setFullText(fullText);
+            letterToADMINRepository.save(letterToADMIN);
+            return "redirect:/";
+        }
+    }
+
 
 
     @GetMapping("/registration-error")

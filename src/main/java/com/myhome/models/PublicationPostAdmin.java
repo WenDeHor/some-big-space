@@ -16,7 +16,8 @@ public class PublicationPostAdmin {
     public PublicationPostAdmin() {
     }
 
-    public PublicationPostAdmin(Date date, @Size(min = 0, max = 5000) String titleText, @Size(min = 0, max = 10000) String fullText, String address, String name, String type, byte[] image) {
+    public PublicationPostAdmin(Long idPublication, Date date, String titleText, String fullText, String address, String name, String type, byte[] image) {
+        this.idPublication=idPublication;
         this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
@@ -24,6 +25,17 @@ public class PublicationPostAdmin {
         this.name = name;
         this.type = type;
         this.image = image;
+    }
+
+    public PublicationPostAdmin(Long idPublication, Date date, String titleText, String fullText, String address, String name, String type, byte[] image, String convert) {
+        this.date = date;
+        this.titleText = titleText;
+        this.fullText = fullText;
+        this.address = address;
+        this.name = name;
+        this.type = type;
+        this.image = image;
+        this.convert = convert;
     }
 
     @Id
@@ -55,6 +67,9 @@ public class PublicationPostAdmin {
     @Lob
     @Column(name = "Image", length = Integer.MAX_VALUE, nullable = true)
     private byte[] image;
+
+    @Column(name = "convert")
+    private String convert;
 
     public Long getIdPublication() {
         return idPublication;
@@ -120,6 +135,14 @@ public class PublicationPostAdmin {
         this.image = image;
     }
 
+    public String getConvert() {
+        return convert;
+    }
+
+    public void setConvert(String convert) {
+        this.convert = convert;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -132,12 +155,13 @@ public class PublicationPostAdmin {
                 Objects.equals(address, that.address) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(type, that.type) &&
-                Arrays.equals(image, that.image);
+                Arrays.equals(image, that.image) &&
+                Objects.equals(convert, that.convert);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(idPublication, date, titleText, fullText, address, name, type);
+        int result = Objects.hash(idPublication, date, titleText, fullText, address, name, type, convert);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }
@@ -153,6 +177,7 @@ public class PublicationPostAdmin {
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", image=" + Arrays.toString(image) +
+                ", convert='" + convert + '\'' +
                 '}';
     }
 }
