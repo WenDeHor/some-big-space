@@ -1,64 +1,64 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-    <!--    <title th:text="${user}"></title>-->
-
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">STUDY ROOM</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Моя кімната. Пишемо, спілкуємось та публікуємо.
+    </h5>
     <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study/read-letters" class="btn btn-info btn-lg btn-block" role="button">My letters</a>
+                    <a href="/study/read-letters"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої листи</a>
+                    <a href="/study/write-letter"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Написати листа</a>
+                    <a href="/study/read-all-publications"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Усі публікації</a>
+                    <a href="/study/read-my-publications"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої публікації</a>
+                    <a href="/study/write-publication"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Написати публікацію</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                     <br>
-                    <a href="/study/write-letter" class="btn btn-info btn-lg btn-block" role="button">To write a letter</a>
-                    <br>
-                    <a href="/study/read-publications" class="btn btn-info btn-lg btn-block" role="button">My publications</a>
-                    <br>
-                    <a href="/study/write-publication" class="btn btn-warning btn-lg btn-block disabled" role="button">Write a
-                        publication</a>
-                    <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
-                    <br>
-
                 </div>
                 <div class="col-md-8">
-                    <form action="/study/publication/add"  method="post" >
-
-                                              <p>
-                            <label>TITLE</label>
-                            <input type="text"  name="titleText" class="form-control"
-                                   placeholder="TITLE NAME" >
-                        </p>
+                    <form action="/study/publication/add" method="post"><p>
+                        <label>Заголовок</label>
+                        <input type="text" name="titleText" class="form-control"
+                               placeholder="Місце для загловку">
+                    </p>
                         <br>
-                        <label>PLACE TO STORY</label>
-                        <label for="fullText"> tell us you story : </label>
-                        <textarea  id ="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                  placeholder="WRITE A STORY {character limit up to 3000} " ></textarea>
-
+                        <label>Місце для ваших публікацій</label>
+                        <label for="fullText">  розкажіть всім : </label>
+                        <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
+                                  placeholder="Місце для основного тексту публікації {максимальна кількість символів публікації - 3000} "></textarea>
                         <br>
-
                         <br>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                     </form>
                 </div>
-                <br>
             </div>
         </div>
     </div>
-    <br><br>
-<!--    <form action="/user-page" method="post">-->
-<!--        <button class="btn btn-lg btn-info btn-block" type="submit">TO MY HOME</button>-->
-<!--    </form>-->
-
 </div>
-
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

@@ -1,72 +1,71 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-
-    <!--    <title th:text="${user}"></title>-->
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">SAFE ROOM</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Робоча кімната - місце для наших спогадів та посилань на сервіси, що є важливими для нас.
+    </h5>
     <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/safe/read-save-diary" class="btn btn-info btn-lg btn-block" role="button">Read Diary</a>
+                    <a href="/safe/read-save-diary"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Читати щоденник</a>
+                    <a href="/safe/edit-diary"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Редагувати щоденник</a>
+                    <a href="/safe/read-save-edit-reference"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої сервіси</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                     <br>
-                    <a href="/safe/edit-diary" class="btn btn-info btn-lg btn-block" role="button"> Edit a diary</a>
-                    <br>
-                    <a href="/safe/read-save-edit-reference" class="btn btn-warning btn-lg btn-block disabled" role="button">My
-                        references</a>
-                    <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
-                    <br>
-
                 </div>
                 <div class="col-md-8">
-
-                    <div th:each="reference, el:${referenceList}" class="alert alert-info mt-2">
-
+                    <div th:each="reference, el:${referenceList}" class="mt-2">
                         <a th:href="${reference.url}"><img th:src="@{${'/image/display/reference/'+ reference.id}}"
                              style="width:100%"/></a>
                         <br>
                        <h4><p th:text="${reference.titleText}"/></h4>
                         <a th:href="'/safe/read-save-edit-reference/'+${reference.id}+'/remove'"
-                           class="btn btn-warning">REMOVE</a>
+                           class="btn btn-warning">Видалити</a>
 
                     </div>
-                    <br>
-                    <h2 class="text-center text-success">Write an reference</h2><br>
                     <form action="/safe/read-save-edit-reference" method="post" enctype="multipart/form-data">
                         <table>
                             <div class="custom-file mb-4">
                                 <input type="file" name="file" class="custom-file-input"
                                        id="customFile"> <label class="custom-file-label"
-                                                               for="customFile">Image</label>
+                                                               for="customFile">Завантажати зображення</label>
                             </div>
                             <h1>
                                 <input type="text" name="url" class="form-control"
-                                       placeholder="Insert URL">
+                                       placeholder="Вставити посилання">
                             </h1>
                             <h1>
                                 <input type="text" name="titleText" class="form-control"
-                                       placeholder="Name of reference">
+                                       placeholder="Назва посилання">
                             </h1>
-
                         </table>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
-
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                     </form>
-                    <br>
-                    <br>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

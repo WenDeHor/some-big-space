@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+<body>
+<div class="container"><br>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Читальня. Пишемо, творимо, публікуємо.
+    </h5>
+    <div class="row">
+        <div class="album col-md-12">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/library/read-all-competitive-composition"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Читати усі історії</a>
+                    <a href="/library/read-all-my-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої історії</a>
+                    <a href="/library/read-friends-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Історії моїх друзів</a>
+                    <a href="/library/wright-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Написати історію</a>
+                    <a href="/user-page"
+                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
+                </div>
+                <div class="col-md-8">
+                    <div th:each="composition, el:${compositionList}" class="mt-2">
+                        <a th:href="'/users/read-competitive-one-composition/'+${composition.id}"> <img
+                                th:src="@{${'/image/display/composition/'+ composition.id}}"
+                                style="width:100%"/></a>`
+                        <br>
+                        <div>
+                            <h5><p th:utext="${composition.titleText}"></p></h5>
+                            <h6><p th:utext="${composition.genre}"></p></h6>
+                            <h5><p th:utext="${composition.shortText}"></p></h5>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
+</html>

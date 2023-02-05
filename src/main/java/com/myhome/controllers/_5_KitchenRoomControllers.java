@@ -25,13 +25,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Controller
-public class KitchenRoomControllers {
+public class _5_KitchenRoomControllers {
     private final ShopMealsRepository shopMealsRepository;
     private final UserRepository userRepository;
     private final CookBookRepository cookBookRepository;
     private final MenuRepository menuRepository;
 
-    public KitchenRoomControllers(UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, ShopMealsRepository shopMealsRepository) {
+    public _5_KitchenRoomControllers(UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, ShopMealsRepository shopMealsRepository) {
         this.userRepository = userRepository;
         this.cookBookRepository = cookBookRepository;
         this.menuRepository = menuRepository;

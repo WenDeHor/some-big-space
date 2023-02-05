@@ -1,29 +1,34 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert ">Написати історію</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Читальня. Пишемо, творимо, публікуємо.
+    </h5>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/users/competitive/read-all-competitive-composition" class="btn btn-info btn-lg btn-block">Публікації</a>
-                    <br>
-                    <a href="/users/my-stories/read-all-my-composition" class="btn btn-info btn-lg btn-block">Мої історії</a>
-                    <br>
-                    <a href="/users/friend-composition/read-friends-composition" class="btn btn-info btn-lg btn-block">Історії моїх друзів</a>
-                    <br>
-                    <a href="/users/wright-story/wright-composition" class="btn btn-warning btn-lg btn-block">Написати історію</a>
-                    <br>
-                    <a href="/users/find-friends/find-friends" class="btn btn-info btn-lg btn-block">Знайти друзів</a>
-                    <br>
-                    <form action="/logout" method="post">
-                        <button class="btn btn-lg btn-secondary btn-block" type="submit">LOGOUT</button>
-                    </form>
+                    <a href="/library/read-all-competitive-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Читати усі історії</a>
+                    <a href="/library/read-all-my-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої історії</a>
+                    <a href="/library/read-friends-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Історії моїх друзів</a>
+                    <a href="/library/wright-composition"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Написати історію</a>
+                    <a href="/user-page"
+                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                 </div>
                 <div class="col-md-8">
                     <form action="/users/save-composition" method="post" enctype="multipart/form-data">
@@ -65,4 +70,10 @@
         </div>
     </div>
 </div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

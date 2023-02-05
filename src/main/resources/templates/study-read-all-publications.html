@@ -1,10 +1,12 @@
 <!DOCTYPE HTML>
+<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
+
 <body>
 <div class="container"><br>
     <h5 class="d-flex justify-content-center " style="color: #095979">
@@ -16,13 +18,13 @@
             <div class="row col-md-12">
                 <div class="col-md-4">
                     <a href="/study/read-letters"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Мої листи</a>
                     <a href="/study/write-letter"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Написати листа</a>
                     <a href="/study/read-all-publications"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                         Усі публікації</a>
                     <a href="/study/read-my-publications"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
@@ -36,15 +38,11 @@
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="el:${letters}" class="mt-2">
-                        <p th:text="${el.titleText}"/>
-                        <p th:utext="${el.fullText}"/>
-                        <p th:text="${el.senderAddress}"/>
-                        <p th:text="${el.recipientAddress}"/>
-                        <p th:text="${el.date}"/>
-                        <!--                        <p th:text="${el.numberOfLetter}"/>-->
-                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>-->
-                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>-->
+                    <div th:each="publicationUser, el:${publications}" class="mt-2">
+                        <h5 th:text="${publicationUser.date}"></h5>
+                        <h5 th:text="${publicationUser.address}"></h5>
+                        <h2 th:text="${publicationUser.titleText}"></h2>
+                        <p th:utext="${publicationUser.fullText}"></p>
                     </div>
                     <br>
                 </div>

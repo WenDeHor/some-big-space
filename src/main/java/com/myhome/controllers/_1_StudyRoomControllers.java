@@ -20,14 +20,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Controller
-public class StudyRoomControllers {
+public class _1_StudyRoomControllers {
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
     private final LetterToUSERRepository letterToUSERRepository;
 
-    public StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository) {
+    private final int LIMIT_LIST = 10;
+
+    public _1_StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
         this.letterToUSERRepository = letterToUSERRepository;
@@ -100,8 +103,25 @@ public class StudyRoomControllers {
     }
 
     //TODO Publications
-    @GetMapping("/study/read-publications")
-    public String studyReadPublicationsOfUser(Authentication authentication, Model model) {
+    @GetMapping("/study/read-all-publications")
+    public String studyReadAllPublicationsOfUser(Authentication authentication, Model model) {
+        String userAddress = findUserAddress(authentication);
+        List<PublicationUser> publicationAllUsers = publicationRepository.findAll().stream()
+                .filter(el -> !el.getAddress().equals(userAddress))
+                .limit(LIMIT_LIST)
+                .sorted(Comparator.comparing(PublicationUser::getIdPublication).reversed())
+                .collect(Collectors.toList());
+
+//        List<PublicationUser> publicationList = new ArrayList<>(publicationAllUsers);
+//        publicationList.sort(Comparator.comparing(PublicationUser::getIdPublication).reversed());
+
+        model.addAttribute("publicationUser", publicationAllUsers);
+        model.addAttribute("title", "Publication of User");
+        return "study-read-all-publications";
+    }
+
+    @GetMapping("/study/read-my-publications")
+    public String studyReadMyPublicationsOfUser(Authentication authentication, Model model) {
 
         String userAddress = findUserAddress(authentication);
         List<PublicationUser> publicationUser = publicationRepository.findAllByAddress(userAddress);
@@ -111,7 +131,7 @@ public class StudyRoomControllers {
 
         model.addAttribute("publicationUser", publicationList);
         model.addAttribute("title", "Publication of User");
-        return "study-read-publications";
+        return "study-read-my-publications";
     }
 
     @GetMapping("/study/publication/{idPublication}/remove")
@@ -164,6 +184,7 @@ public class StudyRoomControllers {
 
     @GetMapping("/study/write-publication")
     public String studyWritePublication(Model model) {
+        model.addAttribute("title", "Write publication");
         return "study-write-publication";
     }
 

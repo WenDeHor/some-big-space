@@ -22,12 +22,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Controller
-public class SafeRoomControllers {
+public class _3_SafeRoomControllers {
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
     private final ReferenceRepository referenceRepository;
 
-    public SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository) {
+    public _3_SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository) {
         this.userRepository = userRepository;
         this.diaryRepository = diaryRepository;
         this.referenceRepository = referenceRepository;

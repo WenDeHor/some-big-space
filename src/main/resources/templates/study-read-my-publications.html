@@ -16,7 +16,7 @@
             <div class="row col-md-12">
                 <div class="col-md-4">
                     <a href="/study/read-letters"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Мої листи</a>
                     <a href="/study/write-letter"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
@@ -25,7 +25,7 @@
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Усі публікації</a>
                     <a href="/study/read-my-publications"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                         Мої публікації</a>
                     <a href="/study/write-publication"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
@@ -36,15 +36,18 @@
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="el:${letters}" class="mt-2">
-                        <p th:text="${el.titleText}"/>
-                        <p th:utext="${el.fullText}"/>
-                        <p th:text="${el.senderAddress}"/>
-                        <p th:text="${el.recipientAddress}"/>
-                        <p th:text="${el.date}"/>
-                        <!--                        <p th:text="${el.numberOfLetter}"/>-->
-                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>-->
-                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>-->
+                    <div th:each="publicationUser, el:${publicationUser}" class="alert alert-info mt-2">
+                        <h4 th:text="${publicationUser.titleText}" class=" text-center"></h4>
+                        <p th:utext="${publicationUser.fullText}" ></p>
+<!--                        <h6 th:text="${el.date}" class="text-right"/>-->
+                        <h6><p class="text-right" th:text="${#dates.format({publicationUser.date}, 'dd:MM:yyyy')}"></p></h6>
+                        <br>
+                        <div class="text-right">
+                            <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/edit'"
+                               class="btn btn-warning">Редагувати</a>
+                            <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/remove'"
+                               class="btn btn-warning">Видалити</a>
+                        </div>
                     </div>
                     <br>
                 </div>

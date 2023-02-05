@@ -1,58 +1,60 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-    <!--    <title th:text="${user}"></title>-->
 </head>
 
-<div th:insert="blocks/library::library"></div>
-<!--<body>-->
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">MY HOME</h5>
-
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Мій дім - оселя для Вас, рідних та близьких.
+    </h5>
+    <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12 ">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study" class="btn btn-info btn-lg btn-block">Study room</a>
-                    <br>
-                    <a href="/safe" class="btn btn-info btn-lg btn-block">Safe room</a>
-                    <br>
-                    <a href="/living" class="btn btn-info btn-lg btn-block">Living room</a>
-                    <br>
-                    <a href="/kitchen" class="btn btn-info btn-lg btn-block">Kitchen</a>
+                    <a href="/study"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Моя кімната</a>
+                    <a href="/library"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Читальня</a>
+                    <a href="/safe"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Робоча кімната</a>
+                    <a href="/living"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Вітальня</a>
+                    <a href="/kitchen"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Кухня</a>
                     <br>
                     <form action="/logout" method="post">
-                        <button class="btn btn-lg btn-secondary btn-block" type="submit">LOGOUT</button>
+                        <button class="btn btn-lg btn-secondary btn-block" type="submit">Вийти в світ</button>
                     </form>
-                    <br>
+
 
                 </div>
                 <div class="col-md-8 text-center">
-                    <div th:each="userPhoto, el:${photos}" class="alert alert-info mt-2">
-                        <img th:src="@{${'/user/page/photo/display/'+ userPhoto.id}}" style="width: 100%"/>
+                    <div th:each="userPhoto, el:${photos}" class="mt-2">
+                        <img th:src="@{${'/user/page/photo/display/'+ userPhoto.id}}" style="width: 100%"
+                             alt="Family photo"/>
                         <br>
-                        <h5><p th:text="${userPhoto.fullText}" class="font-weight-bold" ></p></h5>
-                        <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Change photo</a>
+                        <h5><p th:text="${userPhoto.fullText}" class="font-weight-bold"></p></h5>
+                        <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Замінити фото</a>
 
                     </div>
                 </div>
-<!--                <div class="col-md-12">-->
-<!--                    <div class="text-center">-->
-<!--                        <a href="/call" class="btn btn-info btn-lg " role="button left"-->
-<!--                           style="margin-top: 20px"> Call</a>-->
-
-<!--                        <a href="/stop" class="btn btn-info btn-lg " role="button left"-->
-<!--                           style="margin-top: 20px"> Voice</a>-->
-<!--                    </div>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
-
 </div>
-<!--</body>-->
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

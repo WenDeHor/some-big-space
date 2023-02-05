@@ -1,76 +1,37 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
-<head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAABUDwEA410XALE9DQnCSxIpyFEUQ8hRFEPCSxIpsT0NCeNdFwBUDwEA
-AAAAAAAAAAAAAAAAAAAAAAAAAAC6RxIAsUEQCMhSFlLWYh2x4XEm4uZ5K/LmeSvy4XEm4tZiHbHI
-UhZSsUEQCLpHEgAAAAAAAAAAAAAAAAC8ShMAtUQREs1XGJPjcyf185Q9//mqT//7tFj/+7RY//mq
-T//zlD3/43Mn9c1XGJO1RBESvEoTAAAAAACzRBEApTgNCMhSFpPldSj9+KFH//y7X//9yXD//c94
-//3PeP/9yXD//Ltf//ihR//ldSj9yFIWk6U4DQizRBEAxk0UALpGEVPcYx7195Q8//u0WP/8yG7/
-/NR///zah//82of//NR///zIbv/7tFj/95Q8/9xjHvW6RhFTxk0UAJIwCwnFTROx7XUn//qdQv/7
-tVj/+8du//zUf//82of//NqH//zUf//7x27/+7VY//qdQv/tdSf/xU0TsZIwCwmlOw4pzlIV4fN8
-Kv/5mD7/+qtP//q8Yf/7yG//+853//vOd//7yG//+rxh//qrT//5mD7/83wq/85SFeGlOw4ppjwP
-Q9FTFfL1eSj/+I02//mbQf/5qE3/+bNY//q5Xf/6uV3/+bNY//moTf/5m0H/+I02//V5KP/RUxXy
-pjwPQ6E6DkPMUBTy83Mk//eBLv/4iTP/+JI6//iaQf/4nkT/+J5E//iaQf/4kjr/+Ikz//eBLv/z
-cyT/zFAU8qE6DkOVNQ0pv0kS4e1pHv/2eyz/9n8v//aBL//2hDD/9oYx//aGMf/2hDD/9oEv//Z/
-L//2eyz/7Wke/79JEuGVNQ0peCkKCas+D7HeYSH/9o9R//eSVP/3kFD/9o9N//aOS//2jkv/9o9N
-//eQUP/3k1T/9o9R/95hIf+rPg+xeCkKCaA6DgCVNAtTvk8c9fCVZf/3pHP/96Ry//elc//3pXP/
-96Vz//elc//3pHL/96Rz//CVZf++Txz1lTQLU6A6DgCGMAwAdykJCJo3DZPIa0D98qqE//ixif/4
-sYj/+LGI//ixiP/4sYj/+LKJ//KqhP/Ia0D9mjcNk3cpCQiGMAwAAAAAAIYvCwB+KgcSlzkRk71o
-QvXinn3/8rWV//a6m//2upv/8rWV/+Keff+9aEL1lzkRk34qBxKGLwsAAAAAAAAAAAAAAAAAfSkF
-AHQlAwiJLwhSnUQdsbFeOeK9bUryvW1K8rFeOeKdRB2xiS8IUnQlAwh9KQUAAAAAAAAAAAAAAAAA
-AAAAAAAAAAApAgAAjykAAGgYAAl5IgAqgCcBQ4AnAUN5IgAqaBgACY8pAAApAgAAAAAAAAAAAAAA
-AAAA+B8AAOAHAADAAwAAgAEAAIABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAQAAgAEAAMAD
-AADgBwAA+B8AAA==" rel="icon" type="image/x-icon"/>
-
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <!--    CSS-->
-    <link rel="stylesheet" href="css/mine.css">
-
-    <!-- CSS only -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
-          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-
-    <!-- JS, Popper.js, and jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
-            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
-            crossorigin="anonymous"></script>
-<!--    <script type="text/javascript" src="blocks/js/script.js"></script>-->
 </head>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert">Знайомство з конкурсною роботою та її оцінення</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Читальня. Пишемо, творимо, публікуємо.
+    </h5>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/users/competitive/read-all-competitive-composition" class="btn btn-info btn-lg btn-block">Публікації</a>
-                    <br>
-                    <a href="/users/my-stories/read-all-my-composition" class="btn btn-info btn-lg btn-block">Мої
-                        історії</a>
-                    <br>
-                    <a href="/users/friend-composition/read-friends-composition" class="btn btn-info btn-lg btn-block">Історії
-                        моїх друзів</a>
-                    <br>
-                    <a href="/users/wright-story/wright-composition" class="btn btn-info btn-lg btn-block">Написати
-                        історію</a>
-                    <br>
-                    <a href="/users/find-friends/find-friends" class="btn btn-info btn-lg btn-block">Знайти друзів</a>
-                    <br>
-                    <form action="/logout" method="post">
-                        <button class="btn btn-lg btn-secondary btn-block" type="submit">LOGOUT</button>
-                    </form>
+                    <a href="/library/read-all-competitive-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Читати усі історії</a>
+                    <a href="/library/read-all-my-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої історії</a>
+                    <a href="/library/read-friends-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Історії моїх друзів</a>
+                    <a href="/library/wright-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Написати історію</a>
+                    <a href="/user-page"
+                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="composition, el:${compositionOne}" class="alert  mt-2">
+                    <div th:each="composition, el:${compositionOne}" class="mt-2">
                          <form action="/users/evaluation-one-composition" method="post" enctype="multipart/form-data">
                             <img th:src="@{${'/image/display/composition/'+ composition.id}}" style="width:100%"/>
                             <br>
@@ -147,4 +108,10 @@ AADgBwAA+B8AAA==" rel="icon" type="image/x-icon"/>
         </div>
     </div>
 </div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

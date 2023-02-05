@@ -170,12 +170,17 @@ public class PagesControllers {
 
     @GetMapping("/study")
     public String studyWritePublication() {
-        return "redirect:/study/read-publications";
+        return "redirect:/study/read-all-publications";
     }
 
     @GetMapping("/kitchen")
     public String kitchenReadCookbook() {
         return "redirect:/kitchen/read-cookbook";
+    }
+
+    @GetMapping("/library")
+    public String library() {
+        return "redirect:/library/read-all-competitive-composition";
     }
 
     @GetMapping("/living")
