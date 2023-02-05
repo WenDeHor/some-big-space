@@ -1,7 +1,10 @@
 package com.myhome.controllers;
 
 import com.myhome.controllers.compresor.CompressorImgToJpg;
-import com.myhome.models.*;
+import com.myhome.models.MyFriends;
+import com.myhome.models.PublicationUser;
+import com.myhome.models.User;
+import com.myhome.models.VideoBox;
 import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
 import com.myhome.service.MetricsService;
@@ -12,13 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
@@ -131,28 +131,6 @@ public class _4_LivingRoomControllers {
         return "redirect:/living/friends";
     }
 
-
-    @GetMapping("/living/news/site")
-    public String livingNewsSite(Authentication authentication, Model model) {
-        String userAddress = findUserAddress(authentication);
-
-        Iterable<NewsBox> allNewsBox = newsBoxRepository.findAllByAddressUser(userAddress);
-        List<NewsBox> newsBoxList = new ArrayList<>();
-        allNewsBox.forEach(newsBoxList::add);
-        newsBoxList.sort(Comparator.comparing(NewsBox::getIdNewsBox).reversed());
-
-        model.addAttribute("newsBoxList", newsBoxList);
-        model.addAttribute("title", "LIVING ROOM");
-        return "living-news-site";
-    }
-
-    @GetMapping("/living/news/site/{idNewsBox}/remove")
-    public String livingNewsSiteRemove(@PathVariable(value = "idNewsBox") Long idNewsBox, Model model) {
-        NewsBox newsBox = newsBoxRepository.findById(idNewsBox).orElseThrow(null);
-        newsBoxRepository.delete(newsBox);
-        return "redirect:/living/news/site";
-    }
-
     @GetMapping("/living/news/video")
     public String livingNewVideo(Authentication authentication, Model model) {
         String userAddress = findUserAddress(authentication);
@@ -196,98 +174,6 @@ public class _4_LivingRoomControllers {
         return "redirect:/living/news/video";
     }
 
-    @PostMapping("/living/news/add/site")
-    public String livingNewsAddSite(Authentication authentication,
-                                    Model model,
-                                    @RequestParam("linkToNews") String linkToNews) throws IOException {
-
-        String userAddress = findUserAddress(authentication);
-        LocalDate localDate = LocalDate.now();
-
-        NewsBox newsBox = new NewsBox();
-        newsBox.setAddressUser(userAddress);
-        newsBox.setLinkToNews(linkToNews);
-        newsBox.setLocalDate(localDate);
-
-        newsBoxRepository.save(newsBox);
-        return "redirect:/living/news/site";
-    }
-
-    private List<Composition> convertText(List<Composition> publication) {
-        List<Composition> composition = new ArrayList<>(publication);
-        for (int i = 0; i < publication.size(); i++) {
-            //ShortText
-            String shortText = publication.get(i).getShortText();
-            String trim3 = shortText.replace("&#160&#160 ", "");
-            String trim4 = trim3.replace("<br>", "");
-            composition.get(i).setShortText(trim4);
-            //FullText
-            String fullText = publication.get(i).getFullText();
-            String trim1 = fullText.replace("&#160&#160 ", "");
-            String trim2 = trim1.replace("<br>", "");
-            composition.get(i).setFullText(trim2);
-        }
-        return composition;
-    }
-
-    private Genre getGenre(String genreString) {
-        Map<String, Genre> genreMap = new HashMap<>();
-        genreMap.put("FANTASY", Genre.FANTASY);
-        genreMap.put("NOVEL", Genre.NOVEL);
-        genreMap.put("TALE", Genre.TALE);
-        genreMap.put("STORIES", Genre.STORIES);
-        return genreMap.get(genreString);
-    }
-
-    private String convertTextWithFormatToCompositionSaveAndEdit(String fullText) {
-        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text1);
-    }
-
-    //TODO REGEX
-    private String REGEX(String patternRegex, String replace, String text) {
-        Pattern pattern = Pattern.compile(patternRegex);
-        Matcher matcher = pattern.matcher(text);
-        return matcher.replaceAll(replace);
-    }
-
-    private int countId(int count) {
-        return ++count;
-    }
-
-    private boolean checkData(MultipartFile file, String titleText, String shortText, String fullText) throws IOException {
-        return file.getBytes().length / constant > limit_photo
-                || titleText.toCharArray().length > limit_titleText
-                || shortText.toCharArray().length > limit_shortText
-                || fullText.toCharArray().length > limit_fullText;
-    }
-
-    private String getErrorPage(MultipartFile file, String titleText, String shortText, String fullText, Model model) throws IOException {
-        String stile = "crimson";
-        String originalFilename = file.getOriginalFilename();
-        int fileSize = file.getBytes().length / constant;
-        int titleTextSize = titleText.toCharArray().length;
-        int shortTextSize = shortText.toCharArray().length;
-        int fullTextSize = fullText.toCharArray().length;
-        if (file.getBytes().length / constant > limit_photo) {
-            model.addAttribute("stile", stile);
-        }
-
-        model.addAttribute("originalFilename", originalFilename);
-        model.addAttribute("fileSize", fileSize);
-
-        model.addAttribute("title", titleText);
-        model.addAttribute("titleTextSize", titleTextSize);
-
-        model.addAttribute("short", shortText);
-        model.addAttribute("shortTextSize", shortTextSize);
-
-        model.addAttribute("full", fullText);
-        model.addAttribute("fullTextSize", fullTextSize);
-//        return "redirect:/users/wright-composition";
-
-        return "living-write-error-save-page";
-    }
 
     private String findUserAddress(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
@@ -298,12 +184,6 @@ public class _4_LivingRoomControllers {
 
     private String createURL(String nameURL) {
         return YOUTUBE + nameURL + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-    }
-
-    private String parseUpdateURL(String url) {
-        String[] cutLink = url.split(YOUTUBE);
-        String[] cutName = cutLink[1].split("\\?");
-        return cutName[0];
     }
 
     private String parseNormalURL(String url) {
