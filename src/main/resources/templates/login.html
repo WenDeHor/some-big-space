@@ -1,50 +1,50 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
-    <title th:text="${title}"></title>
 
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
 </head>
-<div th:insert="blocks/library::library"></div>
 <body>
+<div th:insert="blocks/heder-mine::header-mine"></div>
+<br>
 <div class="container">
     <form class="form-sign" method="post" action="/login">
         <!-- error message -->
         <div th:if="${param.error}">
-            <div class="alert alert-danger">Wrong email address or secret code
+            <div class="alert alert-danger">Помилкова пошта або адреса
             </div>
         </div>
         <!-- logout message -->
         <div th:if="${param.logout}">
-            <div class="alert alert-info">Successfully passed from the personal account.</div>
+            <div class="alert alert-info">Успішно</div>
         </div>
 
-        <h2 class="form-sign-heading text-center" style="margin-top: 50px">Login</h2>
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Вхід до будинку</h5>
         <p>
-            <label for="username">Enter your postbox</label>
+            <label for="username">Введіть свою електронну скриньку</label>
             <input type="text" id="username" name="username" class="form-control"
-                   placeholder="Enter your postbox" required>
+                   placeholder="Місце для електронної скриньки" required>
         </p>
         <p>
-            <label for="password">Password</label>
+            <label for="password">Пароль</label>
             <input type="password" id="password" name="password" class="form-control"
-                   placeholder="Enter the secret code" required>
+                   placeholder="Місце для Вашого паролю" required>
         </p>
         <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top: 50px">
-            Log in to your personal account
+            Увійти до будинку
         </button>
         <a href="/registration" class="btn btn-info btn-lg btn-block" role="button"
-           style="margin-bottom: 50px">Register</a>
-
+           style="margin-bottom: 50px">Перейти на сторінку з реєстрації</a>
     </form>
-    <!--    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>-->
-    <!--    <div class="form-group">-->
-    <!--        <span>New user? <a href="/registration">Register</a></span>-->
-    <!--    </div>-->
+</div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
 </div>
 </body>
-<footer th:insert="blocks/footer-first::footer-first"></footer>
 </html>
 
 

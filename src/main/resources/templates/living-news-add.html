@@ -1,62 +1,65 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-
-    <!--    <title th:text="${user}"></title>-->
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">LIVING ROOM</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Вітальня - місце для наших публікацій та пошуку друзів і рідних.
+    </h5>
     <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-<!--                    <a href="/living/fireplace" class="btn btn-info btn-lg btn-block" role="button">Fireplace</a>-->
-<!--                    <br>-->
-                    <a href="/living/news/video" class="btn btn-info btn-lg btn-block" role="button">News Video</a>
-                    <br>
-                    <a href="/living/news/site" class="btn btn-info btn-lg btn-block" role="button">News Site</a>
-                    <br>
-                    <a href="/living/news/add" class="btn btn-warning btn-lg btn-block disabled" role="button">Site & Video
-                        add</a>
-                    <br>
-                    <a href="/living/friends" class="btn btn-info btn-lg btn-block" role="button">Friends</a>
-                    <br>
-                    <a href="/living/publications" class="btn btn-info btn-lg btn-block"
-                       role="button">Publications</a>
-                    <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <a href="/living/news/video"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої відео</a>
+                    <a href="/living/news/site"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої сайти</a>
+                    <a href="/living/news/add"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Добавити відео або сайти</a>
+                    <a href="/living/friends"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Пошук друзів</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <h3>Create link to video</h3>
+                    <h5 class="d-flex justify-content-center " style="color: #095979">
+                        Створити посилання на відео</h5>
                     <form action="/living/news/add/video" method="POST" enctype="multipart/form-data">
                         <input type="text" name="linkToVideo" class="form-control"
-                               placeholder="Write link to video">
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
+                               placeholder="Внести посилання">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зьерегти</button>
                     </form>
                     <br>
-
-                    <h3>Create link to news</h3>
+                        <h5 class="d-flex justify-content-center " style="color: #095979">
+                            Створити посилання на сервіси</h5>
                     <form action="/living/news/add/site" method="POST">
                         <table>
                             <input type="text" name="linkToNews" class="form-control"
-                                   placeholder="Write link to news">
+                                   placeholder="Внести посилання">
                         </table>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                     </form>
                     <br>
                 </div>
             </div>
         </div>
-        <br><br>
     </div>
 </div>
-
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

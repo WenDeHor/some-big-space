@@ -30,15 +30,28 @@
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="reference, el:${referenceList}" class="mt-2">
-                        <a th:href="${reference.url}"><img th:src="@{${'/image/display/reference/'+ reference.id}}"
-                             style="width:100%"/></a>
-                        <br>
-                       <h4><p th:text="${reference.titleText}"/></h4>
-                        <a th:href="'/safe/read-save-edit-reference/'+${reference.id}+'/remove'"
-                           class="btn btn-warning">Видалити</a>
-
-                    </div>
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th><h5>Зображення</h5></th>
+                            <th><h5>Назва</h5></th>
+                            <th><h5>Видалення</h5></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="reference, el:${referenceList}" class="mt-2">
+                            <td><a th:href="${reference.url}"><img
+                                    th:src="@{${'/image/display/reference/'+ reference.id}}"
+                                    style="width:20%"/></a></td>
+                            <td>
+                                <h5><p th:text="${reference.titleText}"/></h5>
+                            </td>
+                            <td><a th:href="'/safe/read-save-edit-reference/'+${reference.id}+'/remove'"
+                                   class="btn btn-warning">Видалити</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <br>
                     <form action="/safe/read-save-edit-reference" method="post" enctype="multipart/form-data">
                         <table>
                             <div class="custom-file mb-4">

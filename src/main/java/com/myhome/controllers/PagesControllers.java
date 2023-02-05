@@ -186,7 +186,7 @@ public class PagesControllers {
     @GetMapping("/living")
     public String livingReadPublications(Authentication authentication, Model model) {
         model.addAttribute("title", "LIVING ROOM");
-        return "redirect:/living/publications";
+        return "redirect:/living/news/video";
     }
 
     @GetMapping("/safe")

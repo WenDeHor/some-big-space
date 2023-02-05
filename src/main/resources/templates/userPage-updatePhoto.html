@@ -1,34 +1,39 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-    <!--    <title th:text="${user}"></title>-->
 </head>
 
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">MY HOME</h5>
-
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Мій дім - оселя для Вас, рідних та близьких.
+    </h5>
+    <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12 ">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study" class="btn btn-info btn-lg btn-block">Study room</a>
-                    <br>
-                    <a href="/safe" class="btn btn-info btn-lg btn-block">Safe room</a>
-                    <br>
-                    <a href="/living" class="btn btn-info btn-lg btn-block">Living room</a>
-                    <br>
-                    <a href="/kitchen" class="btn btn-info btn-lg btn-block">Kitchen</a>
+                    <a href="/study"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Моя кімната</a>
+                    <a href="/library"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Читальня</a>
+                    <a href="/safe"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Робоча кімната</a>
+                    <a href="/living"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Вітальня</a>
+                    <a href="/kitchen"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Кухня</a>
                     <br>
                     <form action="/logout" method="post">
-                        <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
+                        <button class="btn btn-lg btn-secondary btn-block" type="submit">Вийти в світ</button>
                     </form>
-                    <br>
-
                 </div>
                 <div class="col-md-8 text-center">
                     <form action="/change/photo" method="post" enctype="multipart/form-data">
@@ -36,24 +41,24 @@
                         <div class="custom-file mb-4">
                             <input type="file" name="file" class="custom-file-input"
                                    id="customFile"> <label class="custom-file-label"
-                                                           for="customFile">Image</label>
+                                                           for="customFile">Завантажити фото</label>
                         </div>
-
                         <br>
-                        <label for="fullText"> A story about a photo </label>
+                        <label for="fullText"> Опис до фото : </label>
                         <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="20"
-                                  placeholder="Tell us about the photo. The most important thoughts and memories, hopes and expectations. {character limit up to 3000} "></textarea>
-
+                                  placeholder="Опишіть подію та емоцію, що повязана з фото. {Максимальна кількість символів - 3000} "></textarea>
                         <br>
-
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
-
 </div>
-
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

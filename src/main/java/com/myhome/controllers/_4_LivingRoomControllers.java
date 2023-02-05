@@ -37,12 +37,15 @@ public class _4_LivingRoomControllers {
 
     private final long PERIOD_METRICS = 30L;
     private static final String INCOGNITO = "Incognito";
+    private static final String LOCAL_UI = "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
 
     private int constant = 1049335;
     private int limit_photo = 6; //MB
     private int limit_titleText = 150; //chars
     private int limit_shortText = 1000; //chars
     private int limit_fullText = 20000; //chars
+
+    private final String YOUTUBE = "https://www.youtube.com/embed/";
 
     public _4_LivingRoomControllers(MyFriendsRepository myFriendsRepository, UserRepository userRepository, PublicationRepository publicationRepository, NewsBoxRepository newsBoxRepository, VideoBoxRepository videoBoxRepository, CompositionRepository compositionRepository, CompressorImgToJpg compressorImgToJpg, EvaluateRepository evaluateRepository, CommentsRepository commentsRepository, MetricsService metricsService) {
         this.myFriendsRepository = myFriendsRepository;
@@ -183,15 +186,12 @@ public class _4_LivingRoomControllers {
                                      @RequestParam("linkToVideo") String linkToVideo) throws IOException {
 
         String userAddress = findUserAddress(authentication);
-        String url = "https://www.youtube.com/embed/" + linkToVideo + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-
-        LocalDate localDate = LocalDate.now();
-
+        String url = createURL(parseNormalURL(linkToVideo));
         VideoBox videoBox = new VideoBox();
         videoBox.setAddressUser(userAddress);
         videoBox.setLinkToVideo(url);
+        LocalDate localDate = LocalDate.now();
         videoBox.setLocalDate(localDate);
-
         videoBoxRepository.save(videoBox);
         return "redirect:/living/news/video";
     }
@@ -213,51 +213,6 @@ public class _4_LivingRoomControllers {
         return "redirect:/living/news/site";
     }
 
-//    @Transactional
-//    @GetMapping("/users/read-all-my-composition")
-//    public String readAllComposition(Authentication authentication, Model model) {
-//        List<Composition> compositionList = compositionRepository.findAllByEmail(getUserEmail(authentication));
-//        compositionList.sort(Comparator.comparing(Composition::getId).reversed());
-//        model.addAttribute("compositionList", compositionList);
-//        model.addAttribute("title", "Read Composition");
-//        return "living-read-all-my-composition";
-//    }
-
-//    @Transactional
-//    @GetMapping("/users/read-one-composition/{id}")
-//    public String readOneComposition(@PathVariable(value = "id") Long id, Authentication authentication, Model model) {
-//        List<Composition> compositionList = compositionRepository.findAllByEmail(getUserEmail(authentication));
-//        Optional<Composition> composition = compositionList.stream().filter(f -> f.getId().equals(id)).findFirst();
-//        if (composition.isPresent() && composition.get().getPublicationType().equals(PublicationType.NO_PUBLIC)
-//                || composition.isPresent() && composition.get().getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
-//            model.addAttribute("compositionOne", composition.get());
-//            model.addAttribute("title", "Одна з моїх робіт");
-//            return "living-read-one-my-composition-all-button";
-//        } else {
-//            model.addAttribute("compositionOne", composition.get());
-//            model.addAttribute("title", "Одна з моїх робіт");
-//            return "living-read-one-my-composition-off-button";
-//        }
-////        return "redirect:/users/read-all-my-composition";
-//    }
-
-//    @Transactional
-//    @GetMapping("/users/edit-composition/{id}/edit")
-//    public String editOneComposition(@PathVariable(value = "id") Long id, Model model) {
-//        if (!compositionRepository.existsById(id)) {
-//            return "redirect:/users/edit-composition";
-//        }
-//        Optional<Composition> compositionFind = compositionRepository.findById(id);
-//        List<Composition> compositionList = new ArrayList<>();
-//        compositionFind.ifPresent(compositionList::add);
-//
-//        if (compositionFind.isPresent()) {
-//            Composition composition = convertText(compositionList).get(0);
-//            model.addAttribute("compositionList", composition);
-//        }
-//        return "living-edit-one-composition";
-//    }
-
     private List<Composition> convertText(List<Composition> publication) {
         List<Composition> composition = new ArrayList<>(publication);
         for (int i = 0; i < publication.size(); i++) {
@@ -275,41 +230,6 @@ public class _4_LivingRoomControllers {
         return composition;
     }
 
-//    @Transactional
-//    @PostMapping("/users/edit-composition/{id}/edit")
-//    public String compositionUpdate(@PathVariable(value = "id") Long id,
-//                                    MultipartFile file,
-//                                    Authentication authentication,
-//                                    @RequestParam String genre,
-//                                    @RequestParam String titleText,
-//                                    @RequestParam String shortText,
-//                                    @RequestParam String fullText) throws IOException {
-//        Composition composition = compositionRepository.findById(id).orElseThrow(null);
-//        composition.setGenre(getGenre(genre));
-//        composition.setTitleText(titleText);
-//        composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
-//        composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
-//        composition.setLocalDate(composition.getLocalDate());
-//        composition.setName(file.getOriginalFilename());
-//        composition.setType(file.getContentType());
-//
-//        if (file.getContentType().equals("application/octet-stream")) {
-//            Optional<Composition> byId = compositionRepository.findById(id);
-//            byte[] image = byId.get().getImage();
-//            composition.setImage(image);
-//        } else {// нове фото
-//            String userEmail = getUserEmail(authentication);
-//            int count = compositionRepository.findAllByEmail(userEmail).size();
-//            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
-//            composition.setImage(convert.img);
-////            composition.setImage(file.getBytes());
-//            compressorImgToJpg.deleteImage(convert.nameStart);
-//            compressorImgToJpg.deleteImage(convert.nameEnd);
-//        }
-//        compositionRepository.save(composition);
-//        return "redirect:/users/read-all-my-composition";
-//    }
-
     private Genre getGenre(String genreString) {
         Map<String, Genre> genreMap = new HashMap<>();
         genreMap.put("FANTASY", Genre.FANTASY);
@@ -318,32 +238,6 @@ public class _4_LivingRoomControllers {
         genreMap.put("STORIES", Genre.STORIES);
         return genreMap.get(genreString);
     }
-
-//    @GetMapping("/users/edit-composition/{id}/remove")
-//    public String compositionRemove(@PathVariable(value = "id") Long id, Model model) {
-//        Composition composition = compositionRepository.findById(id).orElseThrow(null);
-//        compositionRepository.delete(composition);
-//        return "redirect:/users/read-all-my-composition";
-//    }
-
-//    @GetMapping("/users/public-composition/{id}/to-coordination")
-//    public String compositionToCompetitive(@PathVariable(value = "id") Long id, Model model) {
-//        Composition composition = compositionRepository.findById(id).orElseThrow(null);
-//        if (composition.getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
-//            return "redirect:/users/read-all-my-composition";
-//        }
-//        composition.setPublicationType(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN);
-//        compositionRepository.save(composition);
-//        return "redirect:/users/read-all-my-composition";
-//    }
-
-//    @GetMapping("/users/public-composition/{id}/to-friends")
-//    public String compositionToFriends(@PathVariable(value = "id") Long id, Model model) {
-//        Composition composition = compositionRepository.findById(id).orElseThrow(null);
-//        composition.setPublicationType(PublicationType.PUBLIC_TO_FRIENDS);
-//        compositionRepository.save(composition);
-//        return "redirect:/users/read-all-my-composition";
-//    }
 
     private String convertTextWithFormatToCompositionSaveAndEdit(String fullText) {
         String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
@@ -356,155 +250,6 @@ public class _4_LivingRoomControllers {
         Matcher matcher = pattern.matcher(text);
         return matcher.replaceAll(replace);
     }
-
-//    @Transactional
-//    @GetMapping("/users/read-all-competitive-composition")
-//    public String readCompetitiveComposition(Model model, HttpServletRequest request) {
-//        metricsService.startMetricsCheck(request, "/users/read-all-competitive-composition");
-//        List<Composition> compositionList = compositionRepository.findAllByPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE);
-//        compositionList.sort(Comparator.comparing(Composition::getId).reversed());
-//
-//        model.addAttribute("compositionList", compositionList);
-//        model.addAttribute("title", "Read competitive composition");
-//
-//        return "living-read-all-competitive-composition";
-//    }
-
-//    @Transactional
-//    @GetMapping("/users/read-competitive-one-composition/{id}")
-//    public String readCompetitiveOneComposition(@PathVariable(value = "id") Long id,
-//                                                Authentication authentication,
-//                                                Model model,
-//                                                HttpServletRequest request) {
-//        metricsService.startMetricsCheck(request, "/users/read-competitive-one-composition/" + id);
-//        Optional<Composition> oneById = compositionRepository.findOneById(id);
-//        if (oneById.isPresent()) {
-//            if (oneById.get().getPublicationType().equals(PublicationType.PUBLIC_TO_COMPETITIVE)) {
-//                Optional<Evaluate> byEmailAppraiser = evaluateRepository.findByEmailAppraiserAndIdComposition(getUserEmail(authentication), id);
-//
-//                if (byEmailAppraiser.isPresent()) {
-//                    model.addAttribute("compositionOne", oneById.get());
-//                    return "living-read-competitive-one-composition-off-mark";
-//                }
-//            }
-//            model.addAttribute("compositionOne", oneById.get());
-//            model.addAttribute("title", "Read Composition");
-//            return "living-read-competitive-one-composition-on-mark";
-//        }
-//        return "redirect:/users/read-all-competitive-composition";
-//    }
-
-//    @PostMapping("/users/evaluation-one-composition")
-//    public String saveEvaluation(Authentication authentication,
-//                                 @RequestParam("id") Long id,
-//                                 @RequestParam("environment") String environment,
-//                                 @RequestParam("characters") String characters,
-//                                 @RequestParam("atmosphere") String atmosphere,
-//                                 @RequestParam("plot") String plot,
-//                                 @RequestParam("impression") String impression,
-//                                 @RequestParam("comments") String comments) {
-//        String userEmail = getUserEmail(authentication);
-//
-//        Evaluate evaluate = new Evaluate();
-//        evaluate.setLocalDate(new Date());
-//        evaluate.setIdComposition(id);
-//        evaluate.setEmailAppraiser(userEmail);
-//        evaluate.setEnvironment(getMarkFromFactory("ENVIRONMENT", environment));
-//        evaluate.setCharacters(getMarkFromFactory("CHARACTERS", characters));
-//        evaluate.setAtmosphere(getMarkFromFactory("ATMOSPHERE", atmosphere));
-//        evaluate.setPlot(getMarkFromFactory("PLOT", plot));
-//        evaluate.setImpression(getMarkFromFactory("IMPRESSION", impression));
-//
-//        Comments commentsOfComposition = new Comments();
-//        commentsOfComposition.setEmail(userEmail);
-//        commentsOfComposition.setIdComposition(id);
-//        commentsOfComposition.setComments(convertTextWithFormatToCompositionSaveAndEdit(comments));
-//
-//        evaluateRepository.save(evaluate);
-//        commentsRepository.save(commentsOfComposition);
-//        return "redirect:/users/read-all-competitive-composition";
-//    }
-
-//    @Transactional
-//    @GetMapping("/users/read-friends-composition")
-//    public String readFriendComposition(Authentication authentication, Model model) {
-//        String userEmail = getUserEmail(authentication);
-//
-//        List<Optional<User>> optionalList = myFriendsRepository.findAllByAddressUser(userEmail).stream()
-//                .map(el -> userRepository.findOneByEmail(el.getAddressMyFriends()))
-//                .collect(Collectors.toList());
-//        List<User> userList = optionalList.stream()
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .collect(Collectors.toList());
-//        List<List<Composition>> compositionList = userList.stream()
-//                .map(el -> compositionRepository.findAllByEmail(el.getEmail()))
-//                .collect(Collectors.toList());
-//        List<Composition> allPublicToFriends = new ArrayList<>();
-//        for (List<Composition> compositions : compositionList) {
-//            List<Composition> collect = compositions.stream()
-//                    .filter(a -> a.getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS))
-//                    .collect(Collectors.toList());
-//            allPublicToFriends.addAll(collect);
-//        }
-//        model.addAttribute("friendsPublications", allPublicToFriends);
-//        model.addAttribute("title", "Публікації друзів");
-//        return "living-read-all-friend-composition";
-//    }
-
-//    @Transactional
-//    @GetMapping("/users/read-friend-one-composition/{id}")
-//    public String readFriendOneComposition(@PathVariable(value = "id") Long id, Authentication authentication, Model model) {
-//        Optional<Composition> oneById = compositionRepository.findOneById(id);
-//        if (oneById.isPresent()) {
-//            model.addAttribute("title", "Робота товариша");
-//            model.addAttribute("compositionOne", oneById.get());
-//            return "living-read-one-friend-composition";
-//        }
-//        return "redirect:/users/read-friends-composition";
-//    }
-
-
-//    @Transactional
-//    @GetMapping("/users/wright-composition")
-//    public String wrightComposition(Model model) {
-//        model.addAttribute("title", "Wright Composition");
-//        return "living-write-composition";
-//    }
-
-//    @Transactional
-//    @PostMapping("/users/save-composition")
-//    public String saveComposition(Authentication authentication,
-//                                  Model model,
-//                                  MultipartFile file,
-//                                  @RequestParam("genre") String genre,
-//                                  @RequestParam("titleText") String titleText,
-//                                  @RequestParam("shortText") String shortText,
-//                                  @RequestParam("fullText") String fullText) throws IOException {
-//
-//        if (checkData(file, titleText, shortText, fullText)) {
-//            return getErrorPage(file, titleText, shortText, fullText, model);
-//        } else {
-//            String userEmail = getUserEmail(authentication);
-//            int count = compositionRepository.findAllByEmail(userEmail).size();
-//            Composition composition = new Composition();
-//            composition.setLocalDate(new Date());
-//            composition.setGenre(getGenre(genre));
-//            composition.setPublicationType(PublicationType.NO_PUBLIC);
-//            composition.setTitleText(titleText);
-//            composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
-//            composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
-//            composition.setEmail(userEmail);
-//            composition.setName(file.getOriginalFilename());
-//            composition.setType(file.getContentType());
-//            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
-//            composition.setImage(convert.img);
-//            compositionRepository.save(composition);
-//            compressorImgToJpg.deleteImage(convert.nameStart);
-//            compressorImgToJpg.deleteImage(convert.nameEnd);
-//            return "redirect:/users/read-all-my-composition";
-//        }
-//    }
 
     private int countId(int count) {
         return ++count;
@@ -544,17 +289,30 @@ public class _4_LivingRoomControllers {
         return "living-write-error-save-page";
     }
 
-    private String getUserEmail(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getEmail();
-    }
-
     private String findUserAddress(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getAddress();
+    }
+
+    private String createURL(String nameURL) {
+        return YOUTUBE + nameURL + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
+    }
+
+    private String parseUpdateURL(String url) {
+        String[] cutLink = url.split(YOUTUBE);
+        String[] cutName = cutLink[1].split("\\?");
+        return cutName[0];
+    }
+
+    private String parseNormalURL(String url) {
+        String[] split = url.split("=");
+        StringBuilder sb = new StringBuilder();
+        char[] chars = split[1].trim().toCharArray();
+        for (int i = 0; i < 11; i++) {
+            sb.append(chars[i]);
+        }
+        return sb.toString();
     }
 }

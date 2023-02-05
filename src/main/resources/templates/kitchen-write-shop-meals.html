@@ -1,54 +1,51 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-
-    <!--    <title th:text="${user}"></title>-->
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">KITCHEN ROOM</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Кухня. Місце для смаколиків, рецептів та кулінарних вподобань.
+    </h5>
     <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/kitchen/read-cookbook" class="btn btn-info btn-lg btn-block" role="button">Cook Book</a>
+                    <a href="/kitchen/read-cookbook"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Кулінарна книга</a>
+                    <a href="/kitchen/write-prescription"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Заисати рецепт</a>
+                    <a href="/kitchen/write-menu"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Моє меню</a>
+                    <a href="/kitchen/write-shop-meals"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Придбати в магазині</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                     <br>
-                    <a href="/kitchen/write-prescription" class="btn btn-info btn-lg btn-block" role="button">To write a
-                        prescription</a>
-                    <br>
-                    <a href="/kitchen/write-menu" class="btn btn-info btn-lg btn-block" role="button">My
-                        menu</a>
-                    <br>
-                    <a href="/kitchen/write-shop-menu" class="btn btn-warning btn-lg btn-block disabled" role="button">Shop
-                        menu</a>
-                    <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
-                    <br>
-
                 </div>
-
-
                 <div class="col-md-8">
                     <table class="table">
                         <thead class="thead-dark">
                         <tr>
-                            <th style="width: 10%"><h6>Score</h6></th>
-                            <th class="text-center" style="width: 50%"><h6>--Meals--</h6></th>
+                            <th style="width: 10%"><h6></h6></th>
+                            <th class="text-center" style="width: 50%"><h6>--Перелі необхідних продуктів--</h6></th>
                             <th style="width: 20%"><h6></h6></th>
                             <th style="width: 20%"><h6></h6></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="shopMeals, iterator:${shopMealsList}" class="alert alert-info mt-2">
+                        <tr th:each="shopMeals, iterator:${shopMealsList}" class="mt-2">
                             <td th:text="${iterator.index+1}"></td>
                             <td><span th:text="${shopMeals.fullText}"></span></td>
-
                             <td>
                                 <div class="form-check" size="50px">
                                     <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
@@ -58,25 +55,32 @@
                             </td>
 
                             <td><a th:href="'/kitchen/write-shop-meals/'+${shopMeals.id}+'/remove'"
-                                   class="btn btn-warning">REMOVE</a></td>
+                                   class="btn btn-warning">Видалити</a></td>
                         </tr>
                         </tbody>
                     </table>
                     <br><br>
-                    <h2 class="text-center text-success">WRITE MEAL </h2><br>
+                    <h5 class="d-flex justify-content-center " style="color: #095979">
+                        Добавити продукт</h5>
+                    <br>
                     <form action="/kitchen/write-shop-meal" method="post">
                         <div class="form-floating">
                             <h2>
                                 <input type="text" name="fullText" class="form-control"
-                                       placeholder="Check you meal ">
+                                       placeholder="Вписати що потрібно придбати">
                             </h2>
                         </div>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Add meal</button>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Добавити до переліку</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
 </div>
+</body>
 </html>

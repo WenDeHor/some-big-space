@@ -1,74 +1,69 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-
-    <!--    <title th:text="${user}"></title>-->
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">KITCHEN ROOM</h5>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Кухня. Місце для смаколиків, рецептів та кулінарних вподобань.
+    </h5>
     <br>
     <div class="row">
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/kitchen/read-cookbook" class="btn btn-info btn-lg btn-block" role="button">Cook Book</a>
-                    <br>
-                    <a href="/kitchen/write-prescription" class="btn btn-warning btn-lg btn-block disabled" role="button">To write
-                        a
-                        prescription</a>
-                    <br>
-                    <a href="/kitchen/write-menu" class="btn btn-info btn-lg btn-block" role="button">My
-                        menu</a>
-                    <br>
-                    <a href="/kitchen/write-shop-meals" class="btn btn-info btn-lg btn-block" role="button">Shop menu</a>
-                    <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <a href="/kitchen/read-cookbook"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Кулінарна книга</a>
+                    <a href="/kitchen/write-prescription"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Заисати рецепт</a>
+                    <a href="/kitchen/write-menu"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Моє меню</a>
+                    <a href="/kitchen/write-shop-meals"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Придбати в магазині</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                     <br>
                 </div>
                 <div class="col-md-8">
                     <form action="/kitchen/write-prescription" method="post" enctype="multipart/form-data">
-
-                        <h2 class="form-signin-heading">WRITE PRESCRIPTION</h2>
-
+                        <h5 class="d-flex justify-content-center " style="color: #095979">
+                            Записати рецепт</h5>
                         <div class="custom-file mb-4">
                             <input type="file" name="file" class="custom-file-input"
                                    id="customFile"> <label class="custom-file-label"
-                                                           for="customFile">Image</label>
+                                                           for="customFile">Завантажити фото</label>
                         </div>
-
-<!--                        <div class="input-group mb-3">-->
-<!--                            <label class="input-group-text"  for="inputGroupFile01">Upload</label>-->
-<!--                            <input type="file" name="file" class="form-control" id="inputGroupFile01">-->
-<!--                        </div>-->
                         <br>
                         <p>
-                            <label>TITLE</label>
+                            <label>Назва страви</label>
                             <input type="text" name="titleText" class="form-control"
-                                   placeholder="TITLE NAME">
+                                   placeholder="Назва страви">
                         </p>
                         <br>
-                        <label>PLACE TO PRESCRIPTION</label>
-                        <label for="fullText"> tell us you story : </label>
+                        <label>Перелік інгрідієнтів та рецептура</label>
+                        <label for="fullText"> записати рецепт : </label>
                         <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="20"
-                                  placeholder="WRITE A LETTER {character limit up to 3000} "></textarea>
-
+                                  placeholder="Записати рецепт {Максимальна кількість символів - 3000}"></textarea>
                         <br>
-
                         <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
                     </form>
                 </div>
             </div>
-            <br><br>
-            <!--    <form action="/user-page" method="post">-->
-            <!--        <button class="btn btn-lg btn-info btn-block" type="submit">TO MY HOME</button>-->
-            <!--    </form>-->
-
         </div>
     </div>
+</div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

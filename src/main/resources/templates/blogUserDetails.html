@@ -1,14 +1,12 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
-<head>
-    <title th:text="${title}"></title>
-    <link rel="stylesheet" href="css/mine.css">
-   </head>
-<div th:insert="blocks/library::library"></div>
-<header th:insert="blocks/heder-mine::header-mine"></header>
-<br><br>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
 <body>
+<div th:insert="blocks/heder-mine::header-mine"></div>
 <div class="row col-md-12 mb-12">
     <div th:each="el:${publicationUser}" class="col-md-12 mb-12">
         <h3 th:text="${el.title}"/>
@@ -21,7 +19,10 @@
         <h3><p th:text="${el.full_text}"/></h3>
     </div>
 </div>
-
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
 </body>
-<footer th:insert="blocks/footer-first::footer-first"></footer>
 </html>

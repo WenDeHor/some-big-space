@@ -34,13 +34,12 @@
                     <form action="/logout" method="post">
                         <button class="btn btn-lg btn-secondary btn-block" type="submit">Вийти в світ</button>
                     </form>
-
-
                 </div>
                 <div class="col-md-8 text-center">
                     <div th:each="userPhoto, el:${photos}" class="mt-2">
                         <img th:src="@{${'/user/page/photo/display/'+ userPhoto.id}}" style="width: 100%"
                              alt="Family photo"/>
+                        <br>
                         <br>
                         <h5><p th:text="${userPhoto.fullText}" class="font-weight-bold"></p></h5>
                         <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Замінити фото</a>

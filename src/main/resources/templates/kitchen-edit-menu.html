@@ -1,54 +1,53 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-
-    <!--    <title th:text="${user}"></title>-->
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Кухня. Місце для смаколиків, рецептів та кулінарних вподобань.
+    </h5>
     <br>
     <div class="row">
-
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/kitchen/read-cookbook" class="btn btn-info btn-lg btn-block" role="button">Cook Book</a>
-                    <br>
-                    <a href="/kitchen/write-prescription" class="btn btn-info btn-lg btn-block" role="button">To write
-                        a
-                        prescription</a>
-                    <br>
-                    <a href="/kitchen/write-menu" class="btn btn-warning btn-lg btn-block disabled" role="button">My
-                        menu</a>
-                    <br>
-                    <a href="/kitchen/write-shop-meals" class="btn btn-info btn-lg btn-block" role="button">Shop menu</a>
-                    <br>
-                    <a href="/user-page" class="btn btn-info btn-lg btn-block" role="button">TO MY HOME</a>
+                    <a href="/kitchen/read-cookbook"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Кулінарна книга</a>
+                    <a href="/kitchen/write-prescription"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Заисати рецепт</a>
+                    <a href="/kitchen/write-menu"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Моє меню</a>
+                    <a href="/kitchen/write-shop-meals"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Придбати в магазині</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <h5 class="text-center alert alert-info">MENU</h5>
+                    <h5 class="text-center">Меню</h5>
                     <table class="table">
                         <thead class="thead-dark">
                         <tr>
-                            <th><h6>Date</h6></th>
-                            <th><h6>Day</h6></th>
-                            <th><h6>Breakfast</h6></th>
-                            <th><h6>Dinner</h6></th>
-                            <th><h6>Supper</h6></th>
+                            <th><h6>Дата</h6></th>
+                            <th><h6>Дань</h6></th>
+                            <th><h6>Сніданок</h6></th>
+                            <th><h6>Обід</h6></th>
+                            <th><h6>Вечеря</h6></th>
                             <th><h6></h6></th>
                             <th><h6></h6></th>
                         </tr>
                         </thead>
                         <tbody>
-
-                        <tr th:each="menu, el:${menus}" class="alert alert-info mt-2">
+                        <tr th:each="menu, el:${menus}" class="mt-2">
                             <td><span th:text="${#dates.format({menu.date}, 'dd:MM')}"></span></td>
                             <td><span th:text="${#dates.dayOfWeekName({menu.date})}"></span></td>
                             <td><span th:text="${menu.breakfast}"></span></td>
@@ -56,16 +55,14 @@
                             <td><span th:text="${menu.supper}"></span></td>
 
                             <td><a th:href="'/kitchen/write-menu/'+${menu.id}+'/edit'"
-                                   class="btn btn-warning">EDIT</a></td>
+                                   class="btn btn-warning">Редагувати</a></td>
                             <td><a th:href="'/kitchen/write-menu/'+${menu.id}+'/remove'"
-                                   class="btn btn-warning">REMOVE</a></td>
+                                   class="btn btn-warning">Видалити</a></td>
                         </tr>
 
                         </tbody>
                     </table>
-
-                    <h2 class="text-center text-success">EDIT MENU</h2><br>
-
+                    <h2 class="text-center text-success">Редагувати меню</h2><br>
                     <div th:each="menu, el:${menus}">
                         <form method="post">
                             <table>
@@ -74,25 +71,29 @@
                                 <td>
                                     <input type="text" th:value="${menu.breakfast}" name="breakfast"
                                            class="form-control"
-                                           placeholder="breakfast">
+                                           placeholder="Сніданок">
                                 </td>
                                 <td>
                                     <input type="text" th:value="${menu.dinner}" name="dinner" class="form-control"
-                                           placeholder="dinner">
+                                           placeholder="Обід">
                                 </td>
                                 <td>
                                     <input type="text" th:value="${menu.supper}" name="supper" class="form-control"
-                                           placeholder="supper">
+                                           placeholder="Вечеря">
                                 </td>
                             </table>
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
-
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                         </form>
                     </div>
                 </div>
-                <br><br>
             </div>
         </div>
     </div>
 </div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>
