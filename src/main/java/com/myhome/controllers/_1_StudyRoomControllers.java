@@ -1,5 +1,6 @@
 package com.myhome.controllers;
 
+import com.myhome.forms.LettersDTO;
 import com.myhome.models.LetterToUSER;
 import com.myhome.models.PublicationUser;
 import com.myhome.models.User;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +28,7 @@ public class _1_StudyRoomControllers {
     private final LetterToUSERRepository letterToUSERRepository;
 
     private final int LIMIT_LIST = 10;
+    private final String MY_ROOM = "Моя кімната";
 
     public _1_StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository) {
         this.publicationRepository = publicationRepository;
@@ -37,45 +37,30 @@ public class _1_StudyRoomControllers {
     }
 
     @GetMapping("/study/write-letter")
-    public String studyWriteLetter(Authentication authentication, Model model) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userEmail = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-        String address = oneByEmail.get().getAddress();
+    public String studyWriteLetter(Authentication authentication,
+                                   Model model) {
+        String address = findUserAddress(authentication);
 
         model.addAttribute("address", address);
-        model.addAttribute("title", "Letter");
+        model.addAttribute("title", MY_ROOM);
         return "study-write-letter";
     }
 
     @PostMapping("/study/write-letter/send")
-    public String LetterSend(LetterToUSER letterToUSER,
-                             @RequestParam String titleText,
+    public String LetterSend(@RequestParam String titleText,
                              @RequestParam String fullText,
-                             @RequestParam String senderAddress,
                              @RequestParam String recipientAddress,
-                             Model model, Authentication authentication) {
-
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userEmail = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-        String address = oneByEmail.get().getAddress();
-        String Login = oneByEmail.get().getLogin();
-        System.out.println("mailingAddress  ".toUpperCase() + address + " Login:" + Login);
-
-        LocalDate localDate = LocalDate.now();// получаем текущую дату
-        String localdate = localDate.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
-
-        Date date = new Date();
+                             Authentication authentication) {
+        String address = findUserAddress(authentication);
 
         LetterToUSER userSendLetterToUSER = new LetterToUSER();
-        userSendLetterToUSER.setDate(date);
+        userSendLetterToUSER.setDate(new Date());
         userSendLetterToUSER.setTitleText(titleText);
         userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
-        userSendLetterToUSER.setSenderAddress(senderAddress);
+        userSendLetterToUSER.setSenderAddress(address);
         userSendLetterToUSER.setRecipientAddress(recipientAddress);
         letterToUSERRepository.save(userSendLetterToUSER);
-        return "redirect:/user-page";
+        return "redirect:/study/outer-letters";
     }
 
     private String convertTextWithFormatToSave(String fullText) {
@@ -83,28 +68,60 @@ public class _1_StudyRoomControllers {
         return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
-    @GetMapping("/study/read-letters")
-    public String studyReadLettersOfUser(Authentication authentication, Model model) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        String address = oneByEmail.get().getAddress();
-        Iterable<LetterToUSER> lettersRecipientUser = letterToUSERRepository.findAllByRecipientAddress(address);
-        Iterable<LetterToUSER> letterSendersUser = letterToUSERRepository.findAllBySenderAddress(address);
-        List<LetterToUSER> letterToUSERS = new ArrayList<>();
-        lettersRecipientUser.forEach(letterToUSERS::add);
-        letterSendersUser.forEach(letterToUSERS::add);
+    @GetMapping("/study/outer-letters")
+    public String studyReadAllOutLetters(Authentication authentication,
+                                         Model model) {
+        String address = findUserAddress(authentication);
+        List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllBySenderAddress(address).stream()
+                .map(el -> new LettersDTO(el.getIdLetter(), el.getTitleText(), el.getFullText(), buildInfoBySender(el)))
+                .sorted(Comparator.comparing(LettersDTO::getIdLetter).reversed())
+                .collect(Collectors.toList());
+        model.addAttribute("letters", lettersDTOS);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-letters-outer";
+    }
 
-        letterToUSERS.sort(Comparator.comparing(LetterToUSER::getDate).reversed());
+    private String buildInfoBySender(LetterToUSER letter) {
+        return "Отримувач: " + letter.getRecipientAddress() +
+                ", Дата: " + letter.getDate().toString().split("\\s")[0];
+    }
 
-        model.addAttribute("letters", letterToUSERS);
-        model.addAttribute("title", "letters");
-        return "study-read-letters";
+    @GetMapping("/study/outer-letters/{idLetter}/remove")
+    public String letterRemoveByOuter(@PathVariable(value = "idLetter") Long idLetter) {
+        LetterToUSER letter = letterToUSERRepository.findById(idLetter).orElseThrow(null);
+        letterToUSERRepository.delete(letter);
+        return "redirect:/study/outer-letters";
+    }
+
+    @GetMapping("/study/enter-letters")
+    public String studyReadAlEnterLetters(Authentication authentication,
+                                          Model model) {
+        String address = findUserAddress(authentication);
+        List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllByRecipientAddress(address).stream()
+                .map(el -> new LettersDTO(el.getIdLetter(), el.getTitleText(), el.getFullText(), buildInfoByRecipient(el)))
+                .sorted(Comparator.comparing(LettersDTO::getIdLetter).reversed())
+                .collect(Collectors.toList());
+        model.addAttribute("letters", lettersDTOS);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-letters-enter"; //TODO UI
+    }
+
+    private String buildInfoByRecipient(LetterToUSER letter) {
+        return "Відправник : " + letter.getSenderAddress() +
+                ", Дата: " + letter.getDate().toString().split("\\s")[0];
+    }
+
+    @GetMapping("/study/enter-letters/{idLetter}/remove")
+    public String letterRemoveByEnter(@PathVariable(value = "idLetter") Long idLetter) {
+        LetterToUSER letter = letterToUSERRepository.findById(idLetter).orElseThrow(null);
+        letterToUSERRepository.delete(letter);
+        return "redirect:/study/enter-letters";
     }
 
     //TODO Publications
     @GetMapping("/study/read-all-publications")
-    public String studyReadAllPublicationsOfUser(Authentication authentication, Model model) {
+    public String studyReadAllPublicationsOfUser(Authentication authentication,
+                                                 Model model) {
         String userAddress = findUserAddress(authentication);
         List<PublicationUser> publicationAllUsers = publicationRepository.findAll().stream()
                 .filter(el -> !el.getAddress().equals(userAddress))
@@ -112,44 +129,42 @@ public class _1_StudyRoomControllers {
                 .sorted(Comparator.comparing(PublicationUser::getIdPublication).reversed())
                 .collect(Collectors.toList());
 
-//        List<PublicationUser> publicationList = new ArrayList<>(publicationAllUsers);
-//        publicationList.sort(Comparator.comparing(PublicationUser::getIdPublication).reversed());
-
         model.addAttribute("publicationUser", publicationAllUsers);
-        model.addAttribute("title", "Publication of User");
+        model.addAttribute("title", MY_ROOM);
         return "study-read-all-publications";
     }
 
     @GetMapping("/study/read-my-publications")
-    public String studyReadMyPublicationsOfUser(Authentication authentication, Model model) {
-
+    public String studyReadMyPublicationsOfUser(Authentication authentication,
+                                                Model model) {
         String userAddress = findUserAddress(authentication);
         List<PublicationUser> publicationUser = publicationRepository.findAllByAddress(userAddress);
-
         List<PublicationUser> publicationList = new ArrayList<>(publicationUser);
         publicationList.sort(Comparator.comparing(PublicationUser::getIdPublication).reversed());
 
         model.addAttribute("publicationUser", publicationList);
-        model.addAttribute("title", "Publication of User");
+        model.addAttribute("title", MY_ROOM);
         return "study-read-my-publications";
     }
 
     @GetMapping("/study/publication/{idPublication}/remove")
-    public String publicationRemove(@PathVariable(value = "idPublication") Long idPublication, Model model) {
+    public String publicationRemove(@PathVariable(value = "idPublication") Long idPublication) {
         PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
         publicationRepository.delete(publicationUser);
-        return "redirect:/study/read-publications";
+        return "redirect:/study/read-my-publications";
     }
 
     @GetMapping("/study/publication/{idPublication}/edit")
-    public String publicationEdit(@PathVariable(value = "idPublication") Long idPublication, Model model) {
+    public String publicationEdit(@PathVariable(value = "idPublication") Long idPublication,
+                                  Model model) {
         if (!publicationRepository.existsById(idPublication)) {
-            return "redirect:/study/read-publications";
+            return "redirect:/study/read-my-publications";
         }
         Optional<PublicationUser> post = publicationRepository.findById(idPublication);
-//        Optional<PublicationUser> post = publicationRepository.findAllByEmailId(idPublication);
         List<PublicationUser> res = new ArrayList<>();
         post.ifPresent(res::add);
+
+        model.addAttribute("title", MY_ROOM);
         model.addAttribute("publication", convertTextWithFormatPublicationEdit(res));
         return "study-edit-publications";
     }
@@ -169,52 +184,36 @@ public class _1_StudyRoomControllers {
     @PostMapping("/study/publication/{idPublication}/edit")
     public String publicationUpdate(@PathVariable(value = "idPublication") Long idPublication,
                                     @RequestParam String titleText,
-                                    @RequestParam String fullText,
-                                    Model model) {
+                                    @RequestParam String fullText) {
         PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
         publicationUser.setTitleText(titleText);
-//        String url= "https://www.youtube.com/embed/"+video+"?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-//        https://www.youtube.com/embed/vguSoDvurss?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent
         publicationUser.setFullText(convertTextWithFormatToSave(fullText));
-        Date date = new Date();
-        publicationUser.setDate(date);
+        publicationUser.setDate(new Date());
         publicationRepository.save(publicationUser);
-        return "redirect:/study/read-publications";
+        return "redirect:/study/read-my-publications";
     }
 
     @GetMapping("/study/write-publication")
     public String studyWritePublication(Model model) {
-        model.addAttribute("title", "Write publication");
+        model.addAttribute("title", MY_ROOM);
         return "study-write-publication";
     }
 
     @PostMapping("/study/publication/add")
-    public String blogPublicationAdd(PublicationUser pub,
-                                     @RequestParam String titleText,
+    public String blogPublicationAdd(@RequestParam String titleText,
                                      @RequestParam String fullText,
-                                     Model model, Authentication authentication) {
+                                     Authentication authentication) {
+        String userEmail = getUserEmail(authentication);
+        String address = findUserAddress(authentication);
 
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userEmail = details.getUsername();
-
-//        publicationRepository.findOneByEmail(userEmail);
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-        String address = oneByEmail.get().getAddress();
-        String Login = oneByEmail.get().getLogin();
-        System.out.println("mailingAddress  ".toUpperCase() + address + "Login:" + Login);
-
-        LocalDate localDateNow = LocalDate.now();// получаем текущую дату
-        String localDate = localDateNow.format(DateTimeFormatter.ofPattern("yyyy:MM:dd")); // патерн формату дати
-
-        Date date = new Date();
         PublicationUser publicationUser = new PublicationUser();
         publicationUser.setAddress(address);
         publicationUser.setEmail(userEmail);
-        publicationUser.setDate(date);
+        publicationUser.setDate(new Date());
         publicationUser.setTitleText(titleText);
-        publicationUser.setTitleText(convertTextWithFormatToSave(fullText));
+        publicationUser.setFullText(convertTextWithFormatToSave(fullText));
         publicationRepository.save(publicationUser);
-        return "redirect:/study/read-publications";
+        return "redirect:/study/read-my-publications";
     }
 
     private String findUserAddress(Authentication authentication) {
@@ -222,6 +221,11 @@ public class _1_StudyRoomControllers {
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getAddress();
+    }
+
+    private String getUserEmail(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        return details.getUsername();
     }
 
     //TODO REGEX

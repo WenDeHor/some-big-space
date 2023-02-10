@@ -5,10 +5,6 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "letter_user")
 public class LetterToUSER {

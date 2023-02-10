@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+<body>
+<div class="container"><br>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Вітальня - місце для наших публікацій та пошуку друзів і рідних.
+    </h5>
+    <br>
+    <div class="row">
+        <div class="album col-md-12">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/living/news/video"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої відео</a>
+                    <a href="/living/news/add"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Добавити відео</a>
+                    <a href="/living/friends/family"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Пошук друзів</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
+                    <br>
+                </div>
+                <div class="col-md-8">
+                    <ul class="nav justify-content-center bg-info">
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-dark  font-weight-bold"
+                                   href="/living/friends/family">
+                                    Моя сім’я</a>
+                            </h5>
+                        </li>
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-dark  font-weight-bold"
+                                   href="/living/friends/friends">
+                                    Мої друзі</a>
+                            </h5>
+                        </li>
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-white disabled font-weight-bold"
+                                   href="/living/friends/search">
+                                    Знайти товариша чи родича</a>
+                            </h5>
+                        </li>
+                    </ul>
+                    <br>
+                    <form action="/living/friends/search/find" method="get">
+                        <table>
+                            <div class="custom-file mb-4">
+                                <input type="text" name="userLogin" class="form-control"
+                                       placeholder="Пошук друзів та родичів по імені">
+                            </div>
+                        </table>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Знайти</button>
+                    </form>
+                    <br>
+                    <table class="table">
+                        <thead class="thead-light">
+                        <tr>
+                            <th style="width: 10%"><h6>№</h6></th>
+                            <th style="width: 60%"><h6>-- Адреса --</h6></th>
+                            <th style="width: 15%"><h6>Дія</h6></th>
+                            <th style="width: 15%"><h6>Дія</h6></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user, iterator:${all}" class="mt-2">
+                            <td th:text="${iterator.index+1}"></td>
+                            <td><span th:text="${user.address}"></span></td>
+                            <td><a th:href="'/living/friends/friends/'+${user.idUser}+'/add'"
+                                   class="btn btn-warning">Товариш</a></td>
+                            <td><a th:href="'/living/friends/family/'+${user.idUser}+'/add'"
+                                   class="btn btn-warning">Сім’я</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
+</html>

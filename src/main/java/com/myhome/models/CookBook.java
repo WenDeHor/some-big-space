@@ -6,26 +6,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "cook_book")
 public class CookBook {
-    public CookBook() {
-    }
-
-    public CookBook(Date date, @Size(min = 0, max = 1000) String titleText, @Size(min = 0, max = 3000) String fullText, String email, String name, String type, byte[] image) {
-        this.date = date;
-        this.titleText = titleText;
-        this.fullText = fullText;
-        this.email = email;
-        this.name = name;
-        this.type = type;
-        this.image = image;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -43,8 +26,8 @@ public class CookBook {
     @Size(min = 0, max = 3000)
     private String fullText;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "name")
     private String name;
@@ -55,6 +38,19 @@ public class CookBook {
     @Lob
     @Column(name = "Image", length = Integer.MAX_VALUE, nullable = true)
     private byte[] image;
+
+    public CookBook() {
+    }
+
+    public CookBook(Date date, @Size(min = 0, max = 1000) String titleText, @Size(min = 0, max = 3000) String fullText, String address, String name, String type, byte[] image) {
+        this.date = date;
+        this.titleText = titleText;
+        this.fullText = fullText;
+        this.address = address;
+        this.name = name;
+        this.type = type;
+        this.image = image;
+    }
 
     public Long getId() {
         return id;
@@ -88,12 +84,12 @@ public class CookBook {
         this.fullText = fullText;
     }
 
-    public String getEmail() {
-        return email;
+    public String getAddress() {
+        return address;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getName() {
@@ -129,7 +125,7 @@ public class CookBook {
                 Objects.equals(date, cookBook.date) &&
                 Objects.equals(titleText, cookBook.titleText) &&
                 Objects.equals(fullText, cookBook.fullText) &&
-                Objects.equals(email, cookBook.email) &&
+                Objects.equals(address, cookBook.address) &&
                 Objects.equals(name, cookBook.name) &&
                 Objects.equals(type, cookBook.type) &&
                 Arrays.equals(image, cookBook.image);
@@ -137,7 +133,7 @@ public class CookBook {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, date, titleText, fullText, email, name, type);
+        int result = Objects.hash(id, date, titleText, fullText, address, name, type);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }
@@ -149,7 +145,7 @@ public class CookBook {
                 ", date=" + date +
                 ", titleText='" + titleText + '\'' +
                 ", fullText='" + fullText + '\'' +
-                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", image=" + Arrays.toString(image) +

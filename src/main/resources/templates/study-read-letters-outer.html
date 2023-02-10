@@ -1,12 +1,10 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-
 <body>
 <div class="container"><br>
     <h5 class="d-flex justify-content-center " style="color: #095979">
@@ -18,13 +16,13 @@
             <div class="row col-md-12">
                 <div class="col-md-4">
                     <a href="/study/enter-letters"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                         Мої листи</a>
                     <a href="/study/write-letter"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Написати листа</a>
                     <a href="/study/read-all-publications"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Усі публікації</a>
                     <a href="/study/read-my-publications"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
@@ -37,14 +35,32 @@
                         До головної</a>
                     <br>
                 </div>
+
                 <div class="col-md-8">
-                    <div th:each="publicationUser, el:${publications}" class="mt-2">
-                        <h5 th:text="${publicationUser.date}"></h5>
-                        <h5 th:text="${publicationUser.address}"></h5>
-                        <h2 th:text="${publicationUser.titleText}"></h2>
-                        <p th:utext="${publicationUser.fullText}"></p>
-                    </div>
+                    <ul class="nav justify-content-center bg-info">
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-white disabled font-weight-bold"
+                                   href="/study/outer-letters">
+                                    Вихідні листи</a>
+                            </h5>
+                        </li>
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link  text-dark font-weight-bold"
+                                   href="/study/enter-letters">
+                                    Вхідні листи</a>
+                            </h5>
+                        </li>
+                    </ul>
                     <br>
+                    <div th:each="el:${letters}" class="alert alert-info">
+                        <h5 class="text-center font-weight-bold" th:text="${el.titleText}"></h5>
+                        <h5 th:utext="${el.fullText}"></h5>
+                        <h6 class="text-right" th:text="${el.info}"></h6>
+                        <a th:href="'/study/outer-letters/'+${el.idLetter}+'/remove'"
+                           class="btn btn-outline-warning btn-block font-weight-bold">Видалити</a>
+                    </div>
                 </div>
             </div>
         </div>

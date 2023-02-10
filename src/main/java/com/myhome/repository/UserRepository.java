@@ -3,11 +3,9 @@ package com.myhome.repository;
 
 import com.myhome.models.Role;
 import com.myhome.models.User;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +19,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findOneByIdUser(Long email);
     Optional<User> findOneByLogin(String login);
     Optional<User> findAllByEmail(String email);
-    Optional<User> findAllByLogin(String login);
+    List<User> findAllByLogin(String login);
+    List<User> findAllByLoginLike(String login);
+    List<User> findAllByLoginContaining(String login);
+    List<User> findAllByLoginContains(String login);
+    List<User> findAllByLoginIsContaining(String login);
+    List<User> findAllByLoginContainingIgnoreCase(String login);
 
 
 }

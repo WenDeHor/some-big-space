@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+<body>
+<div class="container"><br>
+    <h5 class="d-flex justify-content-center " style="color: #095979">
+        Вітальня - місце для наших публікацій та пошуку друзів і рідних.
+    </h5>
+    <br>
+    <div class="row">
+        <div class="album col-md-12">
+            <div class="row col-md-12">
+                <div class="col-md-4">
+                    <a href="/living/news/video"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Мої відео</a>
+                    <a href="/living/news/add"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Добавити відео</a>
+                    <a href="/living/friends/family"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                        Пошук друзів</a>
+                    <a href="/user-page"
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                        До головної</a>
+                    <br>
+                </div>
+                <div class="col-md-8">
+                    <ul class="nav justify-content-center bg-info">
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-white disabled  font-weight-bold"
+                                   href="/living/friends/family">
+                                    Моя сім’я</a>
+                            </h5>
+                        </li>
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-dark  font-weight-bold"
+                                   href="/living/friends/friends">
+                                    Мої друзі</a>
+                            </h5>
+                        </li>
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-dark font-weight-bold"
+                                   href="/living/friends/search">
+                                    Знайти товариша чи родича</a>
+                            </h5>
+                        </li>
+                    </ul>
+                    <br>
+                    <table class="table">
+                        <thead class="thead-light">
+                        <tr>
+                            <th style="width: 10%"><h6>№</h6></th>
+                            <th style="width: 70%"><h6>-- Адреса --</h6></th>
+                            <th style="width: 20%"><h6>Дія</h6></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="family, iterator:${myFamilyList}" class="mt-2">
+                            <td th:text="${iterator.index+1}"></td>
+                            <td><span th:text="${family.addressFamily}"></span></td>
+                            <td><a th:href="'/living/friends/family/'+${family.id}+'/remove'"
+                                   class="btn btn-warning">Видалити</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
+</html>

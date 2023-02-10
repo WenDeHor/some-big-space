@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface CookBookRepository extends JpaRepository<CookBook, Long> {
     List<CookBook> findAll();
 
-   List<CookBook> findAllByEmail(String email);
+   List<CookBook> findAllByAddress(String address);
 
     Optional<CookBook> findById(Long id);
 }

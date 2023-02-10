@@ -15,7 +15,7 @@
         <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study/read-letters"
+                    <a href="/study/enter-letters"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Мої листи</a>
                     <a href="/study/write-letter"
@@ -42,12 +42,11 @@
                             <input type="text" name="recipientAddress" class="form-control"
                                    placeholder="Місце для адреси отримувача">
                         </p>
-                        <p>
-                            <label>Відправник</label>
-                            <input type="text" th:value="${address}" name="senderAddress" class="form-control"
-                                   placeholder="Місце для адреси відправника">
-                        </p>
-                        <br>
+
+                        <label>Відправник</label>
+                        <div th:each="addres:${address}">
+                            <h6 class="text-left" th:text="${addres}"></h6>
+                        </div>
                         <br>
                         <p>
                             <label>Заголовок</label>

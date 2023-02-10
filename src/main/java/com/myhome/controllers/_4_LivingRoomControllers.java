@@ -1,11 +1,13 @@
 package com.myhome.controllers;
 
-import com.myhome.controllers.compresor.CompressorImgToJpg;
-import com.myhome.models.MyFriends;
-import com.myhome.models.PublicationUser;
+import com.myhome.models.Family;
+import com.myhome.models.Friends;
 import com.myhome.models.User;
 import com.myhome.models.VideoBox;
-import com.myhome.repository.*;
+import com.myhome.repository.FamilyRepository;
+import com.myhome.repository.FriendsRepository;
+import com.myhome.repository.UserRepository;
+import com.myhome.repository.VideoBoxRepository;
 import com.myhome.security.UserDetailsImpl;
 import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
@@ -16,123 +18,134 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class _4_LivingRoomControllers {
-    private final MyFriendsRepository myFriendsRepository;
     private final UserRepository userRepository;
-    private final PublicationRepository publicationRepository;
-    private final NewsBoxRepository newsBoxRepository;
     private final VideoBoxRepository videoBoxRepository;
-    private final CompositionRepository compositionRepository;
-    private final CompressorImgToJpg compressorImgToJpg;
-    private final EvaluateRepository evaluateRepository;
+    private final FriendsRepository friendsRepository;
+    private final FamilyRepository familyRepository;
 
-    private final CommentsRepository commentsRepository;
+    private final String LIVING_ROOM = "Вітальня";
+
     private final MetricsService metricsService;
 
-    private final long PERIOD_METRICS = 30L;
-    private static final String INCOGNITO = "Incognito";
-    private static final String LOCAL_UI = "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-
-    private int constant = 1049335;
-    private int limit_photo = 6; //MB
-    private int limit_titleText = 150; //chars
-    private int limit_shortText = 1000; //chars
-    private int limit_fullText = 20000; //chars
-
-    private final String YOUTUBE = "https://www.youtube.com/embed/";
-
-    public _4_LivingRoomControllers(MyFriendsRepository myFriendsRepository, UserRepository userRepository, PublicationRepository publicationRepository, NewsBoxRepository newsBoxRepository, VideoBoxRepository videoBoxRepository, CompositionRepository compositionRepository, CompressorImgToJpg compressorImgToJpg, EvaluateRepository evaluateRepository, CommentsRepository commentsRepository, MetricsService metricsService) {
-        this.myFriendsRepository = myFriendsRepository;
+    public _4_LivingRoomControllers(UserRepository userRepository, VideoBoxRepository videoBoxRepository, FriendsRepository friendsRepository, FamilyRepository familyRepository, MetricsService metricsService) {
         this.userRepository = userRepository;
-        this.publicationRepository = publicationRepository;
-        this.newsBoxRepository = newsBoxRepository;
         this.videoBoxRepository = videoBoxRepository;
-        this.compositionRepository = compositionRepository;
-        this.compressorImgToJpg = compressorImgToJpg;
-        this.evaluateRepository = evaluateRepository;
-        this.commentsRepository = commentsRepository;
+        this.friendsRepository = friendsRepository;
+        this.familyRepository = familyRepository;
         this.metricsService = metricsService;
     }
 
-    @GetMapping("/living/publications")
-    public String livingReadPublications(Authentication authentication, Model model) {
-        String userAddress = findUserAddress(authentication);
-        List<MyFriends> allByAddressMyFriends = myFriendsRepository.findAllByAddressUser(userAddress);
-//        List<MyFriends> myFriendsList = new ArrayList<>(allByAddressMyFriends);
-        List<PublicationUser> publicationUserList = new ArrayList<>();
-        for (MyFriends myFriends : allByAddressMyFriends) {
-            String addressMyFriends = myFriends.getAddressMyFriends();
-            List<PublicationUser> allByAddress = publicationRepository.findAllByAddress(addressMyFriends);
-            publicationUserList.addAll(allByAddress);
-        }
-        publicationUserList.sort(Comparator.comparing(PublicationUser::getDate).reversed());
+    private final String YOUTUBE = "https://www.youtube.com/embed/";
 
-        model.addAttribute("publications", publicationUserList);
-        model.addAttribute("title", "LIVING ROOM");
-        return "living-read-publications";
+    @GetMapping("/living/friends/family")
+    public String livingAllMyFamily(Authentication authentication,
+                                    Model model) {
+        Long userId = findUserId(authentication);
+        List<Family> myFamilyList = familyRepository.findAllByIdUser(userId);
+        model.addAttribute("myFamilyList", myFamilyList);
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-friends-family";
     }
 
-    @GetMapping("/living/friends")
-    public String livingFriends(Authentication authentication, Model model) {
-        String userAddress = findUserAddress(authentication);
-        List<MyFriends> myFriendsList = myFriendsRepository.findAllByAddressUser(userAddress);
+    @GetMapping("/living/friends/friends")
+    public String livingAllMyFriends(Authentication authentication,
+                                     Model model) {
+        Long userId = findUserId(authentication);
+        List<Friends> myFriendsList = friendsRepository.findAllByIdUser(userId);
         model.addAttribute("myFriendsList", myFriendsList);
-        model.addAttribute("title", "LIVING ROOM");
-        return "living-friends";
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-friends-friends";
     }
 
-    @GetMapping("/living/friends/add")
-    public String cookBookUpdate(@RequestParam String userNameOrEmail,
-                                 Model model) {
-        List<User> all = userRepository.findAll();
-        List<User> collectLogin = all.stream()
-                .filter(p -> p.getLogin().equals(userNameOrEmail))
-                .collect(Collectors.toList());
-        List<User> collectEmail = all.stream()
-                .filter(p -> p.getEmail().equals(userNameOrEmail))
-                .collect(Collectors.toList());
-
-        Set<User> userSetUsers = new HashSet<>();
-        userSetUsers.addAll(collectLogin);
-        userSetUsers.addAll(collectEmail);
-//        Set<User> userSetUsers = new HashSet<>(userList);
-        model.addAttribute("all", userSetUsers);
-        model.addAttribute("title", "LIVING ROOM");
-        return "living-friends";
+    @GetMapping("/living/friends/search")
+    public String findFriendsPage(Model model) {
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-friends-search";
     }
 
-    @GetMapping("/living/friends/{id}/add")
-    public String livingFriendsAdd(@PathVariable(value = "id") Long id, Authentication authentication) {
-        Optional<User> oneByIdUser = userRepository.findOneByIdUser(id);
-        String addressMyFriends = oneByIdUser.get().getAddress();
-        String userAddress = findUserAddress(authentication);
-        Optional<MyFriends> allByAddressUserAndAddressMyFriends = myFriendsRepository.findAllByAddressUserAndAddressMyFriends(userAddress, addressMyFriends);
-        if (userAddress.equals(addressMyFriends) || allByAddressUserAndAddressMyFriends.isPresent()) {
-            return "redirect:/living/friends";
-        } else {
-            MyFriends myFriends = new MyFriends();
-            myFriends.setAddressUser(userAddress);
-            myFriends.setAddressMyFriends(addressMyFriends);
-            myFriendsRepository.save(myFriends);
+    @GetMapping("/living/friends/search/find")
+    public String findFriends(@RequestParam String userLogin,
+                              Authentication authentication,
+                              Model model) {
+        Long userId = findUserId(authentication);
+        List<Long> integerList = Stream
+                .concat(friendsRepository.findAllByIdUser(userId).stream().map(Friends::getIdFriend),
+                        familyRepository.findAllByIdUser(userId).stream().map(Family::getIdFamily))
+                .collect(Collectors.toList());
+        List<User> users = userRepository.findAllByLoginContainingIgnoreCase(userLogin).stream()
+                .filter(user -> !user.getIdUser().equals(userId))
+                .filter(friend -> !integerList.contains(friend.getIdUser()))
+                .collect(Collectors.toList());
+        model.addAttribute("all", users);
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-friends-search";
+    }
+
+    @GetMapping("/living/friends/friends/{id}/add")
+    public String livingFriendsAdd(@PathVariable(value = "id") Long id,
+                                   Authentication authentication,
+                                   Model model) {
+        Long userId = findUserId(authentication);
+
+        Friends newFriend = new Friends();
+        newFriend.setIdUser(userId);
+        newFriend.setIdFriend(id);
+        newFriend.setAddressFriend(getAddress(id));
+        friendsRepository.save(newFriend);
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-friends-search";
+    }
+
+    @GetMapping("/living/friends/family/{id}/add")
+    public String livingFamilyAdd(@PathVariable(value = "id") Long id,
+                                  Authentication authentication,
+                                  Model model) {
+        Long userId = findUserId(authentication);
+
+        Family newFamily = new Family();
+        newFamily.setIdUser(userId);
+        newFamily.setIdFamily(id);
+        newFamily.setAddressFamily(getAddress(id));
+        familyRepository.save(newFamily);
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-friends-search";
+    }
+
+    private String getAddress(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get().getAddress();
         }
-        return "redirect:/living/friends";
+        return "";
     }
 
-    @GetMapping("/living/friends/{id}/remove")
-    public String livingFriendsRemove(@PathVariable(value = "id") Long id, Model model) {
-        MyFriends myFriends = myFriendsRepository.findById(id).orElseThrow(null);
-        myFriendsRepository.delete(myFriends);
-        return "redirect:/living/friends";
+    @GetMapping("/living/friends/family/{id}/remove")
+    public String livingFamilyRemove(@PathVariable(value = "id") Long id) {
+        Family family = familyRepository.findById(id).orElseThrow(null);
+        familyRepository.delete(family);
+        return "redirect:/living/friends/family";
+    }
+
+    @GetMapping("/living/friends/friend/{id}/remove")
+    public String livingFriendRemove(@PathVariable(value = "id") Long id) {
+        Friends friend = friendsRepository.findById(id).orElseThrow(null);
+        friendsRepository.delete(friend);
+        return "redirect:/living/friends/friends";
     }
 
     @GetMapping("/living/news/video")
-    public String livingNewVideo(Authentication authentication, Model model) {
+    public String livingNewVideo(Authentication authentication,
+                                 Model model) {
         String userAddress = findUserAddress(authentication);
 
         Iterable<VideoBox> allVideoBox = videoBoxRepository.findAllByAddressUser(userAddress);
@@ -141,12 +154,12 @@ public class _4_LivingRoomControllers {
         videoBoxList.sort(Comparator.comparing(VideoBox::getIdVideoBox).reversed());
 
         model.addAttribute("videoBoxList", videoBoxList);
-        model.addAttribute("title", "LIVING ROOM");
+        model.addAttribute("title", LIVING_ROOM);
         return "living-news-video";
     }
 
     @GetMapping("/living/news/video/{idVideoBox}/remove")
-    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") Long idVideoBox, Model model) {
+    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") Long idVideoBox) {
         VideoBox videoBox = videoBoxRepository.findById(idVideoBox).orElseThrow(null);
         videoBoxRepository.delete(videoBox);
         return "redirect:/living/news/video";
@@ -154,17 +167,17 @@ public class _4_LivingRoomControllers {
 
     @GetMapping("/living/news/add")
     public String livingNewsAdd(Model model) {
-        model.addAttribute("title", "LIVING ROOM");
+        model.addAttribute("title", LIVING_ROOM);
         return "living-news-add";
     }
 
     @PostMapping("/living/news/add/video")
     public String livingNewsAddVideo(Authentication authentication,
-                                     Model model,
-                                     @RequestParam("linkToVideo") String linkToVideo) throws IOException {
+                                     @RequestParam("linkToVideo") String linkToVideo) {
 
         String userAddress = findUserAddress(authentication);
         String url = createURL(parseNormalURL(linkToVideo));
+
         VideoBox videoBox = new VideoBox();
         videoBox.setAddressUser(userAddress);
         videoBox.setLinkToVideo(url);
@@ -174,12 +187,18 @@ public class _4_LivingRoomControllers {
         return "redirect:/living/news/video";
     }
 
-
     private String findUserAddress(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getAddress();
+    }
+
+    private Long findUserId(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        return oneByEmail.get().getIdUser();
     }
 
     private String createURL(String nameURL) {

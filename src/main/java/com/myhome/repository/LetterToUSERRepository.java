@@ -4,9 +4,11 @@ import com.myhome.models.LetterToUSER;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LetterToUSERRepository extends JpaRepository<LetterToUSER, Long> {
-    Iterable<LetterToUSER> findAllByRecipientAddress(String email);
+    List<LetterToUSER> findAllByRecipientAddress(String email);
 
-    Iterable<LetterToUSER> findAllBySenderAddress(String email);
+    List<LetterToUSER> findAllBySenderAddress(String email);
 }

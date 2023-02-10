@@ -26,6 +26,7 @@ public class _3_SafeRoomControllers {
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
     private final ReferenceRepository referenceRepository;
+    private final String SAFE_ROOM = "Робоча кімната";
 
     public _3_SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository) {
         this.userRepository = userRepository;
@@ -35,17 +36,13 @@ public class _3_SafeRoomControllers {
 
     @Transactional
     @GetMapping("/safe/read-save-diary")
-    public String safeReadDiary(Authentication authentication, Model model) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        String address = oneByEmail.get().getAddress();
+    public String safeReadDiary(Authentication authentication,
+                                Model model) {
+        String address = findUserAddress(authentication);
         List<Diary> diaryList = diaryRepository.findAllByAddress(address);
-
-        //TODO REVERS
         diaryList.sort(Comparator.comparing(Diary::getId).reversed());
         model.addAttribute("diaryList", diaryList);
-        model.addAttribute("title", "Diary");
+        model.addAttribute("title", SAFE_ROOM);
         return "safe-read-diary";
     }
 
@@ -63,19 +60,12 @@ public class _3_SafeRoomControllers {
 
     @PostMapping("/safe/read-save-diary")
     public String safeSaveDiary(Authentication authentication,
-                                Model model,
                                 MultipartFile file,
                                 @RequestParam("titleText") String titleText,
                                 @RequestParam("fullText") String fullText) throws IOException {
-
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userEmail = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-        String address = oneByEmail.get().getAddress();
-        Date date = new Date();
-
+        String address = findUserAddress(authentication);
         Diary diary = new Diary();
-        diary.setLocalDate(date);
+        diary.setLocalDate(new Date());
         diary.setTitleText(titleText);
         diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
         diary.setAddress(address);
@@ -83,9 +73,6 @@ public class _3_SafeRoomControllers {
         diary.setType(file.getContentType());
         diary.setImage(file.getBytes());
         diaryRepository.save(diary);
-
-        System.out.println(diary.toString());
-        System.out.println("good save");
         return "redirect:/safe/read-save-diary";
     }
 
@@ -95,7 +82,7 @@ public class _3_SafeRoomControllers {
     }
 
     @DeleteMapping("/safe/edit-diary/{id}/remove")
-    public String diaryRemove(@PathVariable(value = "id") Long id, Model model) {
+    public String diaryRemove(@PathVariable(value = "id") Long id) {
         Diary diary = diaryRepository.findById(id).orElseThrow(null);
         diaryRepository.delete(diary);
         return "redirect:/safe/edit-diary";
@@ -103,30 +90,27 @@ public class _3_SafeRoomControllers {
 
     @Transactional
     @GetMapping("/safe/edit-diary")
-    public String safeEditDiary(Authentication authentication, Model model) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        String address = oneByEmail.get().getAddress();
+    public String safeEditDiary(Authentication authentication,
+                                Model model) {
+        String address = findUserAddress(authentication);
         List<Diary> diaryList = diaryRepository.findAllByAddress(address);
-
-        //TODO REVERS
         diaryList.sort(Comparator.comparing(Diary::getId).reversed());
         model.addAttribute("diaryList", diaryList);
-        model.addAttribute("title", "Diary");
+        model.addAttribute("title", SAFE_ROOM);
         return "safe-edit-diary";
     }
 
     @Transactional
     @GetMapping("/safe/edit-diary/{id}/edit")
-    public String diaryEdit(@PathVariable(value = "id") Long id, Model model) {
+    public String diaryEdit(@PathVariable(value = "id") Long id,
+                            Model model) {
         if (!diaryRepository.existsById(id)) {
             return "redirect:/safe/edit-diary";
         }
         Optional<Diary> diary = diaryRepository.findById(id);
         List<Diary> diaryList = new ArrayList<>();
         diary.ifPresent(diaryList::add);
-//        model.addAttribute("diaryList", diaryList);
+        model.addAttribute("title", SAFE_ROOM);
         model.addAttribute("diaryList", convertTextWithFormatEditDiary(diaryList));
         return "safe-edit-diary-one-element";
     }
@@ -147,8 +131,7 @@ public class _3_SafeRoomControllers {
     public String diaryUpdate(@PathVariable(value = "id") Long id,
                               MultipartFile file,
                               @RequestParam String titleText,
-                              @RequestParam String fullText,
-                              Model model) throws IOException {
+                              @RequestParam String fullText) throws IOException {
         Diary diary = diaryRepository.findById(id).orElseThrow(null);
         diary.setTitleText(titleText);
         diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
@@ -166,52 +149,33 @@ public class _3_SafeRoomControllers {
         return "redirect:/safe/edit-diary";
     }
 
-
     @Transactional
     @GetMapping("/safe/read-save-edit-reference")
-    public String safeReadAddRemoveReference(Authentication authentication, Model model) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        String address = oneByEmail.get().getAddress();
+    public String safeReadAddRemoveReference(Authentication authentication,
+                                             Model model) {
+        String address = findUserAddress(authentication);
         List<Reference> referenceList = referenceRepository.findAllByAddress(address);
-
-        //TODO REVERS
         referenceList.sort(Comparator.comparing(Reference::getId).reversed());
         model.addAttribute("referenceList", referenceList);
-        model.addAttribute("title", "referenceList");
+        model.addAttribute("title", SAFE_ROOM);
         return "safe-read-save-edit-reference";
     }
 
     @PostMapping("/safe/read-save-edit-reference")
     public String safeSaveReference(Authentication authentication,
-                                    Model model,
                                     MultipartFile file,
                                     @RequestParam("titleText") String titleText,
                                     @RequestParam("url") String url) throws IOException {
-
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userEmail = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
-        String address = oneByEmail.get().getAddress();
+        String address = findUserAddress(authentication);
 
         Reference reference = new Reference();
         reference.setAddress(address);
         reference.setUrl(url);
         reference.setTitleText(titleText);
-//        if (file.getContentType().equals("application/octet-stream")) {
-//            Optional<Diary> byId = diaryRepository.findById(id);
-//            byte[] image = byId.get().getImage();
-//            diary.setImage(image);
-//        } else {
-//            diary.setImage(file.getBytes());
-//        }
         reference.setName(file.getOriginalFilename());
         reference.setType(file.getContentType());
         reference.setImage(file.getBytes());
         referenceRepository.save(reference);
-
-        System.out.println(reference.toString());
         return "redirect:/safe/read-save-edit-reference";
     }
 
@@ -220,7 +184,6 @@ public class _3_SafeRoomControllers {
     void showImageReference(@PathVariable("id") Long id,
                             HttpServletResponse response,
                             Optional<Reference> reference) throws ServletException, IOException {
-
         reference = referenceRepository.findById(id);
         response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
         response.getOutputStream().write(reference.get().getImage());
@@ -228,17 +191,32 @@ public class _3_SafeRoomControllers {
     }
 
     @GetMapping("/safe/read-save-edit-reference/{id}/remove")
-    public String referenceRemove(@PathVariable(value = "id") Long id, Model model) {
+    public String referenceRemove(@PathVariable(value = "id") Long id) {
         Reference reference = referenceRepository.findById(id).orElseThrow(null);
         referenceRepository.delete(reference);
         return "redirect:/safe/read-save-edit-reference";
     }
 
     //TODO REGEX
-    private String REGEX(String patternRegex, String replace, String text) {
+    private String REGEX(String patternRegex,
+                         String replace,
+                         String text) {
         Pattern pattern = Pattern.compile(patternRegex);
         Matcher matcher = pattern.matcher(text);
         return matcher.replaceAll(replace);
     }
 
+    private String getUserEmail(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        return oneByEmail.get().getEmail();
+    }
+
+    private String findUserAddress(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        return oneByEmail.get().getAddress();
+    }
 }

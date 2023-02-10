@@ -15,7 +15,7 @@
         <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/study/read-letters"
+                    <a href="/study/enter-letters"
                        class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                         Мої листи</a>
                     <a href="/study/write-letter"
@@ -35,18 +35,32 @@
                         До головної</a>
                     <br>
                 </div>
+
                 <div class="col-md-8">
-                    <div th:each="el:${letters}" class="mt-2">
-                        <p th:text="${el.titleText}"/>
-                        <p th:utext="${el.fullText}"/>
-                        <p th:text="${el.senderAddress}"/>
-                        <p th:text="${el.recipientAddress}"/>
-                        <p th:text="${el.date}"/>
-                        <!--                        <p th:text="${el.numberOfLetter}"/>-->
-                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/edit'" class="btn btn-warning">Редагувати</a>-->
-                        <!--                        <a th:href="'/study/publication/'+${el.idPublication}+'/remove'" class="btn btn-warning">Видалити</a>-->
-                    </div>
+                    <ul class="nav justify-content-center bg-info">
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-dark font-weight-bold"
+                                   href="/study/outer-letters">
+                                    Вихідні листи</a>
+                            </h5>
+                        </li>
+                        <li class="nav-item">
+                            <h5>
+                                <a class="nav-link text-white disabled  font-weight-bold"
+                                   href="/study/enter-letters">
+                                    Вхідні листи</a>
+                            </h5>
+                        </li>
+                    </ul>
                     <br>
+                    <div th:each="el:${letters}" class="alert alert-info">
+                        <h5 class="text-center font-weight-bold" th:text="${el.titleText}"></h5>
+                        <h5 th:utext="${el.fullText}"></h5>
+                        <h6 class="text-right" th:text="${el.info}"></h6>
+                        <a th:href="'/study/enter-letters/'+${el.idLetter}+'/remove'"
+                           class="btn btn-outline-warning btn-block font-weight-bold">Видалити</a>
+                    </div>
                 </div>
             </div>
         </div>
