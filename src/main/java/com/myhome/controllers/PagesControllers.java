@@ -27,19 +27,18 @@ public class PagesControllers {
     private final PublicationRepository publicationRepository;
     private final CompositionRepository compositionRepository;
     private final UserRepository userRepository;
-    private final MyFriendsRepository myFriendsRepository;
+    //    private final MyFriendsRepository myFriendsRepository;
     private final VideoBoxAdminRepository videoBoxAdminRepository;
     private final UserPhotoRepository userPhotoRepository;
     private final PublicationPostAdminRepository publicationPostAdminRepository;
-    private final String LINK_BASE="https://www.youtube.com/embed/GYrwebcKoxE?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
+    private final String LINK_BASE = "https://www.youtube.com/embed/GYrwebcKoxE?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
     private final LetterToADMINRepository letterToADMINRepository;
     private final MetricsService metricsService;
 
-    public PagesControllers(PublicationRepository publicationRepository, CompositionRepository compositionRepository, UserRepository userRepository, MyFriendsRepository myFriendsRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService) {
+    public PagesControllers(PublicationRepository publicationRepository, CompositionRepository compositionRepository, UserRepository userRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService) {
         this.publicationRepository = publicationRepository;
         this.compositionRepository = compositionRepository;
         this.userRepository = userRepository;
-        this.myFriendsRepository = myFriendsRepository;
         this.videoBoxAdminRepository = videoBoxAdminRepository;
         this.userPhotoRepository = userPhotoRepository;
         this.publicationPostAdminRepository = publicationPostAdminRepository;
@@ -99,7 +98,6 @@ public class PagesControllers {
     public List<Composition> getCompositionWithComments() {
         return compositionRepository.findAllByPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE).stream()
                 .map(el -> new Composition(
-                        el.getId(),
                         el.getLocalDate(),
                         el.getGenre(),
                         el.getPublicationType(),
@@ -107,8 +105,11 @@ public class PagesControllers {
                         el.getShortText(),
                         el.getFullText(),
                         el.getEmail(),
+                        el.getAddress(),
+                        el.getUserId(),
                         el.getName(),
                         el.getType(),
+                        el.getImage(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
                 .sorted(Comparator.comparing(Composition::getLocalDate).reversed())
                 .limit(3)
@@ -217,7 +218,6 @@ public class PagesControllers {
             return "redirect:/";
         }
     }
-
 
 
     @GetMapping("/registration-error")

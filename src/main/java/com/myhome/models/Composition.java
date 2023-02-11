@@ -40,6 +40,12 @@ public class Composition {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "name")
     private String name;
 
@@ -56,7 +62,8 @@ public class Composition {
     public Composition() {
     }
 
-    public Composition(Date localDate, Genre genre, PublicationType publicationType, @Size(min = 0, max = 150) String titleText, @Size(min = 0, max = 1000) String shortText, @Size(min = 0, max = 20000) String fullText, String email, String name, String type, byte[] image, String convert) {
+
+    public Composition(Date localDate, Genre genre, PublicationType publicationType, String titleText,String shortText,  String fullText, String email, String address, Long userId, String name, String type, byte[] image, String convert) {
         this.localDate = localDate;
         this.genre = genre;
         this.publicationType = publicationType;
@@ -64,29 +71,11 @@ public class Composition {
         this.shortText = shortText;
         this.fullText = fullText;
         this.email = email;
+        this.address = address;
+        this.userId = userId;
         this.name = name;
         this.type = type;
         this.image = image;
-        this.convert = convert;
-    }
-
-    public Composition(Long id, Date localDate, Genre genre, PublicationType publicationType, String titleText, String shortText, String fullText, String email, String name, String type, String convert) {
-        this.id = id;
-        this.localDate = localDate;
-        this.genre = genre;
-        this.publicationType = publicationType;
-        this.titleText = titleText;
-        this.shortText = shortText;
-        this.fullText = fullText;
-        this.email = email;
-        this.name = name;
-        this.type = type;
-        this.convert = convert;
-    }
-
-    public Composition(String titleText, String fullText, String convert) {
-        this.titleText = titleText;
-        this.fullText = fullText;
         this.convert = convert;
     }
 
@@ -154,6 +143,22 @@ public class Composition {
         this.email = email;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public String getName() {
         return name;
     }
@@ -199,6 +204,8 @@ public class Composition {
                 Objects.equals(shortText, that.shortText) &&
                 Objects.equals(fullText, that.fullText) &&
                 Objects.equals(email, that.email) &&
+                Objects.equals(address, that.address) &&
+                Objects.equals(userId, that.userId) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(type, that.type) &&
                 Arrays.equals(image, that.image) &&
@@ -207,8 +214,28 @@ public class Composition {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, localDate, genre, publicationType, titleText, shortText, fullText, email, name, type, convert);
+        int result = Objects.hash(id, localDate, genre, publicationType, titleText, shortText, fullText, email, address, userId, name, type, convert);
         result = 31 * result + Arrays.hashCode(image);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Composition{" +
+                "id=" + id +
+                ", localDate=" + localDate +
+                ", genre=" + genre +
+                ", publicationType=" + publicationType +
+                ", titleText='" + titleText + '\'' +
+                ", shortText='" + shortText + '\'' +
+                ", fullText='" + fullText + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", userId=" + userId +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", image=" + Arrays.toString(image) +
+                ", convert='" + convert + '\'' +
+                '}';
     }
 }

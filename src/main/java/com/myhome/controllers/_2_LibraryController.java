@@ -3,27 +3,25 @@ package com.myhome.controllers;
 import com.myhome.controllers.compresor.CompressorImgToJpg;
 import com.myhome.forms.ConvertFile;
 import com.myhome.models.*;
-import com.myhome.repository.CommentsRepository;
-import com.myhome.repository.CompositionRepository;
-import com.myhome.repository.EvaluateRepository;
-import com.myhome.repository.UserRepository;
+import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
 import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.myhome.controllers.factory.MarkFactory.getMarkFromFactory;
 
@@ -35,6 +33,8 @@ public class _2_LibraryController {
     private final EvaluateRepository evaluateRepository;
     private final CommentsRepository commentsRepository;
     private final MetricsService metricsService;
+    private final FamilyRepository familyRepository;
+    private final FriendsRepository friendsRepository;
 
     private int constant = 1049335;
     private int limit_photo = 6; //MB
@@ -43,13 +43,15 @@ public class _2_LibraryController {
     private int limit_fullText = 20000; //chars
     private final String LIBRARY = "Читальня";
 
-    public _2_LibraryController(UserRepository userRepository, CompositionRepository compositionRepository, CompressorImgToJpg compressorImgToJpg, EvaluateRepository evaluateRepository, CommentsRepository commentsRepository, MetricsService metricsService) {
+    public _2_LibraryController(UserRepository userRepository, CompositionRepository compositionRepository, CompressorImgToJpg compressorImgToJpg, EvaluateRepository evaluateRepository, CommentsRepository commentsRepository, MetricsService metricsService, FamilyRepository familyRepository, FriendsRepository friendsRepository) {
         this.userRepository = userRepository;
         this.compositionRepository = compositionRepository;
         this.compressorImgToJpg = compressorImgToJpg;
         this.evaluateRepository = evaluateRepository;
         this.commentsRepository = commentsRepository;
         this.metricsService = metricsService;
+        this.familyRepository = familyRepository;
+        this.friendsRepository = friendsRepository;
     }
 
     @Transactional
@@ -74,6 +76,127 @@ public class _2_LibraryController {
         model.addAttribute("compositionList", compositionList);
         model.addAttribute("title", LIBRARY);
         return "library-read-all-my-composition";
+    }
+
+    @Transactional
+    @GetMapping("/library/read-my-one-composition/{id}")
+    public String readMyOneComposition(@PathVariable(value = "id") Long id,
+                                       Model model) {
+        Optional<Composition> composition = compositionRepository.findOneById(id);
+        if (composition.isPresent() && composition.get().getPublicationType().equals(PublicationType.NO_PUBLIC)
+                || composition.isPresent() && composition.get().getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
+            model.addAttribute("compositionOne", composition.get());
+            model.addAttribute("title", LIBRARY);
+            return "library-read-one-my-composition-all-button";
+        } else {
+            model.addAttribute("compositionOne", composition.get());
+            model.addAttribute("title", LIBRARY);
+            return "library-read-one-my-composition-off-button";
+        }
+    }
+
+    @Transactional
+    @GetMapping("/library/edit-composition/{id}/edit")
+    public String editOneComposition(@PathVariable(value = "id") Long id,
+                                     Model model) {
+        Optional<Composition> compositionFind = compositionRepository.findById(id);
+        if (!compositionFind.isPresent()) {
+            return "redirect:/library/read-all-my-composition";
+        } else {
+            Composition composition = convertText(compositionFind.get());
+            model.addAttribute("composition", composition);
+            model.addAttribute("title", LIBRARY);
+        }
+        return "living-edit-one-composition";
+    }
+
+    private Composition convertText(Composition composition) {
+        //ShortText
+        String shortText = composition.getShortText();
+        String trim3 = shortText.replace("&#160&#160 ", "");
+        String trim4 = trim3.replace("<br>", "");
+        composition.setShortText(trim4);
+        //FullText
+        String fullText = composition.getFullText();
+        String trim1 = fullText.replace("&#160&#160 ", "");
+        String trim2 = trim1.replace("<br>", "");
+        composition.setFullText(trim2);
+        return composition;
+    }
+
+    @Transactional
+    @PostMapping("/library/edit-composition/{id}/edit")
+    public String compositionUpdate(@PathVariable(value = "id") Long id,
+                                    MultipartFile file,
+                                    Authentication authentication,
+                                    @RequestParam String genre,
+                                    @RequestParam String titleText,
+                                    @RequestParam String shortText,
+                                    @RequestParam String fullText) throws IOException {
+        Composition composition = compositionRepository.findById(id).orElseThrow(null);
+        composition.setGenre(getGenre(genre));
+        composition.setTitleText(titleText);
+        composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
+        composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
+        composition.setLocalDate(composition.getLocalDate());
+        composition.setName(file.getOriginalFilename());
+        composition.setType(file.getContentType());
+
+        if (file.getContentType().equals("application/octet-stream")) {
+            Optional<Composition> byId = compositionRepository.findById(id);
+            byte[] image = byId.get().getImage();
+            composition.setImage(image);
+        } else {// нове фото
+            String userEmail = getUserEmail(authentication);
+            int count = compositionRepository.findAllByEmail(userEmail).size();
+            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
+            composition.setImage(convert.img);
+//            composition.setImage(file.getBytes());
+            compressorImgToJpg.deleteImage(convert.nameStart);
+            compressorImgToJpg.deleteImage(convert.nameEnd);
+        }
+        compositionRepository.save(composition);
+        return "redirect:/library/read-all-my-composition";
+    }
+
+    @GetMapping("/library/edit-composition/{id}/remove")
+    public String compositionRemove(@PathVariable(value = "id") Long id) {
+        Composition composition = compositionRepository.findById(id).orElseThrow(null);
+        compositionRepository.delete(composition);
+        return "redirect:/library/read-all-my-composition";
+    }
+
+    @GetMapping("/library/public-composition/{id}/to-coordination")
+    public String compositionToCompetitive(@PathVariable(value = "id") Long id) {
+        Composition composition = compositionRepository.findById(id).orElseThrow(null);
+        if (composition.getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
+            return "redirect:/library/read-all-my-composition";
+        }
+        composition.setPublicationType(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN);
+        compositionRepository.save(composition);
+        return "redirect:/library/read-all-my-composition";
+    }
+
+    @GetMapping("/library/public-composition/{id}/to-friends")
+    public String compositionToFriends(@PathVariable(value = "id") Long id) {
+        Composition composition = compositionRepository.findById(id).orElseThrow(null);
+        composition.setPublicationType(PublicationType.PUBLIC_TO_FRIENDS);
+        compositionRepository.save(composition);
+        return "redirect:/library/read-all-my-composition";
+    }
+
+
+
+
+    @GetMapping("/image/display/composition/{id}")
+    @ResponseBody
+    void showUserPagePhoto(@PathVariable("id") Long id,
+                           HttpServletResponse response,
+                           Optional<Composition> composition) throws ServletException, IOException {
+        composition = compositionRepository.findById(id);
+        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+        response.getOutputStream().write(composition.get().getImage());
+        response.getOutputStream().close();
     }
 
     @Transactional
@@ -135,28 +258,26 @@ public class _2_LibraryController {
     @GetMapping("/library/read-friends-composition")
     public String readFriendComposition(Authentication authentication,
                                         Model model) {
-        String userEmail = getUserEmail(authentication);
-//TODO change to family and friends repository
-//        List<Optional<User>> optionalList = myFriendsRepository.findAllByAddressUser(userEmail).stream()
-//                .map(el -> userRepository.findOneByEmail(el.getAddressMyFriends()))
-//                .collect(Collectors.toList());
-//        List<User> userList = optionalList.stream()
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .collect(Collectors.toList());
-//        List<List<Composition>> compositionList = userList.stream()
-//                .map(el -> compositionRepository.findAllByEmail(el.getEmail()))
-//                .collect(Collectors.toList());
-//        List<Composition> allPublicToFriends = new ArrayList<>();
-//        for (List<Composition> compositions : compositionList) {
-//            List<Composition> collect = compositions.stream()
-//                    .filter(a -> a.getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS))
-//                    .collect(Collectors.toList());
-//            allPublicToFriends.addAll(collect);
-//        }
-//        model.addAttribute("friendsPublications", allPublicToFriends);
+        Long userId = findUserId(authentication);
+        List<Long> integerList = Stream
+                .concat(friendsRepository.findAllByIdUser(userId).stream().map(Friends::getIdFriend),
+                        familyRepository.findAllByIdUser(userId).stream().map(Family::getIdFamily))
+                .collect(Collectors.toList());
+        List<Composition> friendCompositions = compositionRepository.findAllByUserIdIn(integerList)
+                .stream()
+                .filter(a -> a.getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS))
+                .collect(Collectors.toList());
+
+        model.addAttribute("friendsPublications", friendCompositions);
         model.addAttribute("title", LIBRARY);
         return "library-read-all-friend-composition";
+    }
+
+    private Long findUserId(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        return oneByEmail.get().getIdUser();
     }
 
     @Transactional
@@ -193,8 +314,8 @@ public class _2_LibraryController {
         if (checkData(file, titleText, shortText, fullText)) {
             return getErrorPage(file, titleText, shortText, fullText, model);
         } else {
-            String userEmail = getUserEmail(authentication);
-            int count = compositionRepository.findAllByEmail(userEmail).size();
+            User user = getUser(authentication);
+            int count = compositionRepository.findAllByUserId(user.getIdUser()).size();
             Composition composition = new Composition();
             composition.setLocalDate(new Date());
             composition.setGenre(getGenre(genre));
@@ -202,10 +323,12 @@ public class _2_LibraryController {
             composition.setTitleText(titleText);
             composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
             composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
-            composition.setEmail(userEmail);
+            composition.setEmail(user.getEmail());
+            composition.setAddress(user.getAddress());
+            composition.setUserId(user.getIdUser());
             composition.setName(file.getOriginalFilename());
             composition.setType(file.getContentType());
-            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
+            ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail(), countId(count));
             composition.setImage(convert.img);
             compositionRepository.save(composition);
             compressorImgToJpg.deleteImage(convert.nameStart);
@@ -285,5 +408,11 @@ public class _2_LibraryController {
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getEmail();
+    }
+
+    private User getUser(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        return userRepository.findOneByEmail(userName).get();
     }
 }

@@ -33,7 +33,7 @@
                 </div>
                 <div class="col-md-8">
                     <div th:each="composition, el:${friendsPublications}" class="mt-2">
-                        <a th:href="'/users/read-friend-one-composition/'+${composition.id}"> <img
+                        <a th:href="'/library/read-friend-one-composition/'+${composition.id}"> <img
                                 th:src="@{${'/image/display/composition/'+ composition.id}}"
                                 style="width:100%"/></a>
                         <br>

@@ -8,42 +8,40 @@
 <body>
 <div class="container"><br>
     <h5 class="d-flex justify-content-center " style="color: #095979">
-        Читальня. Пишемо, творимо, публікуємо.
+        Вітальня - місце для наших публікацій та пошуку друзів і рідних.
     </h5>
     <br>
     <div class="row">
         <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/library/read-all-competitive-composition"
+                    <a href="/living/news/video"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Читати усі історії</a>
-                    <a href="/library/read-all-my-composition"
+                       Мої відео</a>
+                    <a href="/living/news/add"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої історії</a>
-                    <a href="/library/read-friends-composition"
+                        Добавити відео</a>
+                    <a href="/living/friends/family"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Історії моїх друзів</a>
-                    <a href="/library/wright-composition"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
-                        Написати історію</a>
+                        Пошук друзів</a>
                     <a href="/user-page"
-                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
                         До головної</a>
+                    <br>
                 </div>
                 <div class="col-md-8">
-                    <form action="/library/save-composition" method="post" enctype="multipart/form-data">
-                        <table>
+                    <div th:each="el:${composition}">
+                        <form method="post" enctype="multipart/form-data">
+                            <div th:each="composition, el:${composition}" class="alert mt-2">
+                                <img th:src="@{${'/image/display/composition/'+ composition.id}}"
+                                     style="width:100%"/>
+                                <br>
+                            </div>
                             <div class="custom-file mb-4">
                                 <input type="file" name="file" class="custom-file-input"
                                        id="customFile"> <label class="custom-file-label"
                                                                for="customFile">Завантажити картинку до 2MB</label>
                             </div>
-                            <br>
-                            <label for="titleText"> Заголовок </label>
-                            <textarea id="titleText" name="titleText" class="form-control" rows="2" cols="20"
-                                      placeholder="Заголовок історії. Розмір до 150 символів" required></textarea>
-                            <br>
                             <p>
                                 <label for="genre">Жанр літератури</label>
                                 <select class="form-control" id="genre" name="genre">
@@ -53,19 +51,26 @@
                                     <option>STORIES</option>
                                 </select>
                             </p>
-                            <br>
+                            <label for="titleText"> Заголовок </label>
+                            <textarea id="titleText" name="titleText" class="form-control" rows="2"
+                                      cols="20"
+                                      placeholder="Заголовок історії. Розмір до 150 символів "
+                                      th:utext="${el.titleText}"></textarea>
+
                             <label for="shortText"> Короткий зміст </label>
-                            <textarea id="shortText" name="shortText" class="form-control" rows="10" cols="20"
-                                      placeholder="Коротко опишіть зміст історії. Розмір до 1_000 символів " required></textarea>
-                            <br>
+                            <textarea id="shortText" name="shortText" class="form-control" rows="10"
+                                      cols="20"
+                                      placeholder="Коротко опишіть зміст історії. Розмір до 1_000 символів "
+                                      th:utext="${el.shortText}"></textarea> <br>
+
                             <label for="fullText"> Сама історія </label>
                             <textarea id="fullText" name="fullText" class="form-control" rows="20" cols="20"
-                                      placeholder="Місце для Вашої історії. Розмір до 20_000 символів " required></textarea>
+                                      placeholder="Місце для Вашої історії. Розмір до 20_000 символів"
+                                      th:utext="${el.fullText}"></textarea>
                             <br>
-                        </table>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
-                    </form>
-                    <br>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">Обновити та зберегти</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
