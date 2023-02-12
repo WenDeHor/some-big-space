@@ -58,7 +58,7 @@ public class _2_LibraryController {
     @GetMapping("/library/read-all-competitive-composition")
     public String readCompetitiveComposition(Model model,
                                              HttpServletRequest request) {
-        metricsService.startMetricsCheck(request, "/users/read-all-competitive-composition");
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         List<Composition> compositionList = compositionRepository.findAllByPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE);
         compositionList.sort(Comparator.comparing(Composition::getId).reversed());
 
@@ -70,7 +70,9 @@ public class _2_LibraryController {
     @Transactional
     @GetMapping("/library/read-all-my-composition")
     public String readAllComposition(Authentication authentication,
-                                     Model model) {
+                                     Model model,
+                                     HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         List<Composition> compositionList = compositionRepository.findAllByEmail(getUserEmail(authentication));
         compositionList.sort(Comparator.comparing(Composition::getId).reversed());
         model.addAttribute("compositionList", compositionList);
@@ -81,7 +83,9 @@ public class _2_LibraryController {
     @Transactional
     @GetMapping("/library/read-my-one-composition/{id}")
     public String readMyOneComposition(@PathVariable(value = "id") Long id,
-                                       Model model) {
+                                       Model model,
+                                       HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Optional<Composition> composition = compositionRepository.findOneById(id);
         if (composition.isPresent() && composition.get().getPublicationType().equals(PublicationType.NO_PUBLIC)
                 || composition.isPresent() && composition.get().getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
@@ -186,8 +190,6 @@ public class _2_LibraryController {
     }
 
 
-
-
     @GetMapping("/image/display/composition/{id}")
     @ResponseBody
     void showUserPagePhoto(@PathVariable("id") Long id,
@@ -205,7 +207,7 @@ public class _2_LibraryController {
                                                 Authentication authentication,
                                                 Model model,
                                                 HttpServletRequest request) {
-        metricsService.startMetricsCheck(request, "/users/read-competitive-one-composition/" + id);
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Optional<Composition> oneById = compositionRepository.findOneById(id);
         if (oneById.isPresent()) {
             if (oneById.get().getPublicationType().equals(PublicationType.PUBLIC_TO_COMPETITIVE)) {
@@ -257,7 +259,9 @@ public class _2_LibraryController {
     @Transactional
     @GetMapping("/library/read-friends-composition")
     public String readFriendComposition(Authentication authentication,
-                                        Model model) {
+                                        Model model,
+                                        HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Long userId = findUserId(authentication);
         List<Long> integerList = Stream
                 .concat(friendsRepository.findAllByIdUser(userId).stream().map(Friends::getIdFriend),
@@ -283,7 +287,9 @@ public class _2_LibraryController {
     @Transactional
     @GetMapping("/library/read-friend-one-composition/{id}")
     public String readFriendOneComposition(@PathVariable(value = "id") Long id,
-                                           Model model) {
+                                           Model model,
+                                           HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Optional<Composition> oneById = compositionRepository.findOneById(id);
         if (oneById.isPresent()) {
             model.addAttribute("title", LIBRARY);

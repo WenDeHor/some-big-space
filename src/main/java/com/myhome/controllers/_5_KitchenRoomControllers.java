@@ -9,6 +9,7 @@ import com.myhome.repository.MenuRepository;
 import com.myhome.repository.ShopMealsRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
+import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,24 +32,31 @@ public class _5_KitchenRoomControllers {
     private final UserRepository userRepository;
     private final CookBookRepository cookBookRepository;
     private final MenuRepository menuRepository;
+    private final MetricsService metricsService;
     private final String KITCHEN_ROOM = "Кухня";
 
-    public _5_KitchenRoomControllers(UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, ShopMealsRepository shopMealsRepository) {
+    public _5_KitchenRoomControllers(ShopMealsRepository shopMealsRepository, UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, MetricsService metricsService) {
+        this.shopMealsRepository = shopMealsRepository;
         this.userRepository = userRepository;
         this.cookBookRepository = cookBookRepository;
         this.menuRepository = menuRepository;
-        this.shopMealsRepository = shopMealsRepository;
+        this.metricsService = metricsService;
     }
 
     @GetMapping("/kitchen/write-prescription")
-    public String kitchenWritePrescription(Authentication authentication, Model model) {
+    public String kitchenWritePrescription(Model model,
+                                           HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         model.addAttribute("title", "Prescription");
         return "kitchen-write-prescription";
     }
 
     @Transactional
     @GetMapping("/kitchen/read-cookbook")
-    public String kitchenReadCookBooks(Authentication authentication, Model model) {
+    public String kitchenReadCookBooks(Authentication authentication,
+                                       Model model,
+                                       HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         List<CookBook> cookBooks = cookBookRepository.findAllByAddress(userAddress);
         cookBooks.sort(Comparator.comparing(CookBook::getId).reversed());
@@ -153,7 +162,10 @@ public class _5_KitchenRoomControllers {
 
     //TODO MENU
     @GetMapping("/kitchen/write-menu")
-    public String kitchenMenu(Authentication authentication, Model model) {
+    public String kitchenMenu(Authentication authentication,
+                              Model model,
+                              HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         List<Menu> allMenuByAddress = menuRepository.findAllByAddress(userAddress);
         allMenuByAddress.sort(Comparator.comparing(Menu::getId));
@@ -234,7 +246,9 @@ public class _5_KitchenRoomControllers {
     @Transactional
     @GetMapping("/kitchen/write-shop-meals")
     public String kitchenWriteShopMenu(Authentication authentication,
-                                       Model model) {
+                                       Model model,
+                                       HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         List<ShopMeals> shopMealsList = shopMealsRepository.findAllByAddress(userAddress);
 

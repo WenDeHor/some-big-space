@@ -9,7 +9,11 @@
 <div th:insert="blocks/heder-mine::header-mine"></div>
 <div class="container">
     <br>
-    <h5 class="text-center text-white alert alert-danger">Дана пошта уже зареєстрована</h5>
+
+    <h5 class="text-center text-white alert alert-danger"> Можливі причини помилки: </h5>
+    <h5 class="text-center text-white alert alert-danger">1. Дана пошта уже зареєстрована</h5>
+    <h5 class="text-center text-white alert alert-danger">2. Імя та прізвище введено не латинецею</h5>
+    <h5 class="text-center text-white alert alert-danger">3. Довжина паролю меньше 4 символів</h5>
     <br>
     <div class="text-center">
         <a href="/registration" class="btn-on"

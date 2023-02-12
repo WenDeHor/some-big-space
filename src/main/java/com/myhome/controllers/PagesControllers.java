@@ -51,7 +51,7 @@ public class PagesControllers {
     @Transactional
     @GetMapping("/")
     public String home(Model model, HttpServletRequest request) {
-        metricsService.startMetricsCheck(request, "/");
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         List<VideoBoxAdmin> videoBoxAdmins = videoBoxAdminRepository.findAll();
         int sizeVideoList = videoBoxAdmins.size();
         List<Composition> compositionWithComments = getCompositionWithComments();
@@ -114,7 +114,7 @@ public class PagesControllers {
     public String displayCommentsOfOneComposition(@PathVariable("id") long id,
                                                   Model model,
                                                   HttpServletRequest request) {
-//        metricsService.startMetricsCheck(request, "/users/read-competitive-one-composition-index/" + id);
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Optional<Composition> compositionOne = compositionRepository.findOneById(id);
         if (compositionOne.isPresent()) {
             Composition composition = new Composition(
@@ -145,7 +145,10 @@ public class PagesControllers {
 
     @Transactional
     @GetMapping("/user-page")
-    public String userSecondLoad(Authentication authentication, Model model) {
+    public String userSecondLoad(Authentication authentication,
+                                 Model model,
+                                 HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
         List<UserPhoto> photos = new CopyOnWriteArrayList<>();
@@ -158,7 +161,6 @@ public class PagesControllers {
 
     @GetMapping("/change/photo")
     public String userPageChangePhotoEdit() {
-
         return "userPage-updatePhoto";
     }
 
@@ -207,7 +209,7 @@ public class PagesControllers {
     }
 
     @GetMapping("/living")
-    public String livingReadPublications(Authentication authentication, Model model) {
+    public String livingReadPublications(Model model) {
         model.addAttribute("title", "LIVING ROOM");
         return "redirect:/living/news/video";
     }
@@ -220,7 +222,7 @@ public class PagesControllers {
     @Transactional
     @GetMapping("/users/write/letter")
     public String userWriteLetter(HttpServletRequest request) {
-        metricsService.startMetricsCheck(request, "/users/write/letter");
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         return "users-write-letter";
     }
 
@@ -241,77 +243,15 @@ public class PagesControllers {
         }
     }
 
-
     @GetMapping("/registration-error")
-    public String registrationError(Model model) {
+    public String registrationError(Model model,
+                                    HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         model.addAttribute("title", "Registration-error");
         return "registration-error";
     }
 
-    //IMAGE CONVECTOR
-//    @GetMapping("/image/display/composition/{id}")
-//    @ResponseBody
-//    void showImageComposition(@PathVariable("id") Long id,
-//                              HttpServletResponse response,
-//                              Optional<Composition> composition) throws IOException {
-//        composition = compositionRepository.findById(id);
-//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-//        response.getOutputStream().write(composition.get().getImage());
-//        response.getOutputStream().close();
-//    }
-
-//    private TargetDataLine microphone;
-//    private SourceDataLine speakers;
-//
-//    @GetMapping("/call")
-//    public void startUserVolume() {
-//        for (int i = 0; i < 100; i++) {
-//            AudioFormat format = new AudioFormat(8000.0f, 8, 2, true, true);
-//
-//            try {
-//                microphone = AudioSystem.getTargetDataLine(format);
-//
-//                DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-//                microphone = (TargetDataLine) AudioSystem.getLine(info);
-//                microphone.open(format);
-//
-//                ByteArrayOutputStream out = new ByteArrayOutputStream();
-//                int numBytesRead;
-//                int CHUNK_SIZE = 1024;
-//                byte[] data = new byte[microphone.getBufferSize() / 5];
-//                microphone.start();
-//
-//                int bytesRead = 0;
-//                DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, format);
-//                speakers = (SourceDataLine) AudioSystem.getLine(dataLineInfo);
-//                speakers.open(format);
-//                speakers.start();
-//                while (bytesRead < 100000) {
-//                    numBytesRead = microphone.read(data, 0, CHUNK_SIZE);
-//                    bytesRead += numBytesRead;
-//                    // write the mic data to a stream for use later
-//                    out.write(data, 0, numBytesRead);
-//                    // write mic data to stream for immediate playback
-//                    speakers.write(data, 0, numBytesRead);
-//                }
-//                speakers.drain();
-//                speakers.close();
-//                microphone.close();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-////        return "redirect:/user-page";
-//    }
-//
-//    @GetMapping("/stop")
-//    public void stopUserVolume() {
-//        speakers.close();
-//        microphone.close();
-////        return "redirect:/user-page";
-//    }
-
-    private String findUserAddress(Authentication authentication) {
+     private String findUserAddress(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);

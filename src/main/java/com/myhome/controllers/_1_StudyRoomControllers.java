@@ -11,6 +11,7 @@ import com.myhome.repository.LetterToUSERRepository;
 import com.myhome.repository.PublicationRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
+import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,21 +32,25 @@ public class _1_StudyRoomControllers {
     private final UserRepository userRepository;
     private final LetterToUSERRepository letterToUSERRepository;
     private final LetterToADMINRepository letterToADMINRepository;
+    private final MetricsService metricsService;
 
     private final static int LIMIT_LIST = 10;
     private final String MY_ROOM = "Моя кімната";
     private final String ADMIN = "ADMIN from New_Apple";
 
-    public _1_StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository, LetterToADMINRepository letterToADMINRepository) {
+    public _1_StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
         this.letterToUSERRepository = letterToUSERRepository;
         this.letterToADMINRepository = letterToADMINRepository;
+        this.metricsService = metricsService;
     }
 
     @GetMapping("/study/write-letter")
     public String studyWriteLetter(Authentication authentication,
-                                   Model model) {
+                                   Model model,
+                                   HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
 
         model.addAttribute("address", address);
@@ -86,7 +92,9 @@ public class _1_StudyRoomControllers {
 
     @GetMapping("/study/outer-letters")
     public String studyReadAllOutLetters(Authentication authentication,
-                                         Model model) {
+                                         Model model,
+                                         HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
         List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllBySenderAddress(address).stream()
                 .map(el -> new LettersDTO(el.getIdLetter(), el.getTitleText(), el.getFullText(), buildInfoBySender(el)))
@@ -137,7 +145,9 @@ public class _1_StudyRoomControllers {
     //TODO Publications
     @GetMapping("/study/read-all-publications")
     public String studyReadAllPublicationsOfUser(Authentication authentication,
-                                                 Model model) {
+                                                 Model model,
+                                                 HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         List<PublicationDTO> publications = publicationRepository.findAll().stream()
                 .filter(el -> !el.getAddress().equals(userAddress))
@@ -158,7 +168,9 @@ public class _1_StudyRoomControllers {
 
     @GetMapping("/study/read-my-publications")
     public String studyReadMyPublicationsOfUser(Authentication authentication,
-                                                Model model) {
+                                                Model model,
+                                                HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         List<PublicationUser> publicationUser = publicationRepository.findAllByAddress(userAddress);
         List<PublicationUser> publicationList = new ArrayList<>(publicationUser);

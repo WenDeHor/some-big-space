@@ -7,6 +7,7 @@ import com.myhome.repository.DiaryRepository;
 import com.myhome.repository.ReferenceRepository;
 import com.myhome.repository.UserRepository;
 import com.myhome.security.UserDetailsImpl;
+import com.myhome.service.MetricsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -26,18 +28,22 @@ public class _3_SafeRoomControllers {
     private final UserRepository userRepository;
     private final DiaryRepository diaryRepository;
     private final ReferenceRepository referenceRepository;
+    private final MetricsService metricsService;
     private final String SAFE_ROOM = "Робоча кімната";
 
-    public _3_SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository) {
+    public _3_SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository, MetricsService metricsService) {
         this.userRepository = userRepository;
         this.diaryRepository = diaryRepository;
         this.referenceRepository = referenceRepository;
+        this.metricsService = metricsService;
     }
 
     @Transactional
     @GetMapping("/safe/read-save-diary")
     public String safeReadDiary(Authentication authentication,
-                                Model model) {
+                                Model model,
+                                HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
         List<Diary> diaryList = diaryRepository.findAllByAddress(address);
         diaryList.sort(Comparator.comparing(Diary::getId).reversed());
@@ -152,7 +158,9 @@ public class _3_SafeRoomControllers {
     @Transactional
     @GetMapping("/safe/read-save-edit-reference")
     public String safeReadAddRemoveReference(Authentication authentication,
-                                             Model model) {
+                                             Model model,
+                                             HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
         List<Reference> referenceList = referenceRepository.findAllByAddress(address);
         referenceList.sort(Comparator.comparing(Reference::getId).reversed());

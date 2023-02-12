@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -59,7 +60,9 @@ public class _4_LivingRoomControllers {
 
     @GetMapping("/living/friends/friends")
     public String livingAllMyFriends(Authentication authentication,
-                                     Model model) {
+                                     Model model,
+                                     HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Long userId = findUserId(authentication);
         List<Friends> myFriendsList = friendsRepository.findAllByIdUser(userId);
         model.addAttribute("myFriendsList", myFriendsList);
@@ -68,7 +71,9 @@ public class _4_LivingRoomControllers {
     }
 
     @GetMapping("/living/friends/search")
-    public String findFriendsPage(Model model) {
+    public String findFriendsPage(Model model,
+                                  HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         model.addAttribute("title", LIVING_ROOM);
         return "living-friends-search";
     }
@@ -76,7 +81,9 @@ public class _4_LivingRoomControllers {
     @GetMapping("/living/friends/search/find")
     public String findFriends(@RequestParam String userLogin,
                               Authentication authentication,
-                              Model model) {
+                              Model model,
+                              HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         Long userId = findUserId(authentication);
         List<Long> integerList = Stream
                 .concat(friendsRepository.findAllByIdUser(userId).stream().map(Friends::getIdFriend),
@@ -145,7 +152,9 @@ public class _4_LivingRoomControllers {
 
     @GetMapping("/living/news/video")
     public String livingNewVideo(Authentication authentication,
-                                 Model model) {
+                                 Model model,
+                                 HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
 
         Iterable<VideoBox> allVideoBox = videoBoxRepository.findAllByAddressUser(userAddress);
@@ -166,7 +175,9 @@ public class _4_LivingRoomControllers {
     }
 
     @GetMapping("/living/news/add")
-    public String livingNewsAdd(Model model) {
+    public String livingNewsAdd(Model model,
+                                HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         model.addAttribute("title", LIVING_ROOM);
         return "living-news-add";
     }
