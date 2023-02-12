@@ -18,6 +18,10 @@ public class LetterToADMIN {
     @Size(min = 0, max = 100)
     private String email;
 
+    @Column(name = "address")
+    @Size(min = 0, max = 100)
+    private String address;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "local_date", nullable = false)
     private Date localDate;
@@ -33,8 +37,9 @@ public class LetterToADMIN {
     public LetterToADMIN() {
     }
 
-    public LetterToADMIN(@Size(min = 0, max = 100) String email, Date localDate, @Size(min = 0, max = 100) String titleText, @Size(min = 0, max = 20000) String fullText) {
+    public LetterToADMIN(String email,String address, Date localDate, String titleText, String fullText) {
         this.email = email;
+        this.address = address;
         this.localDate = localDate;
         this.titleText = titleText;
         this.fullText = fullText;
@@ -54,6 +59,14 @@ public class LetterToADMIN {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Date getLocalDate() {
@@ -84,16 +97,29 @@ public class LetterToADMIN {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LetterToADMIN letterToADMIN = (LetterToADMIN) o;
-        return Objects.equals(idLetter, letterToADMIN.idLetter) &&
-                Objects.equals(email, letterToADMIN.email) &&
-                Objects.equals(localDate, letterToADMIN.localDate) &&
-                Objects.equals(titleText, letterToADMIN.titleText) &&
-                Objects.equals(fullText, letterToADMIN.fullText);
+        LetterToADMIN that = (LetterToADMIN) o;
+        return Objects.equals(idLetter, that.idLetter) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(address, that.address) &&
+                Objects.equals(localDate, that.localDate) &&
+                Objects.equals(titleText, that.titleText) &&
+                Objects.equals(fullText, that.fullText);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idLetter, email, localDate, titleText, fullText);
+        return Objects.hash(idLetter, email, address, localDate, titleText, fullText);
+    }
+
+    @Override
+    public String toString() {
+        return "LetterToADMIN{" +
+                "idLetter=" + idLetter +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", localDate=" + localDate +
+                ", titleText='" + titleText + '\'' +
+                ", fullText='" + fullText + '\'' +
+                '}';
     }
 }

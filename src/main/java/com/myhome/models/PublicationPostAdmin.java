@@ -16,15 +16,13 @@ public class PublicationPostAdmin {
     public PublicationPostAdmin() {
     }
 
-    public PublicationPostAdmin(Long idPublication, Date date, String titleText, String fullText, String address, String name, String type, byte[] image) {
+    public PublicationPostAdmin(Long idPublication, Date date, String titleText, String fullText, String convert) {
         this.idPublication=idPublication;
         this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
-        this.address = address;
-        this.name = name;
-        this.type = type;
-        this.image = image;
+        this.convert = convert;
+
     }
 
     public PublicationPostAdmin(Long idPublication, Date date, String titleText, String fullText, String address, String name, String type, byte[] image, String convert) {

@@ -62,8 +62,14 @@ public class Composition {
     public Composition() {
     }
 
+    public Composition(String titleText, String fullText, String convert) {
+        this.titleText = titleText;
+        this.fullText = fullText;
+        this.convert = convert;
+    }
 
-    public Composition(Date localDate, Genre genre, PublicationType publicationType, String titleText,String shortText,  String fullText, String email, String address, Long userId, String name, String type, byte[] image, String convert) {
+    public Composition(Long id, Date localDate, Genre genre, PublicationType publicationType, String titleText,String shortText,  String fullText, String email, String address, Long userId, String name, String type, String convert) {
+        this.id = id;
         this.localDate = localDate;
         this.genre = genre;
         this.publicationType = publicationType;
@@ -75,7 +81,16 @@ public class Composition {
         this.userId = userId;
         this.name = name;
         this.type = type;
-        this.image = image;
+        this.convert = convert;
+    }
+
+    public Composition(Long id, Date localDate, Genre genre, String titleText,String shortText,  String fullText, String convert) {
+        this.id = id;
+        this.localDate = localDate;
+        this.genre = genre;
+        this.titleText = titleText;
+        this.shortText = shortText;
+        this.fullText = fullText;
         this.convert = convert;
     }
 

@@ -1,53 +1,42 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-<head>
+
+<head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
-
-    <!--    <title th:text="${user}"></title>-->
 </head>
-
-<div th:insert="blocks/library::library"></div>
-
+<body>
 <div class="container"><br>
-    <h5 class="text-center alert alert-info">Admin Publications table </h5>
-    <br>
     <div class="row">
-
-        <div class="album col-md-12 bg-light" style="background-color: bisque">
+        <div class="album col-md-12" >
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/admin-mine/users" class="btn btn-info btn-lg btn-block" role="button">
+                    <a href="/admin-mine/users"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Users data</a>
-                    <br>
-                    <a href="/admin-mine/users-publications" class="btn btn-info btn-lg btn-block" role="button">
-                        Users Publications</a>
-                    <br>
-                    <a href="/admin-mine/admin-publications" class="btn btn-info btn-lg btn-block" role="button">
+                    <a href="/admin-mine/users-competitive"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Users Competitive</a>
+                    <a href="/admin-mine/admin-publications"
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                         Admin publications</a>
-                    <br>
-                    <a href="/admin-mine/admin-video" class="btn btn-info btn-lg btn-block" role="button">Admin
-                        Video</a>
-                    <br>
-                    <a href="/admin-mine/read-letters" class="btn btn-info btn-lg btn-block" role="button">
+                    <a href="/admin-mine/admin-video"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Admin Video</a>
+                    <a href="/admin-mine/read-letters/enter-letters"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         My letters</a>
-                    <br>
-                    <a href="/admin-mine/write-letters/send" class="btn btn-info btn-lg btn-block" role="button">
+                    <a href="/admin-mine/write-letters/send"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         To write a letter</a>
-                    <br>
-                    <a href="/admin-mine/add-services" class="btn btn-info btn-lg btn-block">
-                        Add services</a>
                     <br>
                     <form action="/logout" method="post">
                         <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
                     </form>
                 </div>
-                <!--                model.addAttribute("publicationPostAdminList", publicationPostAdminList);-->
                 <div class="col-md-8">
                     <div th:each="el:${publicationPostAdminList}">
                         <form method="post" enctype="multipart/form-data">
-
                             <div th:each="publicationPostAdmin, el:${publicationPostAdminList}"
                                  class="alert alert-info mt-2">
                                 <div class="text-center">
@@ -57,35 +46,35 @@
                                     <br>
                                 </div>
                             </div>
-
                             <div class="custom-file mb-4">
                                 <input type="file" name="file" class="custom-file-input"
                                        id="customFile"> <label class="custom-file-label"
                                                                for="customFile">Image</label>
                             </div>
-
                             <p>
                                 <label>TITLE</label>
                                 <input type="text" th:value="${el.titleText}" name="titleText" class="form-control"
                                        placeholder="TITLE NAME">
                             </p>
                             <br>
-
                             <label>PLACE TO STORY</label>
                             <label for="fullText"> tell us you story : </label>
                             <textarea id="fullText" name="fullText" class="form-control" rows="10"
                                       placeholder="WRITE A STORY {character limit up to 10 000} "
                                       th:text="${el.fullText}"></textarea> <br>
                             <br>
-
-
                             <button class="btn btn-lg btn-primary btn-block" type="submit">UPDATE</button>
                         </form>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
 </html>

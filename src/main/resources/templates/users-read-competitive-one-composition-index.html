@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+<body>
+<div th:insert="blocks/heder-mine::header-mine"></div>
+<div class="container ">
+    <div class="col-md-12">
+        <br>
+        <div th:each="composition, el:${compositionOne}" class="alert mt-2">
+            <img th:src="'data:image/jpeg;base64,' + ${composition.convert}" style="width:50%" class="rounded mx-auto d-block"
+                 alt="IMAGE OF COMPOSITION"/>
+            <h6><p class="text-right" th:text="${#dates.format({composition.localDate}, 'dd:MM:yyyy')}"></p></h6>
+            <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
+                   th:utext="${composition.titleText}" style=" font-family: 'Open Sans',sans-serif;"></p></h4>
+            <h5><p class=" lh-lg " th:utext="${composition.fullText}"
+                   style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
+        </div>
+        <div th:each="el:${comments}" class="alert mt-2 alert-info">
+            <h5><p class=" lh-lg " th:utext="${el}"
+                   style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
+        </div>
+        <br>
+    </div>
+</div>
+<br>
+<br>
+<div>
+    <footer th:insert="blocks/footer-first::footer-first"></footer>
+</div>
+</body>
+</html>

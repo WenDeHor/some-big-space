@@ -34,8 +34,9 @@ public class PagesControllers {
     private final String LINK_BASE = "https://www.youtube.com/embed/GYrwebcKoxE?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
     private final LetterToADMINRepository letterToADMINRepository;
     private final MetricsService metricsService;
+    private final CommentsRepository commentsRepository;
 
-    public PagesControllers(PublicationRepository publicationRepository, CompositionRepository compositionRepository, UserRepository userRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService) {
+    public PagesControllers(PublicationRepository publicationRepository, CompositionRepository compositionRepository, UserRepository userRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CommentsRepository commentsRepository) {
         this.publicationRepository = publicationRepository;
         this.compositionRepository = compositionRepository;
         this.userRepository = userRepository;
@@ -44,8 +45,10 @@ public class PagesControllers {
         this.publicationPostAdminRepository = publicationPostAdminRepository;
         this.letterToADMINRepository = letterToADMINRepository;
         this.metricsService = metricsService;
+        this.commentsRepository = commentsRepository;
     }
 
+    @Transactional
     @GetMapping("/")
     public String home(Model model, HttpServletRequest request) {
         metricsService.startMetricsCheck(request, "/");
@@ -84,10 +87,6 @@ public class PagesControllers {
                         el.getDate(),
                         el.getTitleText(),
                         el.getFullText(),
-                        el.getAddress(),
-                        el.getName(),
-                        el.getType(),
-                        el.getImage(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
                 .sorted(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed())
                 .limit(3)
@@ -98,22 +97,45 @@ public class PagesControllers {
     public List<Composition> getCompositionWithComments() {
         return compositionRepository.findAllByPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE).stream()
                 .map(el -> new Composition(
+                        el.getId(),
                         el.getLocalDate(),
                         el.getGenre(),
-                        el.getPublicationType(),
                         el.getTitleText(),
                         el.getShortText(),
                         el.getFullText(),
-                        el.getEmail(),
-                        el.getAddress(),
-                        el.getUserId(),
-                        el.getName(),
-                        el.getType(),
-                        el.getImage(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
                 .sorted(Comparator.comparing(Composition::getLocalDate).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @GetMapping("/users/read-competitive-one-composition-index/{id}")
+    public String displayCommentsOfOneComposition(@PathVariable("id") long id,
+                                                  Model model,
+                                                  HttpServletRequest request) {
+//        metricsService.startMetricsCheck(request, "/users/read-competitive-one-composition-index/" + id);
+        Optional<Composition> compositionOne = compositionRepository.findOneById(id);
+        if (compositionOne.isPresent()) {
+            Composition composition = new Composition(
+                    compositionOne.get().getTitleText(),
+                    compositionOne.get().getFullText(),
+                    Base64.getMimeEncoder().encodeToString(compositionOne.get().getImage()));
+            model.addAttribute("compositionOne", composition);
+        }
+        model.addAttribute("comments", findCommentsByIdComposition(id));
+        return "users-read-competitive-one-composition-index";
+    }
+
+    private List<String> findCommentsByIdComposition(Long id) {
+        List<String> allByIdComposition = commentsRepository.findAllByIdComposition(id).stream()
+                .map(Comments::getComments)
+                .collect(Collectors.toList());
+        if (allByIdComposition.isEmpty()) {
+            return new ArrayList<>();
+        } else {
+            return allByIdComposition;
+        }
     }
 
     @GetMapping("/admin-page")
@@ -225,6 +247,18 @@ public class PagesControllers {
         model.addAttribute("title", "Registration-error");
         return "registration-error";
     }
+
+    //IMAGE CONVECTOR
+//    @GetMapping("/image/display/composition/{id}")
+//    @ResponseBody
+//    void showImageComposition(@PathVariable("id") Long id,
+//                              HttpServletResponse response,
+//                              Optional<Composition> composition) throws IOException {
+//        composition = compositionRepository.findById(id);
+//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+//        response.getOutputStream().write(composition.get().getImage());
+//        response.getOutputStream().close();
+//    }
 
 //    private TargetDataLine microphone;
 //    private SourceDataLine speakers;

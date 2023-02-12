@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
@@ -33,6 +32,9 @@ public class AdminBlogControllers {
     private final LetterToADMINRepository letterToADMINRepository;
     private final MetricsService metricsService;
     private final CompressorImgToJpg compressorImgToJpg;
+
+    private final String ADMIN = "ADMIN from New_Apple";
+
 
     private final String YOUTUBE = "https://www.youtube.com/embed/";
 
@@ -279,17 +281,17 @@ public class AdminBlogControllers {
     }
 
     //    @Transactional
-    @GetMapping("/image/display/admin/{idPublication}")
-    @ResponseBody
-    void showImageAdmin(@PathVariable("idPublication") Long idPublication,
-                        HttpServletResponse response,
-                        Optional<PublicationPostAdmin> publicationPostAdmin) throws ServletException, IOException {
-
-        publicationPostAdmin = publicationPostAdminRepository.findById(idPublication);
-        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-        response.getOutputStream().write(publicationPostAdmin.get().getImage());
-        response.getOutputStream().close();
-    }
+//    @GetMapping("/image/display/admin/{idPublication}")
+//    @ResponseBody
+//    void showImageAdmin(@PathVariable("idPublication") Long idPublication,
+//                        HttpServletResponse response,
+//                        Optional<PublicationPostAdmin> publicationPostAdmin) throws ServletException, IOException {
+//
+//        publicationPostAdmin = publicationPostAdminRepository.findById(idPublication);
+//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
+//        response.getOutputStream().write(publicationPostAdmin.get().getImage());
+//        response.getOutputStream().close();
+//    }
 
     @Transactional
     @GetMapping("/admin-mine/admin-publications/{id}/remove")
@@ -483,20 +485,29 @@ public class AdminBlogControllers {
 //    }
 
     //TODO LETTER
-    @GetMapping("/admin-mine/read-letters")
-    public String adminReadLettersOfUser(Authentication authentication, Model model) {
+    @GetMapping("/admin-mine/read-letters/enter-letters")
+    public String adminReadLettersOfUserEnter(Authentication authentication, Model model) {
         String adminAddress = findUserAddress(authentication);
+        List<LetterToADMIN> letterToADMINS = letterToADMINRepository.findAll().stream()
+                .sorted(Comparator.comparing(LetterToADMIN::getLocalDate).reversed())
+                .collect(Collectors.toList());
 
-        Iterable<LetterToUSER> allByRecipientAddress = letterToUSERRepository.findAllByRecipientAddress(adminAddress);
-        Iterable<LetterToUSER> allBySenderAddress = letterToUSERRepository.findAllBySenderAddress(adminAddress);
-        ArrayList<LetterToUSER> adminLetterToUSERS = new ArrayList<>();
-        allByRecipientAddress.forEach(adminLetterToUSERS::add);
-        allBySenderAddress.forEach(adminLetterToUSERS::add);
-        adminLetterToUSERS.sort(Comparator.comparing(LetterToUSER::getDate).reversed());
-
-        model.addAttribute("adminLetters", adminLetterToUSERS);
+        model.addAttribute("adminLetters", letterToADMINS);
         model.addAttribute("title", "Admin Page");
-        return "admin-page-read-user-letters";
+        return "admin-page-read-user-letters-enter";
+    }
+
+    //    href="/admin-mine/read-letters/outer-letters">
+    @GetMapping("/admin-mine/read-letters/outer-letters")
+    public String adminReadLettersOfUserOuter(Authentication authentication, Model model) {
+        List<LetterToUSER> letterFromADMINS = letterToUSERRepository.findAll().stream()
+                .filter(el -> el.getSenderAddress().equals(ADMIN))
+                .sorted(Comparator.comparing(LetterToUSER::getDate).reversed())
+                .collect(Collectors.toList());
+
+        model.addAttribute("adminLetters", letterFromADMINS);
+        model.addAttribute("title", "Admin Page");
+        return "admin-page-read-user-letters-outer";
     }
 
 //    @GetMapping("/admin-mine/read-users-letters")
@@ -537,34 +548,34 @@ public class AdminBlogControllers {
         adminLetterToUSER.setSenderAddress(adminAddress);
         adminLetterToUSER.setRecipientAddress(recipientAddress);
         letterToUSERRepository.save(adminLetterToUSER);
-        return "redirect:/admin-mine/read-letters";
+        return "redirect:/admin-mine/read-letters/enter-letters";
     }
 
-    @GetMapping("/admin-mine/read-letters/{id}/read")
-    public String adminReadLetter(@PathVariable(value = "id") Long id, Model model) {
-        if (!letterToUSERRepository.existsById(id)) {
-            return "redirect:/admin-mine/read-letters";
-        }
-        Optional<LetterToUSER> letter = letterToUSERRepository.findById(id);
-        List<LetterToUSER> res = new ArrayList<>();
-        letter.ifPresent(res::add);
-        model.addAttribute("letter", res);
-        return "admin-page-read-user-letters-fulltext";
+    @GetMapping("/admin-mine/read-letters/enter-letters/{id}/read")
+    public String adminReadLetterEnter(@PathVariable(value = "id") Long id, Model model) {
+        Optional<LetterToADMIN> letter1 = letterToADMINRepository.findById(id);
+        model.addAttribute("letter", letter1.get());
+        return "admin-page-read-user-letters-fulltext-enter";
     }
 
+// <td><a th:href="'/admin-mine/read-letters/outer-letters/'+${letterToUSER.idLetter}+'/read'"
+@GetMapping("/admin-mine/read-letters/outer-letters/{id}/read")
+public String adminReadLetterOuter(@PathVariable(value = "id") Long id, Model model) {
+    Optional<LetterToUSER> letter1 = letterToUSERRepository.findById(id);
+    model.addAttribute("letter", letter1.get());
+    return "admin-page-read-user-letters-fulltext-outer";
+}
     //TODO answer
     @GetMapping("/admin-mine/write-letters/{id}/answer")
     public String adminAnswerWriteLetter(Authentication authentication,
                                          @PathVariable(value = "id") Long id,
                                          Model model) {
+        Optional<LetterToADMIN> letter = letterToADMINRepository.findById(id);
         String adminAddress = findUserAddress(authentication);
-        if (!letterToUSERRepository.existsById(id)) {
-            return "redirect:/admin-mine/read-letters";
+        if (letter.get().getAddress() == null) {
+            return "redirect:/admin-mine/read-letters/enter-letters";
         }
-        Optional<LetterToUSER> byId = letterToUSERRepository.findById(id);
-        String senderAddress = byId.get().getSenderAddress();
-
-        model.addAttribute("senderAddress", senderAddress);
+        model.addAttribute("senderAddress", letter.get().getAddress());
         model.addAttribute("adminAddress", adminAddress);
         model.addAttribute("title", "Admin Page");
         return "admin-page-write-to-user-letters-answer";
@@ -587,18 +598,18 @@ public class AdminBlogControllers {
         adminLetterToUSER.setSenderAddress(adminAddress);
         adminLetterToUSER.setRecipientAddress(recipientAddress);
         letterToUSERRepository.save(adminLetterToUSER);
-        return "redirect:/admin-mine/read-letters";
+        return "redirect:/admin-mine/read-letters/enter-letters";
     }
 
-    @GetMapping("/admin-mine/read-users-letters/{idLetter}/delete")
+    @GetMapping("/admin-mine/read-users-letters/enter-letters/{idLetter}/delete")
     public String adminDeleteLetter(@PathVariable(value = "idLetter") Long idLetter) {
         Optional<LetterToADMIN> byId = letterToADMINRepository.findById(idLetter);
         byId.ifPresent(letterToADMINRepository::delete);
-        return "redirect:/admin-mine/read-users-letters";
+        return "redirect:/admin-mine/read-letters/enter-letters";
     }
 
     @Transactional
-    @GetMapping("/admin-mine/read-users-letters/{idLetter}/read")
+    @GetMapping("/admin-mine/read-users-letters/enter-letters/{idLetter}/read")
     public String adminReadOneLetter(@PathVariable(value = "idLetter") Long idLetter,
                                      Model model) {
         Optional<LetterToADMIN> letterOptional = letterToADMINRepository.findById(idLetter);

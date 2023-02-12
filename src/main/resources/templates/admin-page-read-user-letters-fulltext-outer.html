@@ -24,10 +24,10 @@
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         Admin Video</a>
                     <a href="/admin-mine/read-letters/enter-letters"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                         My letters</a>
                     <a href="/admin-mine/write-letters/send"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                         To write a letter</a>
                     <br>
                     <form action="/logout" method="post">
@@ -35,39 +35,25 @@
                     </form>
                 </div>
                 <div class="col-md-8">
-                    <form action="/admin-mine/write-letters/send" method="POST">
 
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <tr th:each="letterToUSER, el:${letter}">
+                            <th><span th:text="${letterToUSER.titleText}"></span></th>
+                            <th class="col-md-2"></th>
+                        </tr>
+                        </thead>
 
-                        <p>
-                            <label>RECIPIENT</label>
-                            <input type="text" name="recipientAddress" class="form-control"
-                                   placeholder="Recipient's address">
-                        </p>
-                        <p>
-                            <label>SENDER</label>
-                            <input type="text" th:value="${adminAddress}" name="senderAddress" class="form-control"
-                                   placeholder="Sender's address">
-                        </p>
-                        <br>
-                        <br>
-                        <p>
-                            <label>TITLE</label>
-                            <input type="text" name="titleText" class="form-control"
-                                   placeholder="TITLE NAME">
-                        </p>
-                        <br>
-                        <label>PLACE TO LETTER</label>
-                        <label for="fullText"> tell us you story : </label>
-                        <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                  placeholder="WRITE A LETTER {character limit up to 3000} "></textarea>
-                        <br>
-                        <br>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
-                    </form>
-
+                        <tbody>
+                        <tr th:each="letterToUSER, el:${letter}" class="alert alert-info mt-2">
+                            <td><span th:utext="${letterToUSER.fullText}"></span></td>
+<!--                            <td><a th:href="'/admin-mine/write-letters/'+${letterToUSER.idLetter}+'/answer'"-->
+<!--                                   class="btn btn-warning ">answer</a></td>-->
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <br><br>
         </div>
     </div>
 </div>

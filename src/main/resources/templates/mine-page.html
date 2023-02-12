@@ -23,7 +23,7 @@
         </div>
         <div th:each="composition, el:${compositionWithComments}" class="mt-2">
             <a th:href="'/users/read-competitive-one-composition-index/'+${composition.id}">
-                <img th:src="'data:image/jpeg;base64,' + ${composition.convert}" style="width:100%"
+                <img th:src="'data:image/jpeg;base64,' + ${composition.convert}" style="width:50%" class="rounded mx-auto d-block"
                      alt="IMAGE OF COMPOSITION"/></a>
             <h6><p class="text-right" th:text="${#dates.format({composition.localDate}, 'dd:MM:yyyy')}"></p></h6>
             <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"

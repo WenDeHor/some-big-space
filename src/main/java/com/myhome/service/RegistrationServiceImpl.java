@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
 
@@ -35,17 +34,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void signUp(UserForm userForm) {
         Locale defaultLocale = Locale.getDefault();
         Currency currency = Currency.getInstance(defaultLocale);
-        System.out.println("Currency Code: " + currency.getCurrencyCode());
-        System.out.println("Default Fraction Digits: " + currency.getDefaultFractionDigits());
 //        String address = "CC:"+currency.getCurrencyCode() + "-UN:" + userForm.getLogin()+"-SB:" +counter();
-        String address = "[" + userForm.getLogin() + "]" + userForm.getSettlement() + ":" + userForm.getEmail();
+        String address = userForm.getLogin().trim() + " from " + userForm.getSettlement();
         String hashPassword = passwordEncoder.encode(userForm.getPassword());
         Optional<User> adminPresent = usersRepository.findOneByRole(Role.ADMIN);
-
-//        private String login;
-//        private String settlement;
-//        private String email;
-//        private String password;
 
         Date date = new Date();
         if (!adminPresent.isPresent()) {
@@ -63,7 +55,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             usersRepository.save(user);
 
         } else {
-            User user=new User();
+            User user = new User();
             user.setLogin(userForm.getLogin());
             user.setSettlement(userForm.getSettlement());
             user.setEmail(userForm.getEmail());
@@ -76,8 +68,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             user.setDate(date);
             usersRepository.save(user);
             createUserPhotoOnMinePage(address);
-
-
         }
     }
 

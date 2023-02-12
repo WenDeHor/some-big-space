@@ -1,9 +1,12 @@
 package com.myhome.controllers;
 
 import com.myhome.forms.LettersDTO;
+import com.myhome.forms.PublicationDTO;
+import com.myhome.models.LetterToADMIN;
 import com.myhome.models.LetterToUSER;
 import com.myhome.models.PublicationUser;
 import com.myhome.models.User;
+import com.myhome.repository.LetterToADMINRepository;
 import com.myhome.repository.LetterToUSERRepository;
 import com.myhome.repository.PublicationRepository;
 import com.myhome.repository.UserRepository;
@@ -26,14 +29,17 @@ public class _1_StudyRoomControllers {
     private final PublicationRepository publicationRepository;
     private final UserRepository userRepository;
     private final LetterToUSERRepository letterToUSERRepository;
+    private final LetterToADMINRepository letterToADMINRepository;
 
-    private final int LIMIT_LIST = 10;
+    private final static int LIMIT_LIST = 10;
     private final String MY_ROOM = "Моя кімната";
+    private final String ADMIN = "ADMIN from New_Apple";
 
-    public _1_StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository) {
+    public _1_StudyRoomControllers(PublicationRepository publicationRepository, UserRepository userRepository, LetterToUSERRepository letterToUSERRepository, LetterToADMINRepository letterToADMINRepository) {
         this.publicationRepository = publicationRepository;
         this.userRepository = userRepository;
         this.letterToUSERRepository = letterToUSERRepository;
+        this.letterToADMINRepository = letterToADMINRepository;
     }
 
     @GetMapping("/study/write-letter")
@@ -51,16 +57,26 @@ public class _1_StudyRoomControllers {
                              @RequestParam String fullText,
                              @RequestParam String recipientAddress,
                              Authentication authentication) {
-        String address = findUserAddress(authentication);
-
-        LetterToUSER userSendLetterToUSER = new LetterToUSER();
-        userSendLetterToUSER.setDate(new Date());
-        userSendLetterToUSER.setTitleText(titleText);
-        userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
-        userSendLetterToUSER.setSenderAddress(address);
-        userSendLetterToUSER.setRecipientAddress(recipientAddress);
-        letterToUSERRepository.save(userSendLetterToUSER);
-        return "redirect:/study/outer-letters";
+        User user = getUser(authentication);
+        if (recipientAddress.equals(ADMIN)) {
+            LetterToADMIN userSendLetterToADMIN = new LetterToADMIN();
+            userSendLetterToADMIN.setLocalDate(new Date());
+            userSendLetterToADMIN.setTitleText(titleText);
+            userSendLetterToADMIN.setFullText(convertTextWithFormatToSave(fullText));
+            userSendLetterToADMIN.setEmail(user.getEmail());
+            userSendLetterToADMIN.setAddress(user.getAddress());
+            letterToADMINRepository.save(userSendLetterToADMIN);
+            return "redirect:/study/outer-letters";
+        } else {
+            LetterToUSER userSendLetterToUSER = new LetterToUSER();
+            userSendLetterToUSER.setDate(new Date());
+            userSendLetterToUSER.setTitleText(titleText);
+            userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+            userSendLetterToUSER.setSenderAddress(user.getAddress());
+            userSendLetterToUSER.setRecipientAddress(recipientAddress);
+            letterToUSERRepository.save(userSendLetterToUSER);
+            return "redirect:/study/outer-letters";
+        }
     }
 
     private String convertTextWithFormatToSave(String fullText) {
@@ -123,15 +139,21 @@ public class _1_StudyRoomControllers {
     public String studyReadAllPublicationsOfUser(Authentication authentication,
                                                  Model model) {
         String userAddress = findUserAddress(authentication);
-        List<PublicationUser> publicationAllUsers = publicationRepository.findAll().stream()
+        List<PublicationDTO> publications = publicationRepository.findAll().stream()
                 .filter(el -> !el.getAddress().equals(userAddress))
                 .limit(LIMIT_LIST)
-                .sorted(Comparator.comparing(PublicationUser::getIdPublication).reversed())
+                .map(el -> new PublicationDTO(el.getIdPublication(), el.getTitleText(), el.getFullText(), info(el)))
+                .sorted(Comparator.comparing(PublicationDTO::getId).reversed())
                 .collect(Collectors.toList());
 
-        model.addAttribute("publicationUser", publicationAllUsers);
+        model.addAttribute("publications", publications);
         model.addAttribute("title", MY_ROOM);
         return "study-read-all-publications";
+    }
+
+    private String info(PublicationUser publicationUser) {
+        return "Автор : " + publicationUser.getAddress() +
+                ", Дата: " + publicationUser.getDate().toString().split("\\s")[0];
     }
 
     @GetMapping("/study/read-my-publications")
@@ -226,6 +248,12 @@ public class _1_StudyRoomControllers {
     private String getUserEmail(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         return details.getUsername();
+    }
+
+    private User getUser(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        return userRepository.findOneByEmail(userName).get();
     }
 
     //TODO REGEX

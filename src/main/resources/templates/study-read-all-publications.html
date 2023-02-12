@@ -38,11 +38,11 @@
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="publicationUser, el:${publications}" class="mt-2">
-                        <h5 th:text="${publicationUser.date}"></h5>
-                        <h5 th:text="${publicationUser.address}"></h5>
-                        <h2 th:text="${publicationUser.titleText}"></h2>
-                        <p th:utext="${publicationUser.fullText}"></p>
+                    <div th:each="publicationDTO, el:${publications}" class="mt-2">
+                        <h5  class="text-center" th:text="${publicationDTO.titleText}"></h5>
+                        <p th:utext="${publicationDTO.fullText}"></p>
+                        <h6 class="text-right" th:text="${publicationDTO.info}"></h6>
+                        <br>
                     </div>
                     <br>
                 </div>
