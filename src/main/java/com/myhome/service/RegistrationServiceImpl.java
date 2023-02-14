@@ -45,7 +45,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             user.setLogin(userForm.getLogin());
             user.setSettlement(userForm.getSettlement());
             user.setEmail(userForm.getEmail());
-            user.setCounter(counter);
             user.setPassword(hashPassword);
             user.setCurrencyCode(currency.getCurrencyCode());
             user.setAddress(address);
@@ -59,7 +58,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             user.setLogin(userForm.getLogin());
             user.setSettlement(userForm.getSettlement());
             user.setEmail(userForm.getEmail());
-            user.setCounter(counter());
             user.setPassword(hashPassword);
             user.setCurrencyCode(currency.getCurrencyCode());
             user.setAddress(address);
@@ -86,12 +84,5 @@ public class RegistrationServiceImpl implements RegistrationService {
         userFirst.setType("image/jpg");
         userFirst.setName("mine-photo.jpg");
         userPhotoRepository.save(userFirst);
-    }
-
-
-    private Integer counter() {
-        List<User> allByCounter = usersRepository.findAll();
-        int size = allByCounter.size();
-        return counter + size + 1;
     }
 }

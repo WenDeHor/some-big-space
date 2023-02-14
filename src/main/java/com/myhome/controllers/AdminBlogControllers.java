@@ -55,7 +55,7 @@ public class AdminBlogControllers {
     @GetMapping("/admin-mine/users")
     public String adminUsers(Model model) {
         List<User> allUsers = userRepository.findAll();
-        long countUsers = userRepository.count();
+        long countUsers = allUsers.size();
         model.addAttribute("countUsers", countUsers);
         model.addAttribute("allUsers", allUsers);
         model.addAttribute("title", "Admin Page");

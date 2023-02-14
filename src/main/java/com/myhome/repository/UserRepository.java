@@ -11,8 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-//    LinkedList<User>findLastByCounter();
-    Integer findOneByCounter(int count);
     Optional<User> findOneByEmail(String email);
     Optional<User> findOneByRole(Role role);
     Optional<User> findAllByAddress(String addressUser);

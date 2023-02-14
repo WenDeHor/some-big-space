@@ -17,14 +17,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Controller
 public class PagesControllers {
     //    Don't let the sun go down until you keep your promises
     // Картінки підгружати на різні кімнати
-    private final PublicationRepository publicationRepository;
     private final CompositionRepository compositionRepository;
     private final UserRepository userRepository;
     //    private final MyFriendsRepository myFriendsRepository;
@@ -36,8 +34,14 @@ public class PagesControllers {
     private final MetricsService metricsService;
     private final CommentsRepository commentsRepository;
 
-    public PagesControllers(PublicationRepository publicationRepository, CompositionRepository compositionRepository, UserRepository userRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CommentsRepository commentsRepository) {
-        this.publicationRepository = publicationRepository;
+    private final String MY_HOME = "Мій дім";
+    private final String STUDY_ROOM = "Моя кімната";
+    private final String LIBRARY_ROOM = "Читальня";
+    private final String SAFE_ROOM = "Робоча кімната";
+    private final String LIVING_ROOM = "Вітальня";
+    private final String KITCHEN_ROOM = "Кухня";
+
+    public PagesControllers(CompositionRepository compositionRepository, UserRepository userRepository, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CommentsRepository commentsRepository) {
         this.compositionRepository = compositionRepository;
         this.userRepository = userRepository;
         this.videoBoxAdminRepository = videoBoxAdminRepository;
@@ -75,8 +79,7 @@ public class PagesControllers {
         } else {
             model.addAttribute("videoBoxAdmin", videoBoxAdmins.get(sizeVideoList - 1));
         }
-
-        model.addAttribute("title", "STORY FLOW");
+        model.addAttribute("title", MY_HOME);
         return "mine-page";
     }
 
@@ -123,6 +126,7 @@ public class PagesControllers {
                     Base64.getMimeEncoder().encodeToString(compositionOne.get().getImage()));
             model.addAttribute("compositionOne", composition);
         }
+        model.addAttribute("title", MY_HOME);
         model.addAttribute("comments", findCommentsByIdComposition(id));
         return "users-read-competitive-one-composition-index";
     }
@@ -151,21 +155,22 @@ public class PagesControllers {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         String userAddress = findUserAddress(authentication);
         Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
-        List<UserPhoto> photos = new CopyOnWriteArrayList<>();
-        userPhotoFind.ifPresent(photos::add);
+//        List<UserPhoto> photos = new CopyOnWriteArrayList<>();
+//        userPhotoFind.ifPresent(photos::add);
 
-        model.addAttribute("photos", photos);
-        model.addAttribute("title", "Mine Page");
+        model.addAttribute("photos", userPhotoFind.get());
+        model.addAttribute("title", MY_HOME);
         return "userPage";
     }
 
     @GetMapping("/change/photo")
-    public String userPageChangePhotoEdit() {
+    public String userPageChangePhotoEdit(Model model) {
+        model.addAttribute("title", MY_HOME);
         return "userPage-updatePhoto";
     }
 
     @Transactional
-    @PostMapping("/change/photo")
+    @PostMapping("/change/photo") //TODO zipping photo
     public String userPageChangePhoto(Authentication authentication,
                                       MultipartFile file,
                                       @RequestParam("fullText") String fullText) throws IOException {
@@ -210,7 +215,6 @@ public class PagesControllers {
 
     @GetMapping("/living")
     public String livingReadPublications(Model model) {
-        model.addAttribute("title", "LIVING ROOM");
         return "redirect:/living/news/video";
     }
 
@@ -221,7 +225,9 @@ public class PagesControllers {
 
     @Transactional
     @GetMapping("/users/write/letter")
-    public String userWriteLetter(HttpServletRequest request) {
+    public String userWriteLetter(HttpServletRequest request,
+                                  Model model) {
+        model.addAttribute("title", MY_HOME);
         metricsService.startMetricsCheck(request, request.getRequestURI());
         return "users-write-letter";
     }
@@ -247,14 +253,21 @@ public class PagesControllers {
     public String registrationError(Model model,
                                     HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
+        model.addAttribute("title", MY_HOME);
         model.addAttribute("title", "Registration-error");
         return "registration-error";
     }
 
-     private String findUserAddress(Authentication authentication) {
+    private String findUserAddress(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getAddress();
+    }
+    private User findUser(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
+        return oneByEmail.get();
     }
 }

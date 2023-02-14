@@ -2,19 +2,14 @@ package com.myhome.models;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "users")
 public class User {
     public User() {
     }
 
-    public User(String login, String settlement, String email, String password, String address, String currencyCode, Role role, State state, Integer counter, Date date) {
+    public User(String login, String settlement, String email, String password, String address, String currencyCode, Role role, State state, Date date) {
         this.login = login;
         this.settlement = settlement;
         this.email = email;
@@ -23,7 +18,6 @@ public class User {
         this.currencyCode = currencyCode;
         this.role = role;
         this.state = state;
-        this.counter = counter;
         this.date = date;
     }
 
@@ -57,10 +51,6 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "state")
     private State state;
-
-    @Column(name = "counter")
-    private Integer counter;
-
 
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -139,14 +129,6 @@ public class User {
         this.state = state;
     }
 
-    public Integer getCounter() {
-        return counter;
-    }
-
-    public void setCounter(Integer counter) {
-        this.counter = counter;
-    }
-
     public Date getDate() {
         return date;
     }
@@ -155,43 +137,5 @@ public class User {
         this.date = date;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(idUser, user.idUser) &&
-                Objects.equals(login, user.login) &&
-                Objects.equals(settlement, user.settlement) &&
-                Objects.equals(email, user.email) &&
-                Objects.equals(password, user.password) &&
-                Objects.equals(address, user.address) &&
-                Objects.equals(currencyCode, user.currencyCode) &&
-                role == user.role &&
-                state == user.state &&
-                Objects.equals(counter, user.counter) &&
-                Objects.equals(date, user.date);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(idUser, login, settlement, email, password, address, currencyCode, role, state, counter, date);
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "idUser=" + idUser +
-                ", login='" + login + '\'' +
-                ", settlement='" + settlement + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", address='" + address + '\'' +
-                ", currencyCode='" + currencyCode + '\'' +
-                ", role=" + role +
-                ", state=" + state +
-                ", counter=" + counter +
-                ", date=" + date +
-                '}';
-    }
 }
