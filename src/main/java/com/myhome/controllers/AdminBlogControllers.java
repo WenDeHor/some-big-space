@@ -62,46 +62,6 @@ public class AdminBlogControllers {
         return "admin-page";
     }
 
-//    @GetMapping("/admin-mine/users")
-//    public String adminMain() {
-//        return "redirect:/admin-mine/users-registry";
-//    }
-//
-//    @GetMapping("/admin-mine/users-registry")
-//    public String adminUsers(Model model) {
-//        List<User> sortedUsers = userRepository.findAll().stream()
-//                .sorted(Comparator.comparing(User::getDate).reversed())
-//                .collect(Collectors.toList());
-//        long countUsers = userRepository.count();
-//        model.addAttribute("countUsers", countUsers);
-//        model.addAttribute("allUsers", sortedUsers);
-//        model.addAttribute("title", "Admin Page");
-//        return "admin-page";
-//    }
-//
-//    @GetMapping("/admin-mine/users/{id}/block")
-//    public String userLock(@PathVariable(value = "id") Long id) {
-//        Optional<User> oneByIdUser = userRepository.findOneByIdUser(id);
-//        if (oneByIdUser.isPresent() && oneByIdUser.get().getRole().equals(Role.USER)) {
-//            User user = oneByIdUser.get();
-//            user.setState(State.BANNED);
-//            userRepository.save(user);
-//        }
-//        return "redirect:/admin-mine/users-registry";
-//    }
-//
-//    @GetMapping("/admin-mine/users/{id}/unlock")
-//    public String userUnLock(@PathVariable(value = "id") Long id) {
-//        Optional<User> oneByIdUser = userRepository.findOneByIdUser(id);
-//        if (oneByIdUser.isPresent() && oneByIdUser.get().getRole().equals(Role.USER)) {
-//            User user = oneByIdUser.get();
-//            user.setState(State.ACTIVE);
-//            userRepository.save(user);
-//        }
-//        return "redirect:/admin-mine/users-registry";
-//    }
-
-
     //TODO competitive
     @Transactional
     @GetMapping("/admin-mine/users-competitive")
@@ -119,7 +79,7 @@ public class AdminBlogControllers {
 
     @Transactional
     @GetMapping("/admin-mine/users-competitive/{id}/competitive")
-    public String userCompetitiveOK(@PathVariable(value = "id") Long id) {
+    public String userCompetitiveOK(@PathVariable(value = "id") int id) {
         Optional<Composition> oneById = compositionRepository.findOneById(id);
         if (oneById.isPresent()) {
             Composition composition = oneById.get();
@@ -131,7 +91,7 @@ public class AdminBlogControllers {
 
     @Transactional
     @GetMapping("/admin-mine/users-competitive/{id}/delete")
-    public String userCompetitiveDelete(@PathVariable(value = "id") Long id) {
+    public String userCompetitiveDelete(@PathVariable(value = "id") int id) {
         Optional<Composition> oneById = compositionRepository.findOneById(id);
         if (oneById.isPresent()) {
             Composition composition = oneById.get();
@@ -143,7 +103,7 @@ public class AdminBlogControllers {
 
     @Transactional
     @GetMapping("/admin-mine/users-competitive/{id}/read")
-    public String competitiveReadOne(@PathVariable(value = "id") Long id,
+    public String competitiveReadOne(@PathVariable(value = "id") int id,
                                      Model model) {
         Optional<Composition> compositionOne = compositionRepository.findOneById(id);
         if (!compositionOne.isPresent()) {
@@ -168,7 +128,7 @@ public class AdminBlogControllers {
 
     @Transactional
     @GetMapping("/admin-mine/users-publication/{id}/read")
-    public String publicationReadOne(@PathVariable(value = "id") Long id,
+    public String publicationReadOne(@PathVariable(value = "id") int id,
                                      Model model) {
         Optional<Composition> compositionOne = compositionRepository.findOneById(id);
         if (!compositionOne.isPresent()) {
@@ -184,18 +144,14 @@ public class AdminBlogControllers {
                                         MultipartFile file,
                                         @RequestParam("titleText") String titleText,
                                         @RequestParam("fullText") String fullText) throws IOException {
-        String userEmail = getUserEmail(authentication);
-        int count = compositionRepository.findAllByEmail(userEmail).size();
-        ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
+        User user = getUser(authentication);
+        int count = compositionRepository.findAllByIdUser(user.getId()).size();
+        ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail(), countId(count));
         Date date = new Date();
         PublicationPostAdmin publicationPostAdmin = new PublicationPostAdmin();
         publicationPostAdmin.setDate(date);
         publicationPostAdmin.setTitleText(titleText);
         publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
-        publicationPostAdmin.setAddress(userEmail);
-        publicationPostAdmin.setName(file.getOriginalFilename());
-        publicationPostAdmin.setType(file.getContentType());
-//        publicationPostAdmin.setImage(file.getBytes());
         publicationPostAdmin.setImage(convert.img);
         publicationPostAdminRepository.save(publicationPostAdmin);
         compressorImgToJpg.deleteImage(convert.nameStart);
@@ -209,15 +165,15 @@ public class AdminBlogControllers {
 
     @Transactional
     @GetMapping("/admin-mine/admin-publications/{id}/edit")
-    public String adminPublicationEditOne(@PathVariable(value = "id") Long id,
+    public String adminPublicationEditOne(@PathVariable(value = "id") int id,
                                           Model model) {
         if (!publicationPostAdminRepository.existsById(id)) {
             return "redirect:/admin-mine/admin-publications";
         }
-        Optional<PublicationPostAdmin> byIdPublication = publicationPostAdminRepository.findByIdPublication(id);
+        Optional<PublicationPostAdmin> byIdPublication = publicationPostAdminRepository.findById(id);
         List<PublicationPostAdmin> publicationPostAdminList = new ArrayList<>();
         byIdPublication.ifPresent(publicationPostAdminList::add);
-        publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
+        publicationPostAdminList.sort(Comparator.comparing(PublicationPostAdmin::getId).reversed());
         model.addAttribute("publicationPostAdminList", convertTextWithFormatEdit(publicationPostAdminList));
 
         return "admin-page-admin-edit-publication";
@@ -226,7 +182,7 @@ public class AdminBlogControllers {
     //TODO img
     @GetMapping("/image/display/admin/{id}")
     @ResponseBody
-    void showImageComposition(@PathVariable("id") Long id,
+    void showImageComposition(@PathVariable("id") int id,
                               HttpServletResponse response,
                               Optional<Composition> composition) throws IOException {
         Optional<PublicationPostAdmin> composition2 = publicationPostAdminRepository.findById(id);
@@ -248,7 +204,7 @@ public class AdminBlogControllers {
     }
 
     @GetMapping("/admin-mine/users-publications/{idUserPublication}/read")
-    public String publicationEdit(@PathVariable(value = "idUserPublication") Long idUserPublication, Model model) {
+    public String publicationEdit(@PathVariable(value = "idUserPublication") int idUserPublication, Model model) {
         if (!publicationRepository.existsById(idUserPublication)) {
             return "redirect:/admin-mine/admin-publications";
         }
@@ -265,7 +221,7 @@ public class AdminBlogControllers {
     @GetMapping("/admin-mine/admin-publications")
     public String adminPublications(Model model) {
         List<PublicationPostAdmin> publicationPostAdminRepositoryAll = publicationPostAdminRepository.findAll();
-        publicationPostAdminRepositoryAll.sort(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed());
+        publicationPostAdminRepositoryAll.sort(Comparator.comparing(PublicationPostAdmin::getId).reversed());
         long countPublications = publicationPostAdminRepository.count();
 
         model.addAttribute("countPublications", countPublications);
@@ -280,23 +236,10 @@ public class AdminBlogControllers {
         return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
-    //    @Transactional
-//    @GetMapping("/image/display/admin/{idPublication}")
-//    @ResponseBody
-//    void showImageAdmin(@PathVariable("idPublication") Long idPublication,
-//                        HttpServletResponse response,
-//                        Optional<PublicationPostAdmin> publicationPostAdmin) throws ServletException, IOException {
-//
-//        publicationPostAdmin = publicationPostAdminRepository.findById(idPublication);
-//        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-//        response.getOutputStream().write(publicationPostAdmin.get().getImage());
-//        response.getOutputStream().close();
-//    }
-
     @Transactional
     @GetMapping("/admin-mine/admin-publications/{id}/remove")
-    public String adminPublicationRemove(@PathVariable(value = "id") Long id, Model model) {
-        PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findByIdPublication(id).orElseThrow(null);
+    public String adminPublicationRemove(@PathVariable(value = "id") int id, Model model) {
+        PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findById(id).orElseThrow(null);
         publicationPostAdminRepository.delete(publicationPostAdmin);
         return "redirect:/admin-mine/admin-publications";
     }
@@ -316,20 +259,15 @@ public class AdminBlogControllers {
 
     @Transactional
     @PostMapping("/admin-mine/admin-publications/{id}/edit")
-    public String adminPublicationUpdate(@PathVariable(value = "id") Long id,
+    public String adminPublicationUpdate(@PathVariable(value = "id") int id,
                                          MultipartFile file,
                                          @RequestParam String titleText,
-                                         @RequestParam String fullText,
-                                         Model model) throws IOException {
-        PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findByIdPublication(id).orElseThrow(null);
+                                         @RequestParam String fullText) throws IOException {
+        PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findById(id).orElseThrow(null);
         publicationPostAdmin.setTitleText(titleText);
         publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
-        Date date = new Date();
-        publicationPostAdmin.setDate(date);
-        publicationPostAdmin.setName(file.getOriginalFilename());
-        publicationPostAdmin.setType(file.getContentType());
-
-        if (file.getContentType().equals("application/octet-stream")) {
+        publicationPostAdmin.setDate(new Date());
+        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
             Optional<PublicationPostAdmin> byId = publicationPostAdminRepository.findById(id);
             byte[] image = byId.get().getImage();
             publicationPostAdmin.setImage(image);
@@ -337,81 +275,34 @@ public class AdminBlogControllers {
             publicationPostAdmin.setImage(file.getBytes());
         }
         publicationPostAdminRepository.save(publicationPostAdmin);
-
         return "redirect:/admin-mine/admin-publications";
     }
 
-    //    @Transactional
-//    @PostMapping("/admin-mine/admin-publications/{id}/edit")
-//    public String adminPublicationUpdate(@PathVariable(value = "id") Long id,
-//                                         MultipartFile file,
-//                                         Authentication authentication,
-//                                         @RequestParam String titleText,
-//                                         @RequestParam String fullText) throws IOException {
-//        PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findByIdPublication(id).orElseThrow(null);
-//        publicationPostAdmin.setTitleText(titleText);
-//        publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
-//        Date date = new Date();
-//        publicationPostAdmin.setDate(date);
-//        publicationPostAdmin.setName(file.getOriginalFilename());
-//        publicationPostAdmin.setType(file.getContentType());
-//
-//        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
-//            Optional<PublicationPostAdmin> byId = publicationPostAdminRepository.findById(id);
-//            byId.ifPresent(postAdmin -> publicationPostAdmin.setImage(postAdmin.getImage()));
-//        } else {
-//            String userEmail = getUserEmail(authentication);
-//            int count = compositionRepository.findAllByEmail(userEmail).size();
-//            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
-//            publicationPostAdmin.setImage(convert.img);
-////            publicationPostAdmin.setImage(file.getBytes());
-//            compressorImgToJpg.deleteImage(convert.nameStart);
-//            compressorImgToJpg.deleteImage(convert.nameEnd);
-//        }
-//        publicationPostAdminRepository.save(publicationPostAdmin);
-//
-//        return "redirect:/admin-mine/admin-publications";
-//    }
-
     @GetMapping("/admin-mine/admin-video")
     public String adminNewsGetVideo(Authentication authentication, Model model) {
-        String userAddress = findUserAddress(authentication);
-        Iterable<VideoBoxAdmin> allByAddressAdmin = videoBoxAdminRepository.findAllByAddressAdmin(userAddress);
-        List<VideoBoxAdmin> videoBoxAdminList = new ArrayList<>();
-        allByAddressAdmin.forEach(videoBoxAdminList::add);
-        videoBoxAdminList.sort(Comparator.comparing(VideoBoxAdmin::getIdVideoBox).reversed());
-
-        model.addAttribute("videoBoxAdminList", videoBoxAdminList);
+        User user = getUser(authentication);
+        List<VideoBoxAdmin> allByAddressAdmin = videoBoxAdminRepository.findAllById(user.getId());
+        allByAddressAdmin.sort(Comparator.comparing(VideoBoxAdmin::getId).reversed());
+        model.addAttribute("videoBoxAdminList", allByAddressAdmin);
         model.addAttribute("title", "Admin Page");
         return "admin-page-video-publication";
     }
 
     @PostMapping("/admin-mine/admin-video")
     public String adminNewsAddVideo(Authentication authentication,
-                                    Model model,
                                     @RequestParam("linkToVideo") String linkToVideo,
-                                    @RequestParam("titleText") String titleText) throws IOException {
-
-        String userAddress = findUserAddress(authentication);
+                                    @RequestParam("titleText") String titleText) {
         String url = createURL(parseNormalURL(linkToVideo));
         VideoBoxAdmin videoBox = new VideoBoxAdmin();
-        videoBox.setAddressAdmin(userAddress);
         videoBox.setLinkToVideo(url);
         videoBox.setTitleText(titleText);
-        Date date = new Date();
-        videoBox.setDate(date);
+        videoBox.setDate(new Date());
         videoBoxAdminRepository.save(videoBox);
         return "redirect:/admin-mine/admin-video";
     }
 
     private String createURL(String nameURL) {
         return YOUTUBE + nameURL + "?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
-    }
-
-    private String parseUpdateURL(String url) {
-        String[] cutLink = url.split(YOUTUBE);
-        String[] cutName = cutLink[1].split("\\?");
-        return cutName[0];
     }
 
     private String parseNormalURL(String url) {
@@ -425,7 +316,7 @@ public class AdminBlogControllers {
     }
 
     @GetMapping("/admin-mine/admin-video/{idVideoBox}/remove")
-    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") Long idVideoBox, Model model) {
+    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") int idVideoBox) {
         VideoBoxAdmin videoBoxAdmin = videoBoxAdminRepository.findById(idVideoBox).orElseThrow(null);
         videoBoxAdminRepository.delete(videoBoxAdmin);
         return "redirect:/admin-mine/admin-video";
@@ -433,14 +324,15 @@ public class AdminBlogControllers {
 
     @Transactional
     @GetMapping("/admin-mine/admin-video/{id}/edit")
-    public String adminVideoPublicationEdit(@PathVariable(value = "id") Long id, Model model) {
+    public String adminVideoPublicationEdit(@PathVariable(value = "id") int id,
+                                            Model model) {
         if (!videoBoxAdminRepository.existsById(id)) {
             return "redirect:/admin-mine/admin-video";
         }
         Optional<VideoBoxAdmin> videoBoxAdminRepositoryById = videoBoxAdminRepository.findById(id);
         List<VideoBoxAdmin> videoBoxAdminArrayList = new ArrayList<>();
         videoBoxAdminRepositoryById.ifPresent(videoBoxAdminArrayList::add);
-        videoBoxAdminArrayList.sort(Comparator.comparing(VideoBoxAdmin::getIdVideoBox).reversed());
+        videoBoxAdminArrayList.sort(Comparator.comparing(VideoBoxAdmin::getId).reversed());
         model.addAttribute("videoBoxAdminArrayList", videoBoxAdminArrayList);
 
         return "admin-page-edit-video-publication";
@@ -448,12 +340,10 @@ public class AdminBlogControllers {
 
     @Transactional
     @PostMapping("/admin-mine/admin-video/{id}/edit")
-    public String adminVideoUpdate(@PathVariable(value = "id") Long id,
-
+    public String adminVideoUpdate(@PathVariable(value = "id") int id,
                                    @RequestParam String titleText,
-                                   @RequestParam String linkToVideo,
-                                   Model model) throws IOException {
-        VideoBoxAdmin videoBoxAdmin = videoBoxAdminRepository.findByIdVideoBox(id).orElseThrow(null);
+                                   @RequestParam String linkToVideo) {
+        VideoBoxAdmin videoBoxAdmin = videoBoxAdminRepository.findById(id).orElseThrow(null);
         videoBoxAdmin.setTitleText(titleText);
         int length = linkToVideo.length();
         if (length == 11) {
@@ -461,71 +351,35 @@ public class AdminBlogControllers {
             videoBoxAdmin.setLinkToVideo(url);
         }
         videoBoxAdminRepository.save(videoBoxAdmin);
-
         return "redirect:/admin-mine/admin-video";
     }
-
-//    @Transactional
-//    @PostMapping("/admin-mine/admin-video/{id}/edit")
-//    public String adminVideoUpdate(@PathVariable(value = "id") Long id,
-//                                   @RequestParam String titleText,
-//                                   @RequestParam String linkToVideo) {
-//        VideoBoxAdmin videoBoxAdmin = videoBoxAdminRepository.findByIdVideoBox(id).orElseThrow(null);
-//        videoBoxAdmin.setTitleText(titleText);
-//        String url;
-//        if (linkToVideo.split("=").length > 3) {
-//            url = createURL(parseUpdateURL(linkToVideo));
-//        } else {
-//            url = createURL(parseNormalURL(linkToVideo));
-//        }
-//
-//        videoBoxAdmin.setLinkToVideo(url);
-//        videoBoxAdminRepository.save(videoBoxAdmin);
-//        return "redirect:/admin-mine/admin-video";
-//    }
 
     //TODO LETTER
     @GetMapping("/admin-mine/read-letters/enter-letters")
     public String adminReadLettersOfUserEnter(Authentication authentication, Model model) {
         String adminAddress = findUserAddress(authentication);
         List<LetterToADMIN> letterToADMINS = letterToADMINRepository.findAll().stream()
-                .sorted(Comparator.comparing(LetterToADMIN::getLocalDate).reversed())
+                .sorted(Comparator.comparing(LetterToADMIN::getDate).reversed())
                 .collect(Collectors.toList());
-
         model.addAttribute("adminLetters", letterToADMINS);
         model.addAttribute("title", "Admin Page");
         return "admin-page-read-user-letters-enter";
     }
 
-    //    href="/admin-mine/read-letters/outer-letters">
     @GetMapping("/admin-mine/read-letters/outer-letters")
-    public String adminReadLettersOfUserOuter(Authentication authentication, Model model) {
+    public String adminReadLettersOfUserOuter(Model model) {
         List<LetterToUSER> letterFromADMINS = letterToUSERRepository.findAll().stream()
                 .filter(el -> el.getSenderAddress().equals(ADMIN))
                 .sorted(Comparator.comparing(LetterToUSER::getDate).reversed())
                 .collect(Collectors.toList());
-
         model.addAttribute("adminLetters", letterFromADMINS);
         model.addAttribute("title", "Admin Page");
         return "admin-page-read-user-letters-outer";
     }
 
-//    @GetMapping("/admin-mine/read-users-letters")
-//    public String adminReadUsersLetters(Model model) {
-//        List<LetterToADMIN> sortedLetterToADMINS = letterToADMINRepository.findAll().stream()
-//                .sorted(Comparator.comparing(LetterToADMIN::getLocalDate).reversed())
-//                .collect(Collectors.toList());
-//        long countLetters = letterToADMINRepository.count();
-//        model.addAttribute("countLetters", countLetters);
-//        model.addAttribute("sortedLetters", sortedLetterToADMINS);
-//        model.addAttribute("title", "Read Letters");
-//        return "admin-read-users-letters";
-//    }
-
     @GetMapping("/admin-mine/write-letters/send")
     public String adminWriteLetter(Authentication authentication, Model model) {
         String adminAddress = findUserAddress(authentication);
-
         model.addAttribute("adminAddress", adminAddress);
         model.addAttribute("title", "Admin Page");
         return "admin-page-write-to-user-letters";
@@ -537,46 +391,47 @@ public class AdminBlogControllers {
                                   @RequestParam String fullText,
                                   @RequestParam String senderAddress,
                                   @RequestParam String recipientAddress,
-                                  Model model, Authentication authentication) {
+                                  Authentication authentication) {
 
-        String adminAddress = findUserAddress(authentication);
-        Date date = new Date();
+        User user = getUser(authentication);
         LetterToUSER adminLetterToUSER = new LetterToUSER();
-        adminLetterToUSER.setDate(date);
+        adminLetterToUSER.setDate(new Date());
         adminLetterToUSER.setTitleText(titleText);
         adminLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
-        adminLetterToUSER.setSenderAddress(adminAddress);
+        adminLetterToUSER.setSenderAddress(user.getAddress());
         adminLetterToUSER.setRecipientAddress(recipientAddress);
         letterToUSERRepository.save(adminLetterToUSER);
         return "redirect:/admin-mine/read-letters/enter-letters";
     }
 
     @GetMapping("/admin-mine/read-letters/enter-letters/{id}/read")
-    public String adminReadLetterEnter(@PathVariable(value = "id") Long id, Model model) {
+    public String adminReadLetterEnter(@PathVariable(value = "id") int id,
+                                       Model model) {
         Optional<LetterToADMIN> letter1 = letterToADMINRepository.findById(id);
         model.addAttribute("letter", letter1.get());
         return "admin-page-read-user-letters-fulltext-enter";
     }
 
-// <td><a th:href="'/admin-mine/read-letters/outer-letters/'+${letterToUSER.idLetter}+'/read'"
-@GetMapping("/admin-mine/read-letters/outer-letters/{id}/read")
-public String adminReadLetterOuter(@PathVariable(value = "id") Long id, Model model) {
-    Optional<LetterToUSER> letter1 = letterToUSERRepository.findById(id);
-    model.addAttribute("letter", letter1.get());
-    return "admin-page-read-user-letters-fulltext-outer";
-}
+    @GetMapping("/admin-mine/read-letters/outer-letters/{id}/read")
+    public String adminReadLetterOuter(@PathVariable(value = "id") int id,
+                                       Model model) {
+        Optional<LetterToUSER> letter1 = letterToUSERRepository.findById(id);
+        model.addAttribute("letter", letter1.get());
+        return "admin-page-read-user-letters-fulltext-outer";
+    }
+
     //TODO answer
     @GetMapping("/admin-mine/write-letters/{id}/answer")
     public String adminAnswerWriteLetter(Authentication authentication,
-                                         @PathVariable(value = "id") Long id,
+                                         @PathVariable(value = "id") int id,
                                          Model model) {
         Optional<LetterToADMIN> letter = letterToADMINRepository.findById(id);
-        String adminAddress = findUserAddress(authentication);
-        if (letter.get().getAddress() == null) {
+        User user = getUser(authentication);
+        if (letter.get().getAddressUser() == null) {
             return "redirect:/admin-mine/read-letters/enter-letters";
         }
-        model.addAttribute("senderAddress", letter.get().getAddress());
-        model.addAttribute("adminAddress", adminAddress);
+        model.addAttribute("senderAddress", letter.get().getAddressUser());
+        model.addAttribute("adminAddress", user.getAddress());
         model.addAttribute("title", "Admin Page");
         return "admin-page-write-to-user-letters-answer";
     }
@@ -587,22 +442,21 @@ public String adminReadLetterOuter(@PathVariable(value = "id") Long id, Model mo
                                         @RequestParam String fullText,
                                         @RequestParam String senderAddress,
                                         @RequestParam String recipientAddress,
-                                        Model model, Authentication authentication) {
+                                        Authentication authentication) {
 
-        String adminAddress = findUserAddress(authentication);
-        Date date = new Date();
+        User user = getUser(authentication);
         LetterToUSER adminLetterToUSER = new LetterToUSER();
-        adminLetterToUSER.setDate(date);
+        adminLetterToUSER.setDate(new Date());
         adminLetterToUSER.setTitleText(titleText);
         adminLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
-        adminLetterToUSER.setSenderAddress(adminAddress);
+        adminLetterToUSER.setSenderAddress(user.getAddress());
         adminLetterToUSER.setRecipientAddress(recipientAddress);
         letterToUSERRepository.save(adminLetterToUSER);
         return "redirect:/admin-mine/read-letters/enter-letters";
     }
 
     @GetMapping("/admin-mine/read-users-letters/enter-letters/{idLetter}/delete")
-    public String adminDeleteLetter(@PathVariable(value = "idLetter") Long idLetter) {
+    public String adminDeleteLetter(@PathVariable(value = "idLetter") int idLetter) {
         Optional<LetterToADMIN> byId = letterToADMINRepository.findById(idLetter);
         byId.ifPresent(letterToADMINRepository::delete);
         return "redirect:/admin-mine/read-letters/enter-letters";
@@ -610,7 +464,7 @@ public String adminReadLetterOuter(@PathVariable(value = "id") Long id, Model mo
 
     @Transactional
     @GetMapping("/admin-mine/read-users-letters/enter-letters/{idLetter}/read")
-    public String adminReadOneLetter(@PathVariable(value = "idLetter") Long idLetter,
+    public String adminReadOneLetter(@PathVariable(value = "idLetter") int idLetter,
                                      Model model) {
         Optional<LetterToADMIN> letterOptional = letterToADMINRepository.findById(idLetter);
         letterOptional.ifPresent(letterToADMIN -> model.addAttribute("letterReadOne", letterToADMIN));
@@ -644,12 +498,10 @@ public String adminReadLetterOuter(@PathVariable(value = "id") Long id, Model mo
         return oneByEmail.get().getAddress();
     }
 
-    private String getUserEmail(Authentication authentication) {
+    private User getUser(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-
-        return oneByEmail.map(User::getEmail).orElse(null);
+        return userRepository.findOneByEmail(userName).get();
     }
 
 }

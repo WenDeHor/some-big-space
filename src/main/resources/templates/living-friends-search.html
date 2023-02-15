@@ -77,9 +77,9 @@
                         <tr th:each="user, iterator:${all}" class="mt-2">
                             <td th:text="${iterator.index+1}"></td>
                             <td><span th:text="${user.address}"></span></td>
-                            <td><a th:href="'/living/friends/friends/'+${user.idUser}+'/add'"
+                            <td><a th:href="'/living/friends/friends/'+${user.id}+'/add'"
                                    class="btn btn-warning">Товариш</a></td>
-                            <td><a th:href="'/living/friends/family/'+${user.idUser}+'/add'"
+                            <td><a th:href="'/living/friends/family/'+${user.id}+'/add'"
                                    class="btn btn-warning">Сім’я</a></td>
                         </tr>
                         </tbody>

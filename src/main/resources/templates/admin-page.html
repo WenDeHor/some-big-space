@@ -62,9 +62,9 @@
 <!--                            <td><span th:text="${users.counter}"></span></td>-->
                             <td><span th:text="${users.address}"></span></td>
 
-                            <td><a th:href="'/admin-mine/users/'+${users.idUser}+'/write-letter'"
+                            <td><a th:href="'/admin-mine/users/'+${users.id}+'/write-letter'"
                                    class="btn btn-warning disabled" tabindex="-1" role="button" aria-disabled="true">Write letter</a></td>
-                            <td><a th:href="'/admin-mine/users/'+${users.idUser}+'/block'"
+                            <td><a th:href="'/admin-mine/users/'+${users.id}+'/block'"
                                    class="btn btn-warning disabled" tabindex="-1" role="button" aria-disabled="true">Block</a></td>
                         </tr>
 

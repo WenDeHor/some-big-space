@@ -72,7 +72,7 @@
                             <td><span th:text="${#dates.format({letterToUSER.date}, 'dd:MM:YYYY')}"></span></td>
                             <td><span th:text="${letterToUSER.recipientAddress}"></span></td>
                             <td><span th:text="${letterToUSER.titleText}"></span></td>
-                            <td><a th:href="'/admin-mine/read-letters/outer-letters/'+${letterToUSER.idLetter}+'/read'"
+                            <td><a th:href="'/admin-mine/read-letters/outer-letters/'+${letterToUSER.id}+'/read'"
                                    class="btn btn-warning">fullText</a></td>
 <!--                            <td><a th:href="'/admin-mine/write-letters/'+${letterToUSER.idLetter}+'/answer'"-->
 <!--                                   class="btn btn-warning">answer</a></td>-->

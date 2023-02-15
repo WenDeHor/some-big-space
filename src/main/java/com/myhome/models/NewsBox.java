@@ -1,30 +1,16 @@
 package com.myhome.models;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "news_box")
-public class NewsBox  {
-    public NewsBox() {
-    }
-
-    public NewsBox(String linkToNews, String titleText, String addressUser, LocalDate localDate) {
-        this.linkToNews = linkToNews;
-        this.titleText = titleText;
-        this.addressUser = addressUser;
-        this.localDate = localDate;
-    }
-
+public class NewsBox {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "news_box_id")
-    private Long idNewsBox;
+    @Column(name = "id")
+    private int id;
 
     @Column(name = "link_to_news")
     private String linkToNews;
@@ -32,18 +18,28 @@ public class NewsBox  {
     @Column(name = "title_text")
     private String titleText;
 
-    @Column(name = "address_user")
-    private String addressUser;
+    @Column(name = "id_user")
+    private int idUser;
 
-    @Column(name = "local_date")
-    private LocalDate localDate;
+    @Column(name = "date")
+    private Date date;
 
-    public Long getIdNewsBox() {
-        return idNewsBox;
+    public NewsBox() {
     }
 
-    public void setIdNewsBox(Long idNewsBox) {
-        this.idNewsBox = idNewsBox;
+    public NewsBox(String linkToNews, String titleText, int idUser, Date date) {
+        this.linkToNews = linkToNews;
+        this.titleText = titleText;
+        this.idUser = idUser;
+        this.date = date;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getLinkToNews() {
@@ -62,20 +58,20 @@ public class NewsBox  {
         this.titleText = titleText;
     }
 
-    public String getAddressUser() {
-        return addressUser;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setAddressUser(String addressUser) {
-        this.addressUser = addressUser;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setLocalDate(LocalDate localDate) {
-        this.localDate = localDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Override
@@ -83,26 +79,26 @@ public class NewsBox  {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NewsBox newsBox = (NewsBox) o;
-        return Objects.equals(idNewsBox, newsBox.idNewsBox) &&
+        return id == newsBox.id &&
+                idUser == newsBox.idUser &&
                 Objects.equals(linkToNews, newsBox.linkToNews) &&
                 Objects.equals(titleText, newsBox.titleText) &&
-                Objects.equals(addressUser, newsBox.addressUser) &&
-                Objects.equals(localDate, newsBox.localDate);
+                Objects.equals(date, newsBox.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idNewsBox, linkToNews, titleText, addressUser, localDate);
+        return Objects.hash(id, linkToNews, titleText, idUser, date);
     }
 
     @Override
     public String toString() {
         return "NewsBox{" +
-                "idNewsBox=" + idNewsBox +
+                "id=" + id +
                 ", linkToNews='" + linkToNews + '\'' +
                 ", titleText='" + titleText + '\'' +
-                ", addressUser='" + addressUser + '\'' +
-                ", localDate=" + localDate +
+                ", idUser=" + idUser +
+                ", date=" + date +
                 '}';
     }
 }

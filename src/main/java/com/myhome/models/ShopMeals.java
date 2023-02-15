@@ -5,43 +5,39 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "shop_meals")
 public class ShopMeals {
-    public ShopMeals() {
-    }
-
-    public ShopMeals(Date date, @Size(min = 0, max = 3000) String fullText, String address) {
-        this.date = date;
-        this.fullText = fullText;
-        this.address = address;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
     private Date date;
 
     @Column(name = "full_text")
-    @Size(min = 0, max = 3000)
+    @Size(max = 3000)
     private String fullText;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "id_user")
+    private int idUser;
 
-    public Long getId() {
+    public ShopMeals() {
+    }
+
+    public ShopMeals(Date date, @Size(max = 3000) String fullText, int idUser) {
+        this.date = date;
+        this.fullText = fullText;
+        this.idUser = idUser;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -61,12 +57,12 @@ public class ShopMeals {
         this.fullText = fullText;
     }
 
-    public String getAddress() {
-        return address;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
     @Override
@@ -74,15 +70,15 @@ public class ShopMeals {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ShopMeals shopMeals = (ShopMeals) o;
-        return Objects.equals(id, shopMeals.id) &&
+        return id == shopMeals.id &&
+                idUser == shopMeals.idUser &&
                 Objects.equals(date, shopMeals.date) &&
-                Objects.equals(fullText, shopMeals.fullText) &&
-                Objects.equals(address, shopMeals.address);
+                Objects.equals(fullText, shopMeals.fullText);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, fullText, address);
+        return Objects.hash(id, date, fullText, idUser);
     }
 
     @Override
@@ -91,7 +87,7 @@ public class ShopMeals {
                 "id=" + id +
                 ", date=" + date +
                 ", fullText='" + fullText + '\'' +
-                ", address='" + address + '\'' +
+                ", idUser=" + idUser +
                 '}';
     }
 }

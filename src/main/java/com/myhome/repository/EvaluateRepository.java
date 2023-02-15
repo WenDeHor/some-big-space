@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface EvaluateRepository extends JpaRepository<Evaluate, Long> {
+public interface EvaluateRepository extends JpaRepository<Evaluate, Integer> {
 
-    Optional<Evaluate> findByEmailAppraiserAndIdComposition(String emailAppraiser, Long idComposition);
-    List<Evaluate>findAllByIdComposition(Long IdComposition);
+    Optional<Evaluate> findByIdAppraiserAndIdComposition(int idAppraiser, int idComposition);
+
+    List<Evaluate> findAllByIdComposition(int IdComposition);
 }

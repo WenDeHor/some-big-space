@@ -40,10 +40,11 @@ public class SecurityController {
         String login = userForm.getLogin().trim().replaceAll("\\s+", "00");
         if (request.getParameterMap().containsKey("error")
                 || userPresent.isPresent()
-                || !onlyLatinAlphabet(login)
-                || userForm.getLogin().length() < 3
-                || userForm.getPassword().length() < 4
-                || !emailValidator(userForm.getEmail())) {
+//                || !onlyLatinAlphabet(login)
+//                || userForm.getLogin().length() < 3
+//                || userForm.getPassword().length() < 4
+//                || !emailValidator(userForm.getEmail())
+        ) {
             model.addAttribute("error", true);
             model.addAttribute("title", "registration page");
             return "registration-error";

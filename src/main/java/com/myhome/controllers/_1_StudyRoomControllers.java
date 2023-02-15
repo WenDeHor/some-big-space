@@ -59,20 +59,18 @@ public class _1_StudyRoomControllers {
     }
 
     @PostMapping("/study/write-letter/send")
-    public String LetterSend(@RequestParam String titleText,
+    public String letterSend(@RequestParam String titleText,
                              @RequestParam String fullText,
                              @RequestParam String recipientAddress,
                              Authentication authentication) {
         User user = getUser(authentication);
         if (recipientAddress.equals(ADMIN)) {
             LetterToADMIN userSendLetterToADMIN = new LetterToADMIN();
-            userSendLetterToADMIN.setLocalDate(new Date());
+            userSendLetterToADMIN.setDate(new Date());
             userSendLetterToADMIN.setTitleText(titleText);
             userSendLetterToADMIN.setFullText(convertTextWithFormatToSave(fullText));
-            userSendLetterToADMIN.setEmail(user.getEmail());
-            userSendLetterToADMIN.setAddress(user.getAddress());
+            userSendLetterToADMIN.setAddressUser(user.getAddress());
             letterToADMINRepository.save(userSendLetterToADMIN);
-            return "redirect:/study/outer-letters";
         } else {
             LetterToUSER userSendLetterToUSER = new LetterToUSER();
             userSendLetterToUSER.setDate(new Date());
@@ -81,8 +79,8 @@ public class _1_StudyRoomControllers {
             userSendLetterToUSER.setSenderAddress(user.getAddress());
             userSendLetterToUSER.setRecipientAddress(recipientAddress);
             letterToUSERRepository.save(userSendLetterToUSER);
-            return "redirect:/study/outer-letters";
         }
+        return "redirect:/study/outer-letters";
     }
 
     private String convertTextWithFormatToSave(String fullText) {
@@ -97,8 +95,8 @@ public class _1_StudyRoomControllers {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
         List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllBySenderAddress(address).stream()
-                .map(el -> new LettersDTO(el.getIdLetter(), el.getTitleText(), el.getFullText(), buildInfoBySender(el)))
-                .sorted(Comparator.comparing(LettersDTO::getIdLetter).reversed())
+                .map(el -> new LettersDTO(el.getId(), el.getTitleText(), el.getFullText(), buildInfoBySender(el)))
+                .sorted(Comparator.comparing(LettersDTO::getId).reversed())
                 .collect(Collectors.toList());
         model.addAttribute("letters", lettersDTOS);
         model.addAttribute("title", MY_ROOM);
@@ -111,7 +109,7 @@ public class _1_StudyRoomControllers {
     }
 
     @GetMapping("/study/outer-letters/{idLetter}/remove")
-    public String letterRemoveByOuter(@PathVariable(value = "idLetter") Long idLetter) {
+    public String letterRemoveByOuter(@PathVariable(value = "idLetter") int idLetter) {
         LetterToUSER letter = letterToUSERRepository.findById(idLetter).orElseThrow(null);
         letterToUSERRepository.delete(letter);
         return "redirect:/study/outer-letters";
@@ -122,8 +120,8 @@ public class _1_StudyRoomControllers {
                                           Model model) {
         String address = findUserAddress(authentication);
         List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllByRecipientAddress(address).stream()
-                .map(el -> new LettersDTO(el.getIdLetter(), el.getTitleText(), el.getFullText(), buildInfoByRecipient(el)))
-                .sorted(Comparator.comparing(LettersDTO::getIdLetter).reversed())
+                .map(el -> new LettersDTO(el.getId(), el.getTitleText(), el.getFullText(), buildInfoByRecipient(el)))
+                .sorted(Comparator.comparing(LettersDTO::getId).reversed())
                 .collect(Collectors.toList());
         model.addAttribute("letters", lettersDTOS);
         model.addAttribute("title", MY_ROOM);
@@ -136,7 +134,7 @@ public class _1_StudyRoomControllers {
     }
 
     @GetMapping("/study/enter-letters/{idLetter}/remove")
-    public String letterRemoveByEnter(@PathVariable(value = "idLetter") Long idLetter) {
+    public String letterRemoveByEnter(@PathVariable(value = "idLetter") int idLetter) {
         LetterToUSER letter = letterToUSERRepository.findById(idLetter).orElseThrow(null);
         letterToUSERRepository.delete(letter);
         return "redirect:/study/enter-letters";
@@ -148,11 +146,11 @@ public class _1_StudyRoomControllers {
                                                  Model model,
                                                  HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String userAddress = findUserAddress(authentication);
+        User user = getUser(authentication);
         List<PublicationDTO> publications = publicationRepository.findAll().stream()
-                .filter(el -> !el.getAddress().equals(userAddress))
+                .filter(el -> el.getIdUser() != user.getId())
                 .limit(LIMIT_LIST)
-                .map(el -> new PublicationDTO(el.getIdPublication(), el.getTitleText(), el.getFullText(), info(el)))
+                .map(el -> new PublicationDTO(el.getId(), el.getTitleText(), el.getFullText(), info(el, user)))
                 .sorted(Comparator.comparing(PublicationDTO::getId).reversed())
                 .collect(Collectors.toList());
 
@@ -161,8 +159,8 @@ public class _1_StudyRoomControllers {
         return "study-read-all-publications";
     }
 
-    private String info(PublicationUser publicationUser) {
-        return "Автор : " + publicationUser.getAddress() +
+    private String info(PublicationUser publicationUser, User user) {
+        return "Автор : " + user.getAddress() +
                 ", Дата: " + publicationUser.getDate().toString().split("\\s")[0];
     }
 
@@ -171,10 +169,10 @@ public class _1_StudyRoomControllers {
                                                 Model model,
                                                 HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String userAddress = findUserAddress(authentication);
-        List<PublicationUser> publicationUser = publicationRepository.findAllByAddress(userAddress);
+        User user = getUser(authentication);
+        List<PublicationUser> publicationUser = publicationRepository.findAllByIdUser(user.getId());
         List<PublicationUser> publicationList = new ArrayList<>(publicationUser);
-        publicationList.sort(Comparator.comparing(PublicationUser::getIdPublication).reversed());
+        publicationList.sort(Comparator.comparing(PublicationUser::getId).reversed());
 
         model.addAttribute("publicationUser", publicationList);
         model.addAttribute("title", MY_ROOM);
@@ -182,14 +180,14 @@ public class _1_StudyRoomControllers {
     }
 
     @GetMapping("/study/publication/{idPublication}/remove")
-    public String publicationRemove(@PathVariable(value = "idPublication") Long idPublication) {
+    public String publicationRemove(@PathVariable(value = "idPublication") int idPublication) {
         PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
         publicationRepository.delete(publicationUser);
         return "redirect:/study/read-my-publications";
     }
 
     @GetMapping("/study/publication/{idPublication}/edit")
-    public String publicationEdit(@PathVariable(value = "idPublication") Long idPublication,
+    public String publicationEdit(@PathVariable(value = "idPublication") int idPublication,
                                   Model model) {
         if (!publicationRepository.existsById(idPublication)) {
             return "redirect:/study/read-my-publications";
@@ -216,7 +214,7 @@ public class _1_StudyRoomControllers {
     }
 
     @PostMapping("/study/publication/{idPublication}/edit")
-    public String publicationUpdate(@PathVariable(value = "idPublication") Long idPublication,
+    public String publicationUpdate(@PathVariable(value = "idPublication") int idPublication,
                                     @RequestParam String titleText,
                                     @RequestParam String fullText) {
         PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
@@ -237,12 +235,9 @@ public class _1_StudyRoomControllers {
     public String blogPublicationAdd(@RequestParam String titleText,
                                      @RequestParam String fullText,
                                      Authentication authentication) {
-        String userEmail = getUserEmail(authentication);
-        String address = findUserAddress(authentication);
-
+        User user = getUser(authentication);
         PublicationUser publicationUser = new PublicationUser();
-        publicationUser.setAddress(address);
-        publicationUser.setEmail(userEmail);
+        publicationUser.setIdUser(user.getId());
         publicationUser.setDate(new Date());
         publicationUser.setTitleText(titleText);
         publicationUser.setFullText(convertTextWithFormatToSave(fullText));
@@ -255,11 +250,6 @@ public class _1_StudyRoomControllers {
         String userName = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
         return oneByEmail.get().getAddress();
-    }
-
-    private String getUserEmail(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        return details.getUsername();
     }
 
     private User getUser(Authentication authentication) {

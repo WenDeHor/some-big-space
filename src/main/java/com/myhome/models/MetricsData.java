@@ -12,7 +12,7 @@ public class MetricsData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Column(name = "currency_code")
     private Currency currencyCode; //UAH
@@ -20,10 +20,6 @@ public class MetricsData {
     @Column(name = "user_name")
     private String userName; //adminOfMyHome@storyflow.link or Incognito
 
-//    @Column(name = "count_per_day")
-//    private Long countPerDay; //0 - 1000...
-
-    //    @Temporal(TemporalType.DATE)
     @Column(name = "date")
     private LocalDate date; //2022-07-02 18:39:31.024000
 
@@ -36,11 +32,6 @@ public class MetricsData {
 
     @Column(name = "url_name")
     private String URLName; ///users/read-competitive-one-composition-index/{id}
-
-//    @Column(name = "user_principal")
-//    @Size(min = 0, max = 2000)
-//    private String userPrincipal; //UsernamePasswordAuthenticationToken [Principal=com.studio.stories.security.details.UserDetailsImpl@618c5414,
-    // Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=null], Granted Authorities=[ADMIN]]
 
     @Column(name = "remote_addr")
     private String remoteAddr; //0:0:0:0:0:0:0:1
@@ -61,11 +52,11 @@ public class MetricsData {
         this.marker = marker;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -130,7 +121,7 @@ public class MetricsData {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MetricsData that = (MetricsData) o;
-        return Objects.equals(id, that.id) &&
+        return id == that.id &&
                 Objects.equals(currencyCode, that.currencyCode) &&
                 Objects.equals(userName, that.userName) &&
                 Objects.equals(date, that.date) &&

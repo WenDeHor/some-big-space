@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FamilyRepository extends JpaRepository<Family, Long> {
-    List<Family>findAllByIdUser(Long idUser);
+public interface FamilyRepository extends JpaRepository<Family, Integer> {
+    List<Family>findAllByIdUser(int idUser);
 
 }

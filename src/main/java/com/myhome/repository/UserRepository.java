@@ -4,17 +4,15 @@ package com.myhome.repository;
 import com.myhome.models.Role;
 import com.myhome.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findOneByEmail(String email);
     Optional<User> findOneByRole(Role role);
     Optional<User> findAllByAddress(String addressUser);
-    Optional<User> findOneByIdUser(Long email);
+    Optional<User> findOneById(int id);
     Optional<User> findOneByLogin(String login);
     Optional<User> findAllByEmail(String email);
     List<User> findAllByLogin(String login);

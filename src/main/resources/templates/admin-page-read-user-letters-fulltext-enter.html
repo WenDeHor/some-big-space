@@ -50,7 +50,7 @@
                         <tbody>
                         <tr th:each="letterToADMIN, el:${letter}" class="alert alert-info mt-2">
                             <td><span th:utext="${letterToADMIN.fullText}"></span></td>
-                            <td><a th:href="'/admin-mine/write-letters/'+${letterToADMIN.idLetter}+'/answer'"
+                            <td><a th:href="'/admin-mine/write-letters/'+${letterToADMIN.id}+'/answer'"
                                    class="btn btn-warning ">answer</a></td>
                         </tr>
                         </tbody>

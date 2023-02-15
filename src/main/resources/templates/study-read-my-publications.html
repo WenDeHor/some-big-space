@@ -43,9 +43,9 @@
                         <h6><p class="text-right" th:text="${#dates.format({publicationUser.date}, 'dd:MM:yyyy')}"></p></h6>
                         <br>
                         <div class="text-right">
-                            <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/edit'"
+                            <a th:href="'/study/publication/'+${publicationUser.id}+'/edit'"
                                class="btn btn-warning">Редагувати</a>
-                            <a th:href="'/study/publication/'+${publicationUser.idPublication}+'/remove'"
+                            <a th:href="'/study/publication/'+${publicationUser.id}+'/remove'"
                                class="btn btn-warning">Видалити</a>
                         </div>
                     </div>

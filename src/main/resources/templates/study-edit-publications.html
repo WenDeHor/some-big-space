@@ -38,7 +38,6 @@
                 <div class="col-md-8">
                     <div th:each="el:${publication}">
                         <form method="post">
-                            <h2 class="form-signin-heading">Редагувати публікаціюN</h2>
                             <p>
                                 <label>TITLE</label>
                                 <input type="text" th:value="${el.titleText}" name="titleText" class="form-control"

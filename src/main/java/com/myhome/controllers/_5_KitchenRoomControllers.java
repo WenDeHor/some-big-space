@@ -57,8 +57,8 @@ public class _5_KitchenRoomControllers {
                                        Model model,
                                        HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String userAddress = findUserAddress(authentication);
-        List<CookBook> cookBooks = cookBookRepository.findAllByAddress(userAddress);
+        User user = getUser(authentication);
+        List<CookBook> cookBooks = cookBookRepository.findAllByIdUser(user.getId());
         cookBooks.sort(Comparator.comparing(CookBook::getId).reversed());
         model.addAttribute("cookBooks", cookBooks);
         model.addAttribute("title", KITCHEN_ROOM);
@@ -67,7 +67,7 @@ public class _5_KitchenRoomControllers {
 
     @GetMapping("/image/display/{id}")
     @ResponseBody
-    void showImage(@PathVariable("id") Long id,
+    void showImage(@PathVariable("id") int id,
                    HttpServletResponse response,
                    Optional<CookBook> cookBook) throws ServletException, IOException {
 
@@ -78,14 +78,14 @@ public class _5_KitchenRoomControllers {
     }
 
     @GetMapping("/kitchen/read-cookbook/{id}/remove")
-    public String cookBookRemove(@PathVariable(value = "id") Long id) {
+    public String cookBookRemove(@PathVariable(value = "id") int id) {
         CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);
         cookBookRepository.delete(cookBook);
         return "redirect:/kitchen/read-cookbook";
     }
 
     @GetMapping("/kitchen/read-cookbook/{id}/edit")
-    public String cookBookEdit(@PathVariable(value = "id") Long id,
+    public String cookBookEdit(@PathVariable(value = "id") int id,
                                Model model) {
         if (!cookBookRepository.existsById(id)) {
             return "redirect:/kitchen/read-cookbook";
@@ -112,7 +112,7 @@ public class _5_KitchenRoomControllers {
     }
 
     @PostMapping("/kitchen/read-cookbook/{id}/edit")
-    public String cookBookUpdate(@PathVariable(value = "id") Long id,
+    public String cookBookUpdate(@PathVariable(value = "id") int id,
                                  MultipartFile file,
                                  @RequestParam String titleText,
                                  @RequestParam String fullText) throws IOException {
@@ -121,9 +121,7 @@ public class _5_KitchenRoomControllers {
         cookBook.setFullText(convertTextWithFormatToCookBookUpdateAndSave(fullText));
         Date date = new Date();
         cookBook.setDate(date);
-        cookBook.setName(file.getOriginalFilename());
-        cookBook.setType(file.getContentType());
-        if (file.getContentType().equals("application/octet-stream")) {
+        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
             Optional<CookBook> byId = cookBookRepository.findById(id);
             byte[] image = byId.get().getImage();
             cookBook.setImage(image);
@@ -145,17 +143,13 @@ public class _5_KitchenRoomControllers {
                                               MultipartFile file,
                                               @RequestParam("titleText") String titleText,
                                               @RequestParam("fullText") String fullText) throws IOException {
-        String userAddress = findUserAddress(authentication);
-        Date createDate = new Date();
+        User user = getUser(authentication);
         CookBook cookBook = new CookBook();
-        cookBook.setDate(createDate);
+        cookBook.setDate( new Date());
         cookBook.setTitleText(titleText);
         cookBook.setFullText(convertTextWithFormatToCookBookUpdateAndSave(fullText));
-        cookBook.setAddress(userAddress);
-        cookBook.setName(file.getOriginalFilename());
-        cookBook.setType(file.getContentType());
+        cookBook.setIdUser(user.getId());
         cookBook.setImage(file.getBytes());
-
         cookBookRepository.save(cookBook);
         return "redirect:/kitchen/read-cookbook";
     }
@@ -166,8 +160,8 @@ public class _5_KitchenRoomControllers {
                               Model model,
                               HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String userAddress = findUserAddress(authentication);
-        List<Menu> allMenuByAddress = menuRepository.findAllByAddress(userAddress);
+        User user = getUser(authentication);
+        List<Menu> allMenuByAddress = menuRepository.findAllByIdUser(user.getId());
         allMenuByAddress.sort(Comparator.comparing(Menu::getId));
         model.addAttribute("allMenuByAddress", allMenuByAddress);
         model.addAttribute("title", KITCHEN_ROOM);
@@ -180,12 +174,12 @@ public class _5_KitchenRoomControllers {
                                    @RequestParam("breakfast") String breakfast,
                                    @RequestParam("dinner") String dinner,
                                    @RequestParam("supper") String supper) {
-        String userAddress = findUserAddress(authentication);
+        User user = getUser(authentication);
         Menu menu = new Menu();
         menu.setSupper(supper);
         menu.setDinner(dinner);
         menu.setBreakfast(breakfast);
-        menu.setAddress(userAddress);
+        menu.setIdUser(user.getId());
         if (date.isEmpty()) {
             LocalDate localDate = LocalDate.now();
             java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
@@ -200,14 +194,14 @@ public class _5_KitchenRoomControllers {
     }
 
     @GetMapping("/kitchen/write-menu/{id}/remove")
-    public String menuRemove(@PathVariable(value = "id") Long id) {
+    public String menuRemove(@PathVariable(value = "id") int id) {
         Menu menu = menuRepository.findById(id).orElseThrow(null);
         menuRepository.delete(menu);
         return "redirect:/kitchen/write-menu";
     }
 
     @GetMapping("/kitchen/write-menu/{id}/edit")
-    public String menuEdit(@PathVariable(value = "id") Long id, Model model) {
+    public String menuEdit(@PathVariable(value = "id") int id, Model model) {
         if (!menuRepository.existsById(id)) {
             return "redirect:/kitchen/write-menu";
         }
@@ -223,7 +217,7 @@ public class _5_KitchenRoomControllers {
 
 
     @PostMapping("/kitchen/write-menu/{id}/edit")
-    public String menuUpdate(@PathVariable(value = "id") Long id,
+    public String menuUpdate(@PathVariable(value = "id") int id,
                              @RequestParam("date") String date,
                              @RequestParam("breakfast") String breakfast,
                              @RequestParam("dinner") String dinner,
@@ -249,8 +243,8 @@ public class _5_KitchenRoomControllers {
                                        Model model,
                                        HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String userAddress = findUserAddress(authentication);
-        List<ShopMeals> shopMealsList = shopMealsRepository.findAllByAddress(userAddress);
+        User user = getUser(authentication);
+        List<ShopMeals> shopMealsList = shopMealsRepository.findAllByIdUser(user.getId());
 
         shopMealsList.sort(Comparator.comparing(ShopMeals::getId));
         model.addAttribute("shopMealsList", shopMealsList);
@@ -261,11 +255,11 @@ public class _5_KitchenRoomControllers {
     @PostMapping("/kitchen/write-shop-meal")
     public String kitchenWriteShopMeal(Authentication authentication,
                                        @RequestParam("fullText") String fullText) {
-        String userAddress = findUserAddress(authentication);
+        User user = getUser(authentication);
         LocalDate localDate = LocalDate.now();
         java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
         ShopMeals meal = new ShopMeals();
-        meal.setAddress(userAddress);
+        meal.setIdUser(user.getId());
         meal.setDate(dateParse);
         if (fullText.isEmpty()) {
             meal.setFullText("No Meal");
@@ -277,7 +271,7 @@ public class _5_KitchenRoomControllers {
     }
 
     @GetMapping("/kitchen/write-shop-meals/{id}/remove")
-    public String mealRemove(@PathVariable(value = "id") Long id) {
+    public String mealRemove(@PathVariable(value = "id") int id) {
         ShopMeals meal = shopMealsRepository.findById(id).orElseThrow(null);
         shopMealsRepository.delete(meal);
         return "redirect:/kitchen/write-shop-meals";
@@ -290,10 +284,6 @@ public class _5_KitchenRoomControllers {
         Pattern pattern = Pattern.compile(patternRegex);
         Matcher matcher = pattern.matcher(text);
         return matcher.replaceAll(replace);
-    }
-
-    private String findUserAddress(Authentication authentication) {
-        return getUser(authentication).getAddress();
     }
 
     private User getUser(Authentication authentication) {

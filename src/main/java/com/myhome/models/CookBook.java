@@ -12,7 +12,7 @@ public class CookBook {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
@@ -26,37 +26,30 @@ public class CookBook {
     @Size(min = 0, max = 3000)
     private String fullText;
 
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "type")
-    private String type;
+    @Column(name = "id_user")
+    private int idUser;
 
     @Lob
-    @Column(name = "Image", length = Integer.MAX_VALUE, nullable = true)
+    @Column(name = "Image", length = Integer.MAX_VALUE)
     private byte[] image;
 
     public CookBook() {
     }
 
-    public CookBook(Date date, @Size(min = 0, max = 1000) String titleText, @Size(min = 0, max = 3000) String fullText, String address, String name, String type, byte[] image) {
+    public CookBook(Date date, String titleText,
+                    String fullText, int idUser, byte[] image) {
         this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
-        this.address = address;
-        this.name = name;
-        this.type = type;
+        this.idUser = idUser;
         this.image = image;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -84,28 +77,12 @@ public class CookBook {
         this.fullText = fullText;
     }
 
-    public String getAddress() {
-        return address;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
     public byte[] getImage() {
@@ -121,19 +98,17 @@ public class CookBook {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CookBook cookBook = (CookBook) o;
-        return Objects.equals(id, cookBook.id) &&
+        return id == cookBook.id &&
+                idUser == cookBook.idUser &&
                 Objects.equals(date, cookBook.date) &&
                 Objects.equals(titleText, cookBook.titleText) &&
                 Objects.equals(fullText, cookBook.fullText) &&
-                Objects.equals(address, cookBook.address) &&
-                Objects.equals(name, cookBook.name) &&
-                Objects.equals(type, cookBook.type) &&
                 Arrays.equals(image, cookBook.image);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, date, titleText, fullText, address, name, type);
+        int result = Objects.hash(id, date, titleText, fullText, idUser);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }
@@ -145,9 +120,7 @@ public class CookBook {
                 ", date=" + date +
                 ", titleText='" + titleText + '\'' +
                 ", fullText='" + fullText + '\'' +
-                ", address='" + address + '\'' +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
+                ", idUser=" + idUser +
                 ", image=" + Arrays.toString(image) +
                 '}';
     }

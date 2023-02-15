@@ -44,8 +44,8 @@ public class _3_SafeRoomControllers {
                                 Model model,
                                 HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String address = findUserAddress(authentication);
-        List<Diary> diaryList = diaryRepository.findAllByAddress(address);
+        User user = getUser(authentication);
+        List<Diary> diaryList = diaryRepository.findAllByIdUser(user.getId());
         diaryList.sort(Comparator.comparing(Diary::getId).reversed());
         model.addAttribute("diaryList", diaryList);
         model.addAttribute("title", SAFE_ROOM);
@@ -54,7 +54,7 @@ public class _3_SafeRoomControllers {
 
     @GetMapping("/image/display/diary/{id}")
     @ResponseBody
-    void showImageDiary(@PathVariable("id") Long id,
+    void showImageDiary(@PathVariable("id") int id,
                         HttpServletResponse response,
                         Optional<Diary> diary) throws ServletException, IOException {
 
@@ -69,14 +69,12 @@ public class _3_SafeRoomControllers {
                                 MultipartFile file,
                                 @RequestParam("titleText") String titleText,
                                 @RequestParam("fullText") String fullText) throws IOException {
-        String address = findUserAddress(authentication);
+        User user = getUser(authentication);
         Diary diary = new Diary();
-        diary.setLocalDate(new Date());
+        diary.setDate(new Date());
         diary.setTitleText(titleText);
         diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
-        diary.setAddress(address);
-        diary.setName(file.getOriginalFilename());
-        diary.setType(file.getContentType());
+        diary.setIdUser(user.getId());
         diary.setImage(file.getBytes());
         diaryRepository.save(diary);
         return "redirect:/safe/read-save-diary";
@@ -88,7 +86,7 @@ public class _3_SafeRoomControllers {
     }
 
     @DeleteMapping("/safe/edit-diary/{id}/remove")
-    public String diaryRemove(@PathVariable(value = "id") Long id) {
+    public String diaryRemove(@PathVariable(value = "id") int id) {
         Diary diary = diaryRepository.findById(id).orElseThrow(null);
         diaryRepository.delete(diary);
         return "redirect:/safe/edit-diary";
@@ -98,8 +96,8 @@ public class _3_SafeRoomControllers {
     @GetMapping("/safe/edit-diary")
     public String safeEditDiary(Authentication authentication,
                                 Model model) {
-        String address = findUserAddress(authentication);
-        List<Diary> diaryList = diaryRepository.findAllByAddress(address);
+        User user = getUser(authentication);
+        List<Diary> diaryList = diaryRepository.findAllByIdUser(user.getId());
         diaryList.sort(Comparator.comparing(Diary::getId).reversed());
         model.addAttribute("diaryList", diaryList);
         model.addAttribute("title", SAFE_ROOM);
@@ -108,7 +106,7 @@ public class _3_SafeRoomControllers {
 
     @Transactional
     @GetMapping("/safe/edit-diary/{id}/edit")
-    public String diaryEdit(@PathVariable(value = "id") Long id,
+    public String diaryEdit(@PathVariable(value = "id") int id,
                             Model model) {
         if (!diaryRepository.existsById(id)) {
             return "redirect:/safe/edit-diary";
@@ -134,17 +132,15 @@ public class _3_SafeRoomControllers {
     }
 
     @PostMapping("/safe/edit-diary/{id}/edit")
-    public String diaryUpdate(@PathVariable(value = "id") Long id,
+    public String diaryUpdate(@PathVariable(value = "id") int id,
                               MultipartFile file,
                               @RequestParam String titleText,
                               @RequestParam String fullText) throws IOException {
         Diary diary = diaryRepository.findById(id).orElseThrow(null);
         diary.setTitleText(titleText);
         diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
-        diary.setLocalDate(diary.getLocalDate());
-        diary.setName(file.getOriginalFilename());
-        diary.setType(file.getContentType());
-        if (file.getContentType().equals("application/octet-stream")) {
+        diary.setDate(diary.getDate());
+        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
             Optional<Diary> byId = diaryRepository.findById(id);
             byte[] image = byId.get().getImage();
             diary.setImage(image);
@@ -161,8 +157,8 @@ public class _3_SafeRoomControllers {
                                              Model model,
                                              HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String address = findUserAddress(authentication);
-        List<Reference> referenceList = referenceRepository.findAllByAddress(address);
+        User user = getUser(authentication);
+        List<Reference> referenceList = referenceRepository.findAllByIdUser(user.getId());
         referenceList.sort(Comparator.comparing(Reference::getId).reversed());
         model.addAttribute("referenceList", referenceList);
         model.addAttribute("title", SAFE_ROOM);
@@ -174,14 +170,12 @@ public class _3_SafeRoomControllers {
                                     MultipartFile file,
                                     @RequestParam("titleText") String titleText,
                                     @RequestParam("url") String url) throws IOException {
-        String address = findUserAddress(authentication);
+        User user = getUser(authentication);
 
         Reference reference = new Reference();
-        reference.setAddress(address);
+        reference.setIdUser(user.getId());
         reference.setUrl(url);
         reference.setTitleText(titleText);
-        reference.setName(file.getOriginalFilename());
-        reference.setType(file.getContentType());
         reference.setImage(file.getBytes());
         referenceRepository.save(reference);
         return "redirect:/safe/read-save-edit-reference";
@@ -189,7 +183,7 @@ public class _3_SafeRoomControllers {
 
     @GetMapping("/image/display/reference/{id}")
     @ResponseBody
-    void showImageReference(@PathVariable("id") Long id,
+    void showImageReference(@PathVariable("id") int id,
                             HttpServletResponse response,
                             Optional<Reference> reference) throws ServletException, IOException {
         reference = referenceRepository.findById(id);
@@ -199,7 +193,7 @@ public class _3_SafeRoomControllers {
     }
 
     @GetMapping("/safe/read-save-edit-reference/{id}/remove")
-    public String referenceRemove(@PathVariable(value = "id") Long id) {
+    public String referenceRemove(@PathVariable(value = "id") int id) {
         Reference reference = referenceRepository.findById(id).orElseThrow(null);
         referenceRepository.delete(reference);
         return "redirect:/safe/read-save-edit-reference";
@@ -214,17 +208,9 @@ public class _3_SafeRoomControllers {
         return matcher.replaceAll(replace);
     }
 
-    private String getUserEmail(Authentication authentication) {
+    private User getUser(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getEmail();
-    }
-
-    private String findUserAddress(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getAddress();
+        return userRepository.findOneByEmail(userName).get();
     }
 }

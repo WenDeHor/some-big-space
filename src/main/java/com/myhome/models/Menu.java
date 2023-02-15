@@ -5,53 +5,49 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "menu")
 public class Menu {
-    public Menu() {
-    }
-
-    public Menu(Date date, @Size(min = 0, max = 1000) String breakfast, @Size(min = 0, max = 1000) String dinner, @Size(min = 0, max = 1000) String supper, String address) {
-        this.date = date;
-        this.breakfast = breakfast;
-        this.dinner = dinner;
-        this.supper = supper;
-        this.address = address;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
     private Date date;
 
     @Column(name = "breakfast")
-    @Size(min = 0, max = 1000)
+    @Size(max = 1000)
     private String breakfast;
 
     @Column(name = "dinner")
-    @Size(min = 0, max = 1000)
+    @Size(max = 1000)
     private String dinner;
 
     @Column(name = "supper")
-    @Size(min = 0, max = 1000)
+    @Size(max = 1000)
     private String supper;
 
-    @Column(name = "address")
-    private String address;
+    @Column(name = "id_user")
+    private int idUser;
 
-    public Long getId() {
+    public Menu() {
+    }
+
+    public Menu(Date date, String breakfast, String dinner, String supper, int idUser) {
+        this.date = date;
+        this.breakfast = breakfast;
+        this.dinner = dinner;
+        this.supper = supper;
+        this.idUser = idUser;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -87,12 +83,12 @@ public class Menu {
         this.supper = supper;
     }
 
-    public String getAddress() {
-        return address;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
     @Override
@@ -100,17 +96,17 @@ public class Menu {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Menu menu = (Menu) o;
-        return Objects.equals(id, menu.id) &&
+        return id == menu.id &&
+                idUser == menu.idUser &&
                 Objects.equals(date, menu.date) &&
                 Objects.equals(breakfast, menu.breakfast) &&
                 Objects.equals(dinner, menu.dinner) &&
-                Objects.equals(supper, menu.supper) &&
-                Objects.equals(address, menu.address);
+                Objects.equals(supper, menu.supper);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, breakfast, dinner, supper, address);
+        return Objects.hash(id, date, breakfast, dinner, supper, idUser);
     }
 
     @Override
@@ -121,7 +117,7 @@ public class Menu {
                 ", breakfast='" + breakfast + '\'' +
                 ", dinner='" + dinner + '\'' +
                 ", supper='" + supper + '\'' +
-                ", address='" + address + '\'' +
+                ", idUser=" + idUser +
                 '}';
     }
 }

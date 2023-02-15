@@ -61,8 +61,6 @@ public class DbBuilder {
         userFirst.setFullText("Tell us about yourself and your family");
         userFirst.setImage(inputBytes);
         userFirst.setAddress(address);
-        userFirst.setType("image/jpg");
-        userFirst.setName("mine-photo.jpg");
         userPhotoRepository.save(userFirst);
     }
 }

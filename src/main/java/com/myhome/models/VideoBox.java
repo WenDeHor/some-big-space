@@ -1,30 +1,16 @@
 package com.myhome.models;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
-//@Data
-//@AllArgsConstructor
-//@NoArgsConstructor
-//@Builder
 @Entity
 @Table(name = "video_box")
 public class VideoBox {
-    public VideoBox() {
-    }
-
-    public VideoBox(String linkToVideo, String titleText, String addressUser, LocalDate localDate) {
-        this.linkToVideo = linkToVideo;
-        this.titleText = titleText;
-        this.addressUser = addressUser;
-        this.localDate = localDate;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "video_box_id")
-    private Long idVideoBox;
+    @Column(name = "id")
+    private int id;
 
     @Column(name = "link_to_video")
     private String linkToVideo;
@@ -32,18 +18,28 @@ public class VideoBox {
     @Column(name = "title_text")
     private String titleText;
 
-    @Column(name = "address_user")
-    private String addressUser;
+    @Column(name = "id_user")
+    private int idUser;
 
-    @Column(name = "local_date")
-    private LocalDate localDate;
+    @Column(name = "date")
+    private Date date;
 
-    public Long getIdVideoBox() {
-        return idVideoBox;
+    public VideoBox() {
     }
 
-    public void setIdVideoBox(Long idVideoBox) {
-        this.idVideoBox = idVideoBox;
+    public VideoBox(String linkToVideo, String titleText, int idUser, Date date) {
+        this.linkToVideo = linkToVideo;
+        this.titleText = titleText;
+        this.idUser = idUser;
+        this.date = date;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getLinkToVideo() {
@@ -62,20 +58,20 @@ public class VideoBox {
         this.titleText = titleText;
     }
 
-    public String getAddressUser() {
-        return addressUser;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setAddressUser(String addressUser) {
-        this.addressUser = addressUser;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setLocalDate(LocalDate localDate) {
-        this.localDate = localDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @Override
@@ -83,26 +79,26 @@ public class VideoBox {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VideoBox videoBox = (VideoBox) o;
-        return Objects.equals(idVideoBox, videoBox.idVideoBox) &&
+        return id == videoBox.id &&
+                idUser == videoBox.idUser &&
                 Objects.equals(linkToVideo, videoBox.linkToVideo) &&
                 Objects.equals(titleText, videoBox.titleText) &&
-                Objects.equals(addressUser, videoBox.addressUser) &&
-                Objects.equals(localDate, videoBox.localDate);
+                Objects.equals(date, videoBox.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idVideoBox, linkToVideo, titleText, addressUser, localDate);
+        return Objects.hash(id, linkToVideo, titleText, idUser, date);
     }
 
     @Override
     public String toString() {
         return "VideoBox{" +
-                "idVideoBox=" + idVideoBox +
+                "id=" + id +
                 ", linkToVideo='" + linkToVideo + '\'' +
                 ", titleText='" + titleText + '\'' +
-                ", addressUser='" + addressUser + '\'' +
-                ", localDate=" + localDate +
+                ", idUser=" + idUser +
+                ", date=" + date +
                 '}';
     }
 }

@@ -83,15 +83,16 @@ public class PagesControllers {
         return "mine-page";
     }
 
+    //    public PublicationPostAdmin(int id, Date date, String titleText, String fullText, byte[] image, String convert) {
     private List<PublicationPostAdmin> getPublicationPostAdminList(List<PublicationPostAdmin> publicationList) {
         return publicationList.stream()
                 .map(el -> new PublicationPostAdmin(
-                        el.getIdPublication(),
+                        el.getId(),
                         el.getDate(),
                         el.getTitleText(),
                         el.getFullText(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
-                .sorted(Comparator.comparing(PublicationPostAdmin::getIdPublication).reversed())
+                .sorted(Comparator.comparing(PublicationPostAdmin::getId).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
     }
@@ -114,7 +115,7 @@ public class PagesControllers {
 
     @Transactional
     @GetMapping("/users/read-competitive-one-composition-index/{id}")
-    public String displayCommentsOfOneComposition(@PathVariable("id") long id,
+    public String displayCommentsOfOneComposition(@PathVariable("id") int id,
                                                   Model model,
                                                   HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
@@ -131,8 +132,8 @@ public class PagesControllers {
         return "users-read-competitive-one-composition-index";
     }
 
-    private List<String> findCommentsByIdComposition(Long id) {
-        List<String> allByIdComposition = commentsRepository.findAllByIdComposition(id).stream()
+    private List<String> findCommentsByIdComposition(int id) {
+        List<String> allByIdComposition = commentsRepository.findAllById(id).stream()
                 .map(Comments::getComments)
                 .collect(Collectors.toList());
         if (allByIdComposition.isEmpty()) {
@@ -153,12 +154,15 @@ public class PagesControllers {
                                  Model model,
                                  HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        String userAddress = findUserAddress(authentication);
-        Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByAddress(userAddress);
-//        List<UserPhoto> photos = new CopyOnWriteArrayList<>();
-//        userPhotoFind.ifPresent(photos::add);
-
-        model.addAttribute("photos", userPhotoFind.get());
+        User user = getUser(authentication);
+        Optional<UserPhoto> userPhotoFind = userPhotoRepository.findOneByIdUser(user.getId());
+        if (userPhotoFind.isPresent()) {
+            model.addAttribute("photos", userPhotoFind.get());
+            model.addAttribute("title", MY_HOME);
+            return "userPage";
+        }
+        Optional<UserPhoto> oneByAddress = userPhotoRepository.findOneByAddress(user.getAddress());
+        model.addAttribute("photos", oneByAddress.get());
         model.addAttribute("title", MY_HOME);
         return "userPage";
     }
@@ -174,22 +178,19 @@ public class PagesControllers {
     public String userPageChangePhoto(Authentication authentication,
                                       MultipartFile file,
                                       @RequestParam("fullText") String fullText) throws IOException {
-        String userAddress = findUserAddress(authentication);
-
+        User user = getUser(authentication);
         UserPhoto userPhoto = new UserPhoto();
-        userPhoto.setAddress(userAddress);
+        userPhoto.setIdUser(user.getId());
         userPhoto.setImage(file.getBytes());
-        userPhoto.setName(file.getOriginalFilename());
-        userPhoto.setType(file.getContentType());
         userPhoto.setFullText(fullText);
-        userPhotoRepository.deleteByAddress(userAddress);
+        userPhotoRepository.deleteByIdUser(user.getId());
         userPhotoRepository.save(userPhoto);
         return "redirect:/user-page";
     }
 
     @GetMapping("/user/page/photo/display/{id}")
     @ResponseBody
-    void showUserPagePhoto(@PathVariable("id") Long id,
+    void showUserPagePhoto(@PathVariable("id") int id,
                            HttpServletResponse response,
                            Optional<UserPhoto> userPhoto) throws ServletException, IOException {
         userPhoto = userPhotoRepository.findById(id);
@@ -240,7 +241,7 @@ public class PagesControllers {
             return "redirect:/error-letter";
         } else {
             LetterToADMIN letterToADMIN = new LetterToADMIN();
-            letterToADMIN.setLocalDate(new Date());
+            letterToADMIN.setDate(new Date());
             letterToADMIN.setEmail(userPost);
             letterToADMIN.setTitleText(titleText);
             letterToADMIN.setFullText(fullText);
@@ -258,16 +259,9 @@ public class PagesControllers {
         return "registration-error";
     }
 
-    private String findUserAddress(Authentication authentication) {
+    private User getUser(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getAddress();
-    }
-    private User findUser(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get();
+        return userRepository.findOneByEmail(userName).get();
     }
 }

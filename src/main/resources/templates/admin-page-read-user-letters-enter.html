@@ -70,13 +70,13 @@
                         <tbody>
                         <tr th:each="letterToADMIN, iterator:${adminLetters}" class="alert alert-info mt-2">
                             <td th:text="${iterator.index+1}"></td>
-                            <td><span th:text="${#dates.format({letterToADMIN.localDate}, 'dd:MM:YYYY')}"></span></td>
+                            <td><span th:text="${#dates.format({letterToADMIN.date}, 'dd:MM:YYYY')}"></span></td>
                             <td><span th:text="${letterToADMIN.email}"></span></td>
                             <td><span th:text="${letterToADMIN.address}"></span></td>
                             <td><span th:text="${letterToADMIN.titleText}"></span></td>
-                            <td><a th:href="'/admin-mine/read-letters/enter-letters/'+${letterToADMIN.idLetter}+'/read'"
+                            <td><a th:href="'/admin-mine/read-letters/enter-letters/'+${letterToADMIN.id}+'/read'"
                                    class="btn btn-warning">fullText</a></td>
-                            <td><a th:href="'/admin-mine/write-letters/'+${letterToADMIN.idLetter}+'/answer'"
+                            <td><a th:href="'/admin-mine/write-letters/'+${letterToADMIN.id}+'/answer'"
                                    class="btn btn-warning">answer</a></td>
                         </tr>
                         </tbody>

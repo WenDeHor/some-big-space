@@ -10,16 +10,16 @@ public class MetricsDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
-    @Column(name = "metrics_date")
-    LocalDate date;
+    @Column(name = "date")
+    private LocalDate date;
 
     @Column(name = "count_users")
-    long countUsers;
+    private long countUsers;
 
     @Column(name = "count_of_votes")
-    long countOfVotes;
+    private long countOfVotes;
 
     public MetricsDTO() {
     }
@@ -30,11 +30,11 @@ public class MetricsDTO {
         this.countOfVotes = countOfVotes;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -67,9 +67,9 @@ public class MetricsDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MetricsDTO that = (MetricsDTO) o;
-        return countUsers == that.countUsers &&
+        return id == that.id &&
+                countUsers == that.countUsers &&
                 countOfVotes == that.countOfVotes &&
-                Objects.equals(id, that.id) &&
                 Objects.equals(date, that.date);
     }
 

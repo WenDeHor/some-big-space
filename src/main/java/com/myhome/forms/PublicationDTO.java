@@ -3,7 +3,7 @@ package com.myhome.forms;
 import java.util.Objects;
 
 public class PublicationDTO {
-    private Long id;
+    private int id;
     private String titleText;
     private String fullText;
     private String info;
@@ -11,18 +11,18 @@ public class PublicationDTO {
     public PublicationDTO() {
     }
 
-    public PublicationDTO(Long id, String titleText, String fullText, String info) {
+    public PublicationDTO(int id, String titleText, String fullText, String info) {
         this.id = id;
         this.titleText = titleText;
         this.fullText = fullText;
         this.info = info;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -55,7 +55,7 @@ public class PublicationDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PublicationDTO that = (PublicationDTO) o;
-        return Objects.equals(id, that.id) &&
+        return id == that.id &&
                 Objects.equals(titleText, that.titleText) &&
                 Objects.equals(fullText, that.fullText) &&
                 Objects.equals(info, that.info);
@@ -64,15 +64,5 @@ public class PublicationDTO {
     @Override
     public int hashCode() {
         return Objects.hash(id, titleText, fullText, info);
-    }
-
-    @Override
-    public String toString() {
-        return "PublicationDTO{" +
-                "id=" + id +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", info='" + info + '\'' +
-                '}';
     }
 }

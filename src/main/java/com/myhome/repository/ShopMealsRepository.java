@@ -1,6 +1,5 @@
 package com.myhome.repository;
 
-import com.myhome.models.CookBook;
 import com.myhome.models.ShopMeals;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -8,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ShopMealsRepository extends JpaRepository<ShopMeals, Long> {
+public interface ShopMealsRepository extends JpaRepository<ShopMeals, Integer> {
 
-    List<ShopMeals> findAllByAddress(String address);
+    List<ShopMeals> findAllByIdUser(int idUser);
 }

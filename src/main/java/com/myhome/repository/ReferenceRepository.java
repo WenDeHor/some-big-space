@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ReferenceRepository extends JpaRepository<Reference, Long> {
-    List<Reference> findAllByAddress(String address);
+public interface ReferenceRepository extends JpaRepository<Reference, Integer> {
+    List<Reference> findAllByIdUser(int idUser);
 }

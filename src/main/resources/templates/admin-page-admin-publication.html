@@ -63,7 +63,7 @@
                          class="alert alert-info mt-2">
                         <div class="text-center">
                             <img class="rounded"
-                                 th:src="@{${'/image/display/admin/'+ publicationPostAdmin.idPublication}}"
+                                 th:src="@{${'/image/display/admin/'+ publicationPostAdmin.id}}"
                                  style="width:80%" alt="myhome.com"/>
                         </div>
 
@@ -72,9 +72,9 @@
                         <h5 class="text-center" th:text="${publicationPostAdmin.titleText}"></h5>
                         <h6 th:utext="${publicationPostAdmin.fullText}"></h6>
                         <div class="text-right">
-                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.idPublication}+'/edit'"
+                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.id}+'/edit'"
                                class="btn btn-outline-dark">EDIT</a>
-                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.idPublication}+'/remove'"
+                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.id}+'/remove'"
                                class="btn btn-outline-danger">REMOVE</a>
                         </div>
                     </div>

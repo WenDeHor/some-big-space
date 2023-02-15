@@ -22,7 +22,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserPhotoRepository userPhotoRepository;
-    private final static Integer counter = 100;
 
     public RegistrationServiceImpl(UserRepository usersRepository, PasswordEncoder passwordEncoder, UserPhotoRepository userPhotoRepository) {
         this.usersRepository = usersRepository;
@@ -76,13 +75,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         UserPhoto userFirst = new UserPhoto();
         userFirst.setFullText("Tell us about yourself and your family");
         userFirst.setImage(inputBytes);
         userFirst.setAddress(address);
-        userFirst.setType("image/jpg");
-        userFirst.setName("mine-photo.jpg");
         userPhotoRepository.save(userFirst);
     }
 }

@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
-import java.util.Currency;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -126,55 +123,3 @@ public class MetricsServiceImpl implements MetricsService {
         return remoteAddr;
     }
 }
-
-//TODO
-//    private Long id;
-//    private Currency currencyCode; //UAH
-//    private String userName; //adminOfMyHome@storyflow.link or Incognito
-//    private Long countPerDay; //0 - 1000...
-//    private Date date; //2022-07-02 18:39:31.024000
-//    private String userAgent; //Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36
-//    private String acceptLanguage; //en-US,en;q=0.9,uk;q=0.8
-//    private String URLName; ///users/read-competitive-one-composition-index/{id}
-//    private String userPrincipal; //UsernamePasswordAuthenticationToken [Principal=com.studio.stories.security.details.UserDetailsImpl@618c5414,
-//    // Credentials=[PROTECTED], Authenticated=true, Details=WebAuthenticationDetails [RemoteIpAddress=0:0:0:0:0:0:0:1, SessionId=null], Granted Authorities=[ADMIN]]
-//    private String remoteAddr; //0:0:0:0:0:0:0:1
-
-//    private String getPrincipal(HttpServletRequest request) {
-//        String principal = "";
-//        if (request.getUserPrincipal() == null) {
-//            return principal = INCOGNITO;
-//        } else {
-//            return request.getUserPrincipal().toString();
-//        }
-//    }
-
-//    public Map<String, String> getRequestHeadersInMap(HttpServletRequest request) {
-//        Map<String, String> result = new HashMap<>();
-//        Enumeration headerNames = request.getHeaderNames();
-//        while (headerNames.hasMoreElements()) {
-//            String key = (String) headerNames.nextElement();
-//            String value = request.getHeader(key);
-//            result.put(key, value);
-//        }
-//        return result;
-//    }
-//
-//    public String createQuery(String pastDay) {
-//        String select = "SELECT DISTINCT ON (user_name) date, url_name, count(user_name) as count_users, count(url_name) as count_of_votes "; //  String select = "SELECT date, url_name, count(distinct user_name) as user_name, count(url_name) as url_name ";
-//        String fromTable = "FROM metrics_data ";
-//        String where = ""; //  String where = "WHERE date =  DATE_ADD( NOW(), INTERVAL " + pastDay + " DAY) ";
-//        String groupBy = "GROUP BY DATE(date) "; //    String groupBy = "GROUP BY url_name ";
-//        String orderBy = ""; //  String orderBy = "ORDER BY date ";
-//        String limit = "";
-//        return select + fromTable + where + groupBy + orderBy + limit;
-//    }
-
-//    private Map<String, List<MetricsDTO>> monitoringMetricsIncognito() {
-//        List<MetricsData> all = metricsDataRepository.findAll();
-//        return metricsDataRepository.findAll().stream()
-//                .filter(el -> el.getMarker().equals(Marker.NO_FILTERED.name()))
-//                .sorted(Comparator.comparing(MetricsData::getDate).reversed())
-//                .map(el -> new MetricsDTO(el.getURLName(), el.getDate(), el.)
-//                        .collect(groupingBy(MetricsDTO::getDate, toList()));
-//    }

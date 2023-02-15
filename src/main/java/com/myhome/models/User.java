@@ -2,29 +2,16 @@ package com.myhome.models;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 public class User {
-    public User() {
-    }
-
-    public User(String login, String settlement, String email, String password, String address, String currencyCode, Role role, State state, Date date) {
-        this.login = login;
-        this.settlement = settlement;
-        this.email = email;
-        this.password = password;
-        this.address = address;
-        this.currencyCode = currencyCode;
-        this.role = role;
-        this.state = state;
-        this.date = date;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long idUser;
+    @Column(name = "id")
+    private int id;
 
     @Column(name = "login")
     private String login;//REGISTRATION PAGE
@@ -52,17 +39,31 @@ public class User {
     @Column(name = "state")
     private State state;
 
-
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date")
     private Date date;
 
-    public Long getIdUser() {
-        return idUser;
+    public User() {
     }
 
-    public void setIdUser(Long idUser) {
-        this.idUser = idUser;
+    public User(String login, String settlement, String email, String password, String address, String currencyCode, Role role, State state, Date date) {
+        this.login = login;
+        this.settlement = settlement;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.currencyCode = currencyCode;
+        this.role = role;
+        this.state = state;
+        this.date = date;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getLogin() {
@@ -137,5 +138,41 @@ public class User {
         this.date = date;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id &&
+                Objects.equals(login, user.login) &&
+                Objects.equals(settlement, user.settlement) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(address, user.address) &&
+                Objects.equals(currencyCode, user.currencyCode) &&
+                role == user.role &&
+                state == user.state &&
+                Objects.equals(date, user.date);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, login, settlement, email, password, address, currencyCode, role, state, date);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", settlement='" + settlement + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", address='" + address + '\'' +
+                ", currencyCode='" + currencyCode + '\'' +
+                ", role=" + role +
+                ", state=" + state +
+                ", date=" + date +
+                '}';
+    }
 }

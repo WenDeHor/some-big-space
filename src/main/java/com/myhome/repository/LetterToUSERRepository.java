@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface LetterToUSERRepository extends JpaRepository<LetterToUSER, Long> {
+public interface LetterToUSERRepository extends JpaRepository<LetterToUSER, Integer> {
     List<LetterToUSER> findAllByRecipientAddress(String email);
 
     List<LetterToUSER> findAllBySenderAddress(String email);

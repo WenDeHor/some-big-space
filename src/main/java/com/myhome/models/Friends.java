@@ -10,13 +10,13 @@ public class Friends {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Column(name = "id_user")
-    private Long idUser;
+    private int idUser;
 
     @Column(name = "id_friend")
-    private Long idFriend;
+    private int idFriend;
 
     @Column(name = "address_friend")
     private String addressFriend;
@@ -24,33 +24,33 @@ public class Friends {
     public Friends() {
     }
 
-    public Friends(Long idUser, Long idFriend, String addressFriend) {
+    public Friends(int idUser, int idFriend, String addressFriend) {
         this.idUser = idUser;
         this.idFriend = idFriend;
         this.addressFriend = addressFriend;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Long getIdUser() {
+    public int getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(Long idUser) {
+    public void setIdUser(int idUser) {
         this.idUser = idUser;
     }
 
-    public Long getIdFriend() {
+    public int getIdFriend() {
         return idFriend;
     }
 
-    public void setIdFriend(Long idFriend) {
+    public void setIdFriend(int idFriend) {
         this.idFriend = idFriend;
     }
 
@@ -67,24 +67,14 @@ public class Friends {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Friends friends = (Friends) o;
-        return Objects.equals(id, friends.id) &&
-                Objects.equals(idUser, friends.idUser) &&
-                Objects.equals(idFriend, friends.idFriend) &&
+        return id == friends.id &&
+                idUser == friends.idUser &&
+                idFriend == friends.idFriend &&
                 Objects.equals(addressFriend, friends.addressFriend);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, idUser, idFriend, addressFriend);
-    }
-
-    @Override
-    public String toString() {
-        return "Friends{" +
-                "id=" + id +
-                ", idUser=" + idUser +
-                ", idFriend=" + idFriend +
-                ", addressFriend='" + addressFriend + '\'' +
-                '}';
     }
 }

@@ -8,36 +8,22 @@ import java.util.Objects;
 @Entity
 @Table(name = "letter_user")
 public class LetterToUSER {
-    public LetterToUSER() {
-    }
-
-    public LetterToUSER(Date date, @Size(min = 0, max = 1000) String titleText, @Size(min = 0, max = 3000) String fullText, String senderAddress, String recipientAddress) {
-        this.date = date;
-        this.titleText = titleText;
-        this.fullText = fullText;
-        this.senderAddress = senderAddress;
-        this.recipientAddress = recipientAddress;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id_letter")
-    private Long idLetter;
+    @Column(name = "id")
+    private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date", nullable = false)
     private Date date;
 
     @Column(name = "title_text")
-    @Size(min = 0, max = 1000)
+    @Size(max = 1000)
     private String titleText;
 
     @Column(name = "full_text")
-    @Size(min = 0, max = 3000)
+    @Size(max = 3000)
     private String fullText;
-
-//    @Column(name = "number_of_letter")
-//    private Integer numberOfLetter;
 
     @Column(name = "sender_address")
     private String senderAddress;
@@ -45,12 +31,24 @@ public class LetterToUSER {
     @Column(name = "recipient_address")
     private String recipientAddress;
 
-    public Long getIdLetter() {
-        return idLetter;
+    public LetterToUSER() {
     }
 
-    public void setIdLetter(Long idLetter) {
-        this.idLetter = idLetter;
+    public LetterToUSER(Date date, String titleText, String fullText,
+                        String senderAddress, String recipientAddress) {
+        this.date = date;
+        this.titleText = titleText;
+        this.fullText = fullText;
+        this.senderAddress = senderAddress;
+        this.recipientAddress = recipientAddress;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Date getDate() {
@@ -97,24 +95,24 @@ public class LetterToUSER {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LetterToUSER letterToUSER = (LetterToUSER) o;
-        return Objects.equals(idLetter, letterToUSER.idLetter) &&
-                Objects.equals(date, letterToUSER.date) &&
-                Objects.equals(titleText, letterToUSER.titleText) &&
-                Objects.equals(fullText, letterToUSER.fullText) &&
-                Objects.equals(senderAddress, letterToUSER.senderAddress) &&
-                Objects.equals(recipientAddress, letterToUSER.recipientAddress);
+        LetterToUSER that = (LetterToUSER) o;
+        return id == that.id &&
+                Objects.equals(date, that.date) &&
+                Objects.equals(titleText, that.titleText) &&
+                Objects.equals(fullText, that.fullText) &&
+                Objects.equals(senderAddress, that.senderAddress) &&
+                Objects.equals(recipientAddress, that.recipientAddress);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idLetter, date, titleText, fullText, senderAddress, recipientAddress);
+        return Objects.hash(id, date, titleText, fullText, senderAddress, recipientAddress);
     }
 
     @Override
     public String toString() {
-        return "Letter{" +
-                "idLetter=" + idLetter +
+        return "LetterToUSER{" +
+                "id=" + id +
                 ", date=" + date +
                 ", titleText='" + titleText + '\'' +
                 ", fullText='" + fullText + '\'' +

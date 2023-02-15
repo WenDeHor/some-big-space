@@ -11,46 +11,54 @@ import java.util.Objects;
 public class LetterToADMIN {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "letter_id")
-    private Long idLetter;
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "address_user")
+    @Size(max = 50)
+    private String addressUser;
 
     @Column(name = "email")
-    @Size(min = 0, max = 100)
+    @Size(max = 100)
     private String email;
 
-    @Column(name = "address")
-    @Size(min = 0, max = 100)
-    private String address;
-
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "local_date", nullable = false)
-    private Date localDate;
+    @Column(name = "date", nullable = false)
+    private Date date;
 
     @Column(name = "title_text")
-    @Size(min = 0, max = 100)
+    @Size(max = 100)
     private String titleText;
 
     @Column(name = "full_text")
-    @Size(min = 0, max = 20000)
+    @Size(max = 20000)
     private String fullText;
 
     public LetterToADMIN() {
     }
 
-    public LetterToADMIN(String email,String address, Date localDate, String titleText, String fullText) {
+    public LetterToADMIN(@Size(max = 50) String addressUser, @Size(max = 100) String email, Date date, @Size(max = 100) String titleText, @Size(max = 20000) String fullText) {
+        this.addressUser = addressUser;
         this.email = email;
-        this.address = address;
-        this.localDate = localDate;
+        this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
     }
 
-    public Long getIdLetter() {
-        return idLetter;
+    public int getId() {
+        return id;
     }
 
-    public void setIdLetter(Long idLetter) {
-        this.idLetter = idLetter;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getAddressUser() {
+        return addressUser;
+    }
+
+    public void setAddressUser(String addressUser) {
+        this.addressUser = addressUser;
     }
 
     public String getEmail() {
@@ -61,20 +69,12 @@ public class LetterToADMIN {
         this.email = email;
     }
 
-    public String getAddress() {
-        return address;
+    public Date getDate() {
+        return date;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Date getLocalDate() {
-        return localDate;
-    }
-
-    public void setLocalDate(Date localDate) {
-        this.localDate = localDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public String getTitleText() {
@@ -98,28 +98,16 @@ public class LetterToADMIN {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LetterToADMIN that = (LetterToADMIN) o;
-        return Objects.equals(idLetter, that.idLetter) &&
+        return id == that.id &&
+                Objects.equals(addressUser, that.addressUser) &&
                 Objects.equals(email, that.email) &&
-                Objects.equals(address, that.address) &&
-                Objects.equals(localDate, that.localDate) &&
+                Objects.equals(date, that.date) &&
                 Objects.equals(titleText, that.titleText) &&
                 Objects.equals(fullText, that.fullText);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idLetter, email, address, localDate, titleText, fullText);
-    }
-
-    @Override
-    public String toString() {
-        return "LetterToADMIN{" +
-                "idLetter=" + idLetter +
-                ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                ", localDate=" + localDate +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                '}';
+        return Objects.hash(id, addressUser, email, date, titleText, fullText);
     }
 }

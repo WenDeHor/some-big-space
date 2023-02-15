@@ -6,11 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
 @Repository
-public interface CookBookRepository extends JpaRepository<CookBook, Long> {
+public interface CookBookRepository extends JpaRepository<CookBook, Integer> {
     List<CookBook> findAll();
 
-   List<CookBook> findAllByAddress(String address);
+    List<CookBook> findAllByIdUser(int idUser);
 
-    Optional<CookBook> findById(Long id);
+    Optional<CookBook> findById(int id);
 }

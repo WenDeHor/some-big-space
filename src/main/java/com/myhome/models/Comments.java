@@ -9,11 +9,11 @@ import java.util.Objects;
 public class Comments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comments_id")
-    private Long idComments;
+    @Column(name = "id")
+    private int id;
 
-    @Column(name = "email")
-    private String email;
+    @Column(name = "id_user")
+    private int idUser;
 
     @Column(name = "id_composition")
     private long idComposition;
@@ -24,26 +24,26 @@ public class Comments {
     public Comments() {
     }
 
-    public Comments(String email, long idComposition, String comments) {
-        this.email = email;
+    public Comments(int idUser, long idComposition, String comments) {
+        this.idUser = idUser;
         this.idComposition = idComposition;
         this.comments = comments;
     }
 
-    public Long getIdComments() {
-        return idComments;
+    public int getId() {
+        return id;
     }
 
-    public void setIdComments(Long idComments) {
-        this.idComments = idComments;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public int getIdUser() {
+        return idUser;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setIdUser(int idUser) {
+        this.idUser = idUser;
     }
 
     public long getIdComposition() {
@@ -67,14 +67,24 @@ public class Comments {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Comments comments1 = (Comments) o;
-        return idComposition == comments1.idComposition &&
-                Objects.equals(idComments, comments1.idComments) &&
-                Objects.equals(email, comments1.email) &&
+        return id == comments1.id &&
+                idUser == comments1.idUser &&
+                idComposition == comments1.idComposition &&
                 Objects.equals(comments, comments1.comments);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idComments, email, idComposition, comments);
+        return Objects.hash(id, idUser, idComposition, comments);
+    }
+
+    @Override
+    public String toString() {
+        return "Comments{" +
+                "id=" + id +
+                ", idUser=" + idUser +
+                ", idComposition=" + idComposition +
+                ", comments='" + comments + '\'' +
+                '}';
     }
 }

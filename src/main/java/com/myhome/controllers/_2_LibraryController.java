@@ -73,7 +73,8 @@ public class _2_LibraryController {
                                      Model model,
                                      HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        List<Composition> compositionList = compositionRepository.findAllByEmail(getUserEmail(authentication));
+        User user = getUser(authentication);
+        List<Composition> compositionList = compositionRepository.findAllByIdUser(user.getId());
         compositionList.sort(Comparator.comparing(Composition::getId).reversed());
         model.addAttribute("compositionList", compositionList);
         model.addAttribute("title", LIBRARY);
@@ -82,7 +83,7 @@ public class _2_LibraryController {
 
     @Transactional
     @GetMapping("/library/read-my-one-composition/{id}")
-    public String readMyOneComposition(@PathVariable(value = "id") Long id,
+    public String readMyOneComposition(@PathVariable(value = "id") int id,
                                        Model model,
                                        HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
@@ -101,7 +102,7 @@ public class _2_LibraryController {
 
     @Transactional
     @GetMapping("/library/edit-composition/{id}/edit")
-    public String editOneComposition(@PathVariable(value = "id") Long id,
+    public String editOneComposition(@PathVariable(value = "id") int id,
                                      Model model) {
         Optional<Composition> compositionFind = compositionRepository.findById(id);
         if (!compositionFind.isPresent()) {
@@ -130,7 +131,7 @@ public class _2_LibraryController {
 
     @Transactional
     @PostMapping("/library/edit-composition/{id}/edit")
-    public String compositionUpdate(@PathVariable(value = "id") Long id,
+    public String compositionUpdate(@PathVariable(value = "id") int id,
                                     MultipartFile file,
                                     Authentication authentication,
                                     @RequestParam String genre,
@@ -143,17 +144,15 @@ public class _2_LibraryController {
         composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
         composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
         composition.setLocalDate(composition.getLocalDate());
-        composition.setName(file.getOriginalFilename());
-        composition.setType(file.getContentType());
 
-        if (file.getContentType().equals("application/octet-stream")) {
+        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
             Optional<Composition> byId = compositionRepository.findById(id);
             byte[] image = byId.get().getImage();
             composition.setImage(image);
         } else {// нове фото
-            String userEmail = getUserEmail(authentication);
-            int count = compositionRepository.findAllByEmail(userEmail).size();
-            ConvertFile convert = compressorImgToJpg.convert(file, userEmail, countId(count));
+            User user = getUser(authentication);
+            int count = compositionRepository.findAllByIdUser(user.getId()).size();
+            ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail(), countId(count));
             composition.setImage(convert.img);
 //            composition.setImage(file.getBytes());
             compressorImgToJpg.deleteImage(convert.nameStart);
@@ -164,14 +163,14 @@ public class _2_LibraryController {
     }
 
     @GetMapping("/library/edit-composition/{id}/remove")
-    public String compositionRemove(@PathVariable(value = "id") Long id) {
+    public String compositionRemove(@PathVariable(value = "id") Integer id) {
         Composition composition = compositionRepository.findById(id).orElseThrow(null);
         compositionRepository.delete(composition);
         return "redirect:/library/read-all-my-composition";
     }
 
     @GetMapping("/library/public-composition/{id}/to-coordination")
-    public String compositionToCompetitive(@PathVariable(value = "id") Long id) {
+    public String compositionToCompetitive(@PathVariable(value = "id") Integer id) {
         Composition composition = compositionRepository.findById(id).orElseThrow(null);
         if (composition.getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
             return "redirect:/library/read-all-my-composition";
@@ -182,7 +181,7 @@ public class _2_LibraryController {
     }
 
     @GetMapping("/library/public-composition/{id}/to-friends")
-    public String compositionToFriends(@PathVariable(value = "id") Long id) {
+    public String compositionToFriends(@PathVariable(value = "id") Integer id) {
         Composition composition = compositionRepository.findById(id).orElseThrow(null);
         composition.setPublicationType(PublicationType.PUBLIC_TO_FRIENDS);
         compositionRepository.save(composition);
@@ -192,7 +191,7 @@ public class _2_LibraryController {
 
     @GetMapping("/image/display/composition/{id}")
     @ResponseBody
-    void showUserPagePhoto(@PathVariable("id") Long id,
+    void showUserPagePhoto(@PathVariable("id") Integer id,
                            HttpServletResponse response,
                            Optional<Composition> composition) throws ServletException, IOException {
         composition = compositionRepository.findById(id);
@@ -203,7 +202,7 @@ public class _2_LibraryController {
 
     @Transactional
     @GetMapping("/library/read-competitive-one-composition/{id}")
-    public String readCompetitiveOneComposition(@PathVariable(value = "id") Long id,
+    public String readCompetitiveOneComposition(@PathVariable(value = "id") Integer id,
                                                 Authentication authentication,
                                                 Model model,
                                                 HttpServletRequest request) {
@@ -211,7 +210,7 @@ public class _2_LibraryController {
         Optional<Composition> oneById = compositionRepository.findOneById(id);
         if (oneById.isPresent()) {
             if (oneById.get().getPublicationType().equals(PublicationType.PUBLIC_TO_COMPETITIVE)) {
-                Optional<Evaluate> byEmailAppraiser = evaluateRepository.findByEmailAppraiserAndIdComposition(getUserEmail(authentication), id);
+                Optional<Evaluate> byEmailAppraiser = evaluateRepository.findByIdAppraiserAndIdComposition(getUser(authentication).getId(), id);
                 if (byEmailAppraiser.isPresent()) {
                     model.addAttribute("compositionOne", oneById.get());
                     model.addAttribute("title", LIBRARY);
@@ -227,19 +226,19 @@ public class _2_LibraryController {
 
     @PostMapping("/library/evaluation-one-composition")
     public String saveEvaluation(Authentication authentication,
-                                 @RequestParam("id") Long id,
+                                 @RequestParam("id") Integer id,
                                  @RequestParam("environment") String environment,
                                  @RequestParam("characters") String characters,
                                  @RequestParam("atmosphere") String atmosphere,
                                  @RequestParam("plot") String plot,
                                  @RequestParam("impression") String impression,
                                  @RequestParam("comments") String comments) {
-        String userEmail = getUserEmail(authentication);
+        User user = getUser(authentication);
 
         Evaluate evaluate = new Evaluate();
-        evaluate.setLocalDate(new Date());
+        evaluate.setDate(new Date());
         evaluate.setIdComposition(id);
-        evaluate.setEmailAppraiser(userEmail);
+        evaluate.setIdAppraiser(user.getId());
         evaluate.setEnvironment(getMarkFromFactory("ENVIRONMENT", environment));
         evaluate.setCharacters(getMarkFromFactory("CHARACTERS", characters));
         evaluate.setAtmosphere(getMarkFromFactory("ATMOSPHERE", atmosphere));
@@ -247,7 +246,6 @@ public class _2_LibraryController {
         evaluate.setImpression(getMarkFromFactory("IMPRESSION", impression));
 
         Comments commentsOfComposition = new Comments();
-        commentsOfComposition.setEmail(userEmail);
         commentsOfComposition.setIdComposition(id);
         commentsOfComposition.setComments(convertTextWithFormatToCompositionSaveAndEdit(comments));
 
@@ -262,12 +260,13 @@ public class _2_LibraryController {
                                         Model model,
                                         HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        Long userId = findUserId(authentication);
-        List<Long> integerList = Stream
-                .concat(friendsRepository.findAllByIdUser(userId).stream().map(Friends::getIdFriend),
-                        familyRepository.findAllByIdUser(userId).stream().map(Family::getIdFamily))
+        User user = getUser(authentication);
+        int idUser = user.getId();
+        List<Integer> integerList = Stream
+                .concat(friendsRepository.findAllByIdUser(idUser).stream().map(Friends::getIdFriend),
+                        familyRepository.findAllByIdUser(idUser).stream().map(Family::getIdFamily))
                 .collect(Collectors.toList());
-        List<Composition> friendCompositions = compositionRepository.findAllByUserIdIn(integerList)
+        List<Composition> friendCompositions = compositionRepository.findAllByIdIn(integerList)
                 .stream()
                 .filter(a -> a.getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS))
                 .collect(Collectors.toList());
@@ -277,16 +276,9 @@ public class _2_LibraryController {
         return "library-read-all-friend-composition";
     }
 
-    private Long findUserId(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getIdUser();
-    }
-
     @Transactional
     @GetMapping("/library/read-friend-one-composition/{id}")
-    public String readFriendOneComposition(@PathVariable(value = "id") Long id,
+    public String readFriendOneComposition(@PathVariable(value = "id") int id,
                                            Model model,
                                            HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
@@ -321,7 +313,7 @@ public class _2_LibraryController {
             return getErrorPage(file, titleText, shortText, fullText, model);
         } else {
             User user = getUser(authentication);
-            int count = compositionRepository.findAllByUserId(user.getIdUser()).size();
+            int count = compositionRepository.findAllByIdUser(user.getId()).size();
             Composition composition = new Composition();
             composition.setLocalDate(new Date());
             composition.setGenre(getGenre(genre));
@@ -329,11 +321,7 @@ public class _2_LibraryController {
             composition.setTitleText(titleText);
             composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
             composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
-            composition.setEmail(user.getEmail());
-            composition.setAddress(user.getAddress());
-            composition.setUserId(user.getIdUser());
-            composition.setName(file.getOriginalFilename());
-            composition.setType(file.getContentType());
+            composition.setIdUser(user.getId());
             ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail(), countId(count));
             composition.setImage(convert.img);
             compositionRepository.save(composition);
@@ -407,13 +395,6 @@ public class _2_LibraryController {
         genreMap.put("TALE", Genre.TALE);
         genreMap.put("STORIES", Genre.STORIES);
         return genreMap.get(genreString);
-    }
-
-    private String getUserEmail(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getEmail();
     }
 
     private User getUser(Authentication authentication) {

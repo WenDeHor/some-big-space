@@ -10,13 +10,7 @@ public class Image {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "type")
-    private String type;
+    private int id;
 
     @Column(name = "image", unique = false, nullable = false, length = 100000)
     private byte[] image;
@@ -24,34 +18,16 @@ public class Image {
     public Image() {
     }
 
-    public Image(String name, String type, byte[] image) {
-        this.name = name;
-        this.type = type;
+    public Image(byte[] image) {
         this.image = image;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public byte[] getImage() {
@@ -67,16 +43,22 @@ public class Image {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Image image1 = (Image) o;
-        return Objects.equals(id, image1.id) &&
-                Objects.equals(name, image1.name) &&
-                Objects.equals(type, image1.type) &&
+        return id == image1.id &&
                 Arrays.equals(image, image1.image);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, name, type);
+        int result = Objects.hash(id);
         result = 31 * result + Arrays.hashCode(image);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Image{" +
+                "id=" + id +
+                ", image=" + Arrays.toString(image) +
+                '}';
     }
 }

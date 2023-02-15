@@ -7,14 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface CompositionRepository extends JpaRepository<Composition, Long> {
-    List<Composition> findAllByEmail(String email);
+public interface CompositionRepository extends JpaRepository<Composition, Integer> {
 
-    List<Composition> findAllByUserId(Long userId);
+    List<Composition> findAllByIdUser(int idUser);
 
     List<Composition> findAllByPublicationType(PublicationType publicationType);
 
-    Optional<Composition> findOneById(Long id);
+    Optional<Composition> findOneById(int id);
 
-    List<Composition> findAllByUserIdIn(List<Long> userIds);
+    List<Composition> findAllByIdIn(List<Integer> userIds);
 }

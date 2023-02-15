@@ -12,17 +12,17 @@ public class Evaluate {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "local_date", nullable = false)
-    private Date localDate;
+    @Column(name = "date", nullable = false)
+    private Date date;
 
     @Column(name = "id_composition")
-    private long idComposition;
+    private int idComposition;
 
-    @Column(name = "email_appraiser")
-    private String emailAppraiser;
+    @Column(name = "id_appraiser")
+    private int idAppraiser;
 
     //MARK
     @Column(name = "environment")
@@ -41,16 +41,16 @@ public class Evaluate {
     private Mark impression;
 
     @Column(name = "comments")
-    @Size(min = 0, max = 3000)
+    @Size(max = 3000)
     private String comments;
 
     public Evaluate() {
     }
 
-    public Evaluate(Date localDate, long idComposition, String emailAppraiser, Mark environment, Mark characters, Mark atmosphere, Mark plot, Mark impression, @Size(min = 0, max = 3000) String comments) {
-        this.localDate = localDate;
+    public Evaluate(Date date, int idComposition, int idAppraiser, Mark environment, Mark characters, Mark atmosphere, Mark plot, Mark impression, @Size(max = 3000) String comments) {
+        this.date = date;
         this.idComposition = idComposition;
-        this.emailAppraiser = emailAppraiser;
+        this.idAppraiser = idAppraiser;
         this.environment = environment;
         this.characters = characters;
         this.atmosphere = atmosphere;
@@ -59,36 +59,36 @@ public class Evaluate {
         this.comments = comments;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Date getLocalDate() {
-        return localDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setLocalDate(Date localDate) {
-        this.localDate = localDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public long getIdComposition() {
+    public int getIdComposition() {
         return idComposition;
     }
 
-    public void setIdComposition(long idComposition) {
+    public void setIdComposition(int idComposition) {
         this.idComposition = idComposition;
     }
 
-    public String getEmailAppraiser() {
-        return emailAppraiser;
+    public int getIdAppraiser() {
+        return idAppraiser;
     }
 
-    public void setEmailAppraiser(String emailAppraiser) {
-        this.emailAppraiser = emailAppraiser;
+    public void setIdAppraiser(int idAppraiser) {
+        this.idAppraiser = idAppraiser;
     }
 
     public Mark getEnvironment() {
@@ -144,10 +144,10 @@ public class Evaluate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Evaluate evaluate = (Evaluate) o;
-        return idComposition == evaluate.idComposition &&
-                Objects.equals(id, evaluate.id) &&
-                Objects.equals(localDate, evaluate.localDate) &&
-                Objects.equals(emailAppraiser, evaluate.emailAppraiser) &&
+        return id == evaluate.id &&
+                idComposition == evaluate.idComposition &&
+                idAppraiser == evaluate.idAppraiser &&
+                Objects.equals(date, evaluate.date) &&
                 environment == evaluate.environment &&
                 characters == evaluate.characters &&
                 atmosphere == evaluate.atmosphere &&
@@ -158,6 +158,22 @@ public class Evaluate {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, localDate, idComposition, emailAppraiser, environment, characters, atmosphere, plot, impression, comments);
+        return Objects.hash(id, date, idComposition, idAppraiser, environment, characters, atmosphere, plot, impression, comments);
+    }
+
+    @Override
+    public String toString() {
+        return "Evaluate{" +
+                "id=" + id +
+                ", date=" + date +
+                ", idComposition=" + idComposition +
+                ", idAppraiser=" + idAppraiser +
+                ", environment=" + environment +
+                ", characters=" + characters +
+                ", atmosphere=" + atmosphere +
+                ", plot=" + plot +
+                ", impression=" + impression +
+                ", comments='" + comments + '\'' +
+                '}';
     }
 }

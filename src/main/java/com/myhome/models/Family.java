@@ -10,13 +10,13 @@ public class Family {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
 
     @Column(name = "id_user")
-    private Long idUser;
+    private int idUser;
 
     @Column(name = "id_family")
-    private Long idFamily;
+    private int idFamily;
 
     @Column(name = "address_family")
     private String addressFamily;
@@ -24,33 +24,33 @@ public class Family {
     public Family() {
     }
 
-    public Family(Long idUser, Long idFamily, String addressFamily) {
+    public Family(int idUser, int idFamily, String addressFamily) {
         this.idUser = idUser;
         this.idFamily = idFamily;
         this.addressFamily = addressFamily;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Long getIdUser() {
+    public int getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(Long idUser) {
+    public void setIdUser(int idUser) {
         this.idUser = idUser;
     }
 
-    public Long getIdFamily() {
+    public int getIdFamily() {
         return idFamily;
     }
 
-    public void setIdFamily(Long idFamily) {
+    public void setIdFamily(int idFamily) {
         this.idFamily = idFamily;
     }
 
@@ -67,24 +67,14 @@ public class Family {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Family family = (Family) o;
-        return Objects.equals(id, family.id) &&
-                Objects.equals(idUser, family.idUser) &&
-                Objects.equals(idFamily, family.idFamily) &&
+        return id == family.id &&
+                idUser == family.idUser &&
+                idFamily == family.idFamily &&
                 Objects.equals(addressFamily, family.addressFamily);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, idUser, idFamily, addressFamily);
-    }
-
-    @Override
-    public String toString() {
-        return "Family{" +
-                "id=" + id +
-                ", idUser=" + idUser +
-                ", idFamily=" + idFamily +
-                ", addressFamily='" + addressFamily + '\'' +
-                '}';
     }
 }

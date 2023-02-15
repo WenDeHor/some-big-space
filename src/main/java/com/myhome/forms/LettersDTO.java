@@ -3,7 +3,7 @@ package com.myhome.forms;
 import java.util.Objects;
 
 public class LettersDTO {
-    private Long idLetter;
+    private int id;
     private String titleText;
     private String fullText;
     private String info;
@@ -11,19 +11,19 @@ public class LettersDTO {
     public LettersDTO() {
     }
 
-    public LettersDTO(Long idLetter, String titleText, String fullText, String info) {
-        this.idLetter = idLetter;
+    public LettersDTO(int id, String titleText, String fullText, String info) {
+        this.id = id;
         this.titleText = titleText;
         this.fullText = fullText;
         this.info = info;
     }
 
-    public Long getIdLetter() {
-        return idLetter;
+    public int getId() {
+        return id;
     }
 
-    public void setIdLetter(Long idLetter) {
-        this.idLetter = idLetter;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitleText() {
@@ -55,7 +55,7 @@ public class LettersDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LettersDTO that = (LettersDTO) o;
-        return Objects.equals(idLetter, that.idLetter) &&
+        return id == that.id &&
                 Objects.equals(titleText, that.titleText) &&
                 Objects.equals(fullText, that.fullText) &&
                 Objects.equals(info, that.info);
@@ -63,16 +63,6 @@ public class LettersDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idLetter, titleText, fullText, info);
-    }
-
-    @Override
-    public String toString() {
-        return "LettersDTO{" +
-                "idLetter=" + idLetter +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", info='" + info + '\'' +
-                '}';
+        return Objects.hash(id, titleText, fullText, info);
     }
 }
