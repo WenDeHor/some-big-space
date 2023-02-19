@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+>
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
@@ -15,28 +15,29 @@
         <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
-                    <a href="/living/news/video"
+                    <a href="/library/read-all-competitive-composition"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                       Мої відео</a>
-                    <a href="/living/news/add"
+                        Читати усі історії</a>
+                    <a href="/library/read-all-my-composition"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Добавити відео</a>
-                    <a href="/living/friends/family"
+                        Мої історії</a>
+                    <a href="/library/read-friends-composition"
                        class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Пошук друзів</a>
+                        Історії моїх друзів</a>
+                    <a href="/library/wright-composition"
+                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                        Написати історію</a>
                     <a href="/user-page"
-                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
                         До головної</a>
-                    <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="el:${composition}">
+                    <div th:each="compositionDTO, el:${composition}">
                         <form method="post" enctype="multipart/form-data">
-                            <div th:each="composition, el:${composition}" class="alert mt-2">
-                                <img th:src="@{${'/image/display/composition/'+ composition.id}}"
-                                     style="width:100%"/>
-                                <br>
-                            </div>
+                            <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}" style="width:50%"
+                                 class="rounded mx-auto d-block"
+                                 alt="IMAGE OF COMPOSITION"/>
+                            <br>
                             <div class="custom-file mb-4">
                                 <input type="file" name="file" class="custom-file-input"
                                        id="customFile"> <label class="custom-file-label"
@@ -55,18 +56,18 @@
                             <textarea id="titleText" name="titleText" class="form-control" rows="2"
                                       cols="20"
                                       placeholder="Заголовок історії. Розмір до 150 символів "
-                                      th:utext="${el.titleText}"></textarea>
+                                      th:utext="${compositionDTO.titleText}"></textarea>
 
                             <label for="shortText"> Короткий зміст </label>
                             <textarea id="shortText" name="shortText" class="form-control" rows="10"
                                       cols="20"
                                       placeholder="Коротко опишіть зміст історії. Розмір до 1_000 символів "
-                                      th:utext="${el.shortText}"></textarea> <br>
+                                      th:utext="${compositionDTO.shortText}"></textarea> <br>
 
                             <label for="fullText"> Сама історія </label>
                             <textarea id="fullText" name="fullText" class="form-control" rows="20" cols="20"
                                       placeholder="Місце для Вашої історії. Розмір до 20_000 символів"
-                                      th:utext="${el.fullText}"></textarea>
+                                      th:utext="${compositionDTO.fullText}"></textarea>
                             <br>
                             <button class="btn btn-lg btn-primary btn-block" type="submit">Обновити та зберегти</button>
                         </form>

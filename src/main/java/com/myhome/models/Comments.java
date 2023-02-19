@@ -16,7 +16,7 @@ public class Comments {
     private int idUser;
 
     @Column(name = "id_composition")
-    private long idComposition;
+    private int idComposition;
 
     @Column(name = "comments")
     private String comments;
@@ -24,7 +24,7 @@ public class Comments {
     public Comments() {
     }
 
-    public Comments(int idUser, long idComposition, String comments) {
+    public Comments(int idUser, int idComposition, String comments) {
         this.idUser = idUser;
         this.idComposition = idComposition;
         this.comments = comments;
@@ -46,11 +46,11 @@ public class Comments {
         this.idUser = idUser;
     }
 
-    public long getIdComposition() {
+    public int getIdComposition() {
         return idComposition;
     }
 
-    public void setIdComposition(long idComposition) {
+    public void setIdComposition(int idComposition) {
         this.idComposition = idComposition;
     }
 
@@ -76,15 +76,5 @@ public class Comments {
     @Override
     public int hashCode() {
         return Objects.hash(id, idUser, idComposition, comments);
-    }
-
-    @Override
-    public String toString() {
-        return "Comments{" +
-                "id=" + id +
-                ", idUser=" + idUser +
-                ", idComposition=" + idComposition +
-                ", comments='" + comments + '\'' +
-                '}';
     }
 }

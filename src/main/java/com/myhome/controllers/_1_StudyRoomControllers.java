@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -72,20 +75,25 @@ public class _1_StudyRoomControllers {
             userSendLetterToADMIN.setAddressUser(user.getAddress());
             letterToADMINRepository.save(userSendLetterToADMIN);
         } else {
-            LetterToUSER userSendLetterToUSER = new LetterToUSER();
-            userSendLetterToUSER.setDate(new Date());
-            userSendLetterToUSER.setTitleText(titleText);
-            userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
-            userSendLetterToUSER.setSenderAddress(user.getAddress());
-            userSendLetterToUSER.setRecipientAddress(recipientAddress);
+            LetterToUSER userSendLetterToUSER = createLetterToUSER(titleText, fullText, recipientAddress, user);
             letterToUSERRepository.save(userSendLetterToUSER);
         }
         return "redirect:/study/outer-letters";
     }
 
+    private LetterToUSER createLetterToUSER(String titleText, String fullText, String recipientAddress, User user) {
+        LetterToUSER userSendLetterToUSER = new LetterToUSER();
+        userSendLetterToUSER.setDate(new Date());
+        userSendLetterToUSER.setTitleText(titleText);
+        userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+        userSendLetterToUSER.setSenderAddress(user.getAddress());
+        userSendLetterToUSER.setRecipientAddress(recipientAddress);
+        return userSendLetterToUSER;
+    }
+
     private String convertTextWithFormatToSave(String fullText) {
-        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text1);
+        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text);
     }
 
     @GetMapping("/study/outer-letters")
@@ -125,7 +133,7 @@ public class _1_StudyRoomControllers {
                 .collect(Collectors.toList());
         model.addAttribute("letters", lettersDTOS);
         model.addAttribute("title", MY_ROOM);
-        return "study-read-letters-enter"; //TODO UI
+        return "study-read-letters-enter";
     }
 
     private String buildInfoByRecipient(LetterToUSER letter) {
@@ -147,8 +155,8 @@ public class _1_StudyRoomControllers {
                                                  HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<PublicationDTO> publications = publicationRepository.findAll().stream()
-                .filter(el -> el.getIdUser() != user.getId())
+        int userId = user.getId();
+        List<PublicationDTO> publications = publicationRepository.findAllByIdUserNot(userId).stream()
                 .limit(LIMIT_LIST)
                 .map(el -> new PublicationDTO(el.getId(), el.getTitleText(), el.getFullText(), info(el, user)))
                 .sorted(Comparator.comparing(PublicationDTO::getId).reversed())
@@ -170,10 +178,10 @@ public class _1_StudyRoomControllers {
                                                 HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<PublicationUser> publicationUser = publicationRepository.findAllByIdUser(user.getId());
-        List<PublicationUser> publicationList = new ArrayList<>(publicationUser);
-        publicationList.sort(Comparator.comparing(PublicationUser::getId).reversed());
-
+        int idUser = user.getId();
+        List<PublicationUser> publicationList = publicationRepository.findAllByIdUser(idUser).stream()
+                .sorted(Comparator.comparing(PublicationUser::getId).reversed())
+                .collect(Collectors.toList());
         model.addAttribute("publicationUser", publicationList);
         model.addAttribute("title", MY_ROOM);
         return "study-read-my-publications";
@@ -192,25 +200,20 @@ public class _1_StudyRoomControllers {
         if (!publicationRepository.existsById(idPublication)) {
             return "redirect:/study/read-my-publications";
         }
-        Optional<PublicationUser> post = publicationRepository.findById(idPublication);
-        List<PublicationUser> res = new ArrayList<>();
-        post.ifPresent(res::add);
-
+        Optional<PublicationUser> userPublication = publicationRepository.findById(idPublication);
+        PublicationUser publicationUser = userPublication.orElseGet(PublicationUser::new);
         model.addAttribute("title", MY_ROOM);
-        model.addAttribute("publication", convertTextWithFormatPublicationEdit(res));
+        model.addAttribute("publication", convertTextWithFormatPublicationEdit(publicationUser));
         return "study-edit-publications";
     }
 
-    private List<PublicationUser> convertTextWithFormatPublicationEdit(List<PublicationUser> publicationPostAdminList) {
-        List<PublicationUser> list = new ArrayList<>();
-        for (PublicationUser publicationPostAdmin : publicationPostAdminList) {
-            String fullText = publicationPostAdmin.getFullText();
-            String trim1 = fullText.replace("&#160&#160 ", "");
-            String trim2 = trim1.replace("<br>", "");
-            publicationPostAdmin.setFullText(trim2);
-            list.add(publicationPostAdmin);
-        }
-        return list;
+    private PublicationUser convertTextWithFormatPublicationEdit(PublicationUser publication) {
+        String fullText = publication.getFullText();
+        String trim = fullText
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
+        publication.setFullText(trim);
+        return publication;
     }
 
     @PostMapping("/study/publication/{idPublication}/edit")

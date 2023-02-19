@@ -32,12 +32,18 @@
                         До головної</a>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="composition, el:${compositionOne}" class="mt-2">
-                        <img th:src="@{${'/image/display/composition/'+ composition.id}}" style="width:100%"/>
+                    <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
+                        <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}" style="width:100%"
+                             class="rounded mx-auto d-block"
+                             alt="IMAGE OF COMPOSITION"/>
                         <br>
-                        <h5><p th:utext="${composition.titleText}"></p></h5>
-                        <h5><p th:utext="${composition.fullText}"></p></h5>
+                        <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                        <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
                         <br>
+                    </div>
+                    <div th:each="el:${comments}" class="alert mt-2 alert-info">
+                        <h5><p class=" lh-lg " th:utext="${el}"
+                               style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
                     </div>
                 </div>
             </div>

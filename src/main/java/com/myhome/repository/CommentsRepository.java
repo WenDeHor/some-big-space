@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CommentsRepository extends JpaRepository<Comments, Integer> {
     List<Comments> findAllById(int id);
+    List<Comments> findAllByIdComposition(int idComposition);
 }

@@ -8,7 +8,7 @@
 <body>
 <div class="container"><br>
     <div class="row">
-        <div class="album col-md-12" >
+        <div class="album col-md-12">
             <div class="row col-md-12">
                 <div class="col-md-4">
                     <a href="/admin-mine/users"
@@ -53,15 +53,15 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="composition, iterator:${compositionList}" class="alert alert-info mt-2">
+                        <tr th:each="compositionDTO, iterator:${compositionList}" class="alert alert-info mt-2">
                             <td th:text="${iterator.index+1}"></td>
-                            <td><span th:text="${composition.titleText}"></span></td>
-                            <td><a th:href="'/admin-mine/users-competitive/'+${composition.id}+'/read'"
+                            <td><span th:text="${compositionDTO.titleText}"></span></td>
+                            <td><a th:href="'/admin-mine/users-competitive/'+${compositionDTO.id}+'/read'"
                                    class="btn btn-warning " tabindex="-1" role="button" aria-disabled="true">Read</a>
                             </td>
-                            <td><a th:href="'/admin-mine/users-competitive/'+${composition.id}+'/competitive'"
+                            <td><a th:href="'/admin-mine/users-competitive/'+${compositionDTO.id}+'/competitive'"
                                    class="btn btn-warning " tabindex="-1" role="button" aria-disabled="true">OK</a></td>
-                            <td><a th:href="'/admin-mine/users-competitive/'+${composition.id}+'/delete'"
+                            <td><a th:href="'/admin-mine/users-competitive/'+${compositionDTO.id}+'/delete'"
                                    class="btn btn-warning " tabindex="-1" role="button" aria-disabled="true">DELETE</a>
                             </td>
                         </tr>

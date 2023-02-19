@@ -48,14 +48,22 @@
                         <tbody>
                         <tr th:each="menu, el:${allMenuByAddress}" class="mt-2">
                             <td><span th:text="${#dates.format({menu.date}, 'dd:MM')}"></span></td>
-                            <td><span th:text="${#dates.dayOfWeekName({menu.date})}"></span></td>
+                            <div th:switch="${#dates.dayOfWeekName({menu.date})}">
+                                <td th:case="'Monday'" class="table-success">Пн</td>
+                                <td th:case="'Tuesday'" class="table-success">Вт</td>
+                                <td th:case="'Wednesday'" class="table-success">Ср</td>
+                                <td th:case="'Thursday'" class="table-success">Чт</td>
+                                <td th:case="'Friday'" class="table-success">Пт</td>
+                                <td th:case="'Saturday'" class="table-success">Сб</td>
+                                <td th:case="'Sunday'" class="table-success">Нд</td>
+                            </div>
                             <td><span th:text="${menu.breakfast}"></span></td>
                             <td><span th:text="${menu.dinner}"></span></td>
                             <td><span th:text="${menu.supper}"></span></td>
                             <td><a th:href="'/kitchen/write-menu/'+${menu.id}+'/edit'"
-                                   class="btn btn-warning">Редагувати</a></td>
+                                   class="btn btn-warning">Ред.</a></td>
                             <td><a th:href="'/kitchen/write-menu/'+${menu.id}+'/remove'"
-                                   class="btn btn-warning">Видалити</a></td>
+                                   class="btn btn-warning">Вид.</a></td>
                         </tr>
                         </tbody>
                     </table>

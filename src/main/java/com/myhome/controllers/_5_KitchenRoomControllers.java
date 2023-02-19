@@ -1,5 +1,9 @@
 package com.myhome.controllers;
 
+import com.myhome.controllers.compresor.CompressorImgToJpg;
+import com.myhome.forms.ConvertFile;
+import com.myhome.forms.CookBookDTO;
+import com.myhome.forms.MenuDTO;
 import com.myhome.models.CookBook;
 import com.myhome.models.Menu;
 import com.myhome.models.ShopMeals;
@@ -14,17 +18,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Controller
 public class _5_KitchenRoomControllers {
@@ -33,14 +37,16 @@ public class _5_KitchenRoomControllers {
     private final CookBookRepository cookBookRepository;
     private final MenuRepository menuRepository;
     private final MetricsService metricsService;
+    private final CompressorImgToJpg compressorImgToJpg;
     private final String KITCHEN_ROOM = "Кухня";
 
-    public _5_KitchenRoomControllers(ShopMealsRepository shopMealsRepository, UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, MetricsService metricsService) {
+    public _5_KitchenRoomControllers(ShopMealsRepository shopMealsRepository, UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
         this.shopMealsRepository = shopMealsRepository;
         this.userRepository = userRepository;
         this.cookBookRepository = cookBookRepository;
         this.menuRepository = menuRepository;
         this.metricsService = metricsService;
+        this.compressorImgToJpg = compressorImgToJpg;
     }
 
     @GetMapping("/kitchen/write-prescription")
@@ -58,85 +64,83 @@ public class _5_KitchenRoomControllers {
                                        HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<CookBook> cookBooks = cookBookRepository.findAllByIdUser(user.getId());
-        cookBooks.sort(Comparator.comparing(CookBook::getId).reversed());
+        List<CookBookDTO> cookBooks = cookBookRepository.findAllByIdUser(user.getId()).stream()
+                .map(el -> new CookBookDTO(
+                        el.getId(),
+                        el.getDate(),
+                        convertText(el.getTitleText()),
+                        convertText(el.getFullText()),
+                        converterImage(el.getImage())
+                ))
+                .sorted(Comparator.comparing(CookBookDTO::getId).reversed())
+                .collect(Collectors.toList());
         model.addAttribute("cookBooks", cookBooks);
         model.addAttribute("title", KITCHEN_ROOM);
         return "kitchen-read-cookbook";
     }
 
-    @GetMapping("/image/display/{id}")
-    @ResponseBody
-    void showImage(@PathVariable("id") int id,
-                   HttpServletResponse response,
-                   Optional<CookBook> cookBook) throws ServletException, IOException {
+    private String convertText(String text) {
+        return text
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
+    }
 
-        cookBook = cookBookRepository.findById(id);
-        response.setContentType("image/jpeg, image/jpg, image/png, image/gif");
-        response.getOutputStream().write(cookBook.get().getImage());
-        response.getOutputStream().close();
+    private String converterImage(byte[] img) {
+        return Base64.getEncoder().encodeToString(img);
     }
 
     @GetMapping("/kitchen/read-cookbook/{id}/remove")
-    public String cookBookRemove(@PathVariable(value = "id") int id) {
-        CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);
-        cookBookRepository.delete(cookBook);
+    public String cookBookRemove(@PathVariable(value = "id") int id,
+                                 Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<CookBook> cookBookOptional = cookBookRepository.findByIdAndIdUser(id, user.getId());
+        cookBookOptional.ifPresent(cookBookRepository::delete);
         return "redirect:/kitchen/read-cookbook";
     }
 
     @GetMapping("/kitchen/read-cookbook/{id}/edit")
     public String cookBookEdit(@PathVariable(value = "id") int id,
-                               Model model) {
-        if (!cookBookRepository.existsById(id)) {
-            return "redirect:/kitchen/read-cookbook";
+                               Model model,
+                               Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<CookBook> cookBookOptional = cookBookRepository.findByIdAndIdUser(id, user.getId());
+        if (cookBookOptional.isPresent()) {
+            CookBook cookBook = cookBookOptional.get();
+            CookBookDTO cookBookDTO = new CookBookDTO(
+                    cookBook.getId(),
+                    convertText(cookBook.getTitleText()),
+                    convertText(cookBook.getFullText()),
+                    converterImage(cookBook.getImage()));
+            model.addAttribute("cookBook", cookBookDTO);
+            model.addAttribute("title", KITCHEN_ROOM);
+            return "kitchen-edit-cookbook";
         }
-        Optional<CookBook> post = cookBookRepository.findById(id);
-        List<CookBook> res = new ArrayList<>();
-        post.ifPresent(res::add);
-        model.addAttribute("cookBook", convertTextWithFormatCookBookEdit(res));
-        model.addAttribute("cookBooks", convertTextWithFormatCookBookEdit(res));
-        model.addAttribute("title", KITCHEN_ROOM);
-        return "kitchen-edit-cookbook";
-    }
-
-    private List<CookBook> convertTextWithFormatCookBookEdit(List<CookBook> publicationPostAdminList) {
-        List<CookBook> list = new ArrayList<>();
-        for (CookBook publicationPostAdmin : publicationPostAdminList) {
-            String fullText = publicationPostAdmin.getFullText();
-            String trim1 = fullText.replace("&#160&#160 ", "");
-            String trim2 = trim1.replace("<br>", "");
-            publicationPostAdmin.setFullText(trim2);
-            list.add(publicationPostAdmin);
-        }
-        return list;
+        return "redirect:/kitchen/read-cookbook";
     }
 
     @PostMapping("/kitchen/read-cookbook/{id}/edit")
     public String cookBookUpdate(@PathVariable(value = "id") int id,
                                  MultipartFile file,
+                                 Authentication authentication,
                                  @RequestParam String titleText,
                                  @RequestParam String fullText) throws IOException {
-        CookBook cookBook = cookBookRepository.findById(id).orElseThrow(null);
-        cookBook.setTitleText(titleText);
-        cookBook.setFullText(convertTextWithFormatToCookBookUpdateAndSave(fullText));
-        Date date = new Date();
-        cookBook.setDate(date);
-        if (Objects.equals(file.getContentType(), "application/octet-stream")) {
-            Optional<CookBook> byId = cookBookRepository.findById(id);
-            byte[] image = byId.get().getImage();
-            cookBook.setImage(image);
-        } else {
-            cookBook.setImage(file.getBytes());
+        User user = getUser(authentication);
+        Optional<CookBook> cookBookOptional = cookBookRepository.findByIdAndIdUser(id, user.getId());
+        if (cookBookOptional.isPresent()) {
+            CookBook cookBook = cookBookOptional.get();
+            cookBook.setTitleText(titleText);
+            cookBook.setFullText(convertText(fullText));
+            cookBook.setDate(new Date());
+            if (!Objects.equals(file.getContentType(), "application/octet-stream")) { //new Photo
+                ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
+                cookBook.setImage(convert.img);
+                compressorImgToJpg.deleteImage(convert.nameStart);
+                compressorImgToJpg.deleteImage(convert.nameEnd);
+            }
+            cookBookRepository.save(cookBook);
         }
-        cookBookRepository.save(cookBook);
         return "redirect:/kitchen/read-cookbook";
     }
-
-    private String convertTextWithFormatToCookBookUpdateAndSave(String fullText) {
-        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text1);
-    }
-
 
     @PostMapping("/kitchen/write-prescription")
     public String kitchenWritePrescriptionAdd(Authentication authentication,
@@ -145,9 +149,9 @@ public class _5_KitchenRoomControllers {
                                               @RequestParam("fullText") String fullText) throws IOException {
         User user = getUser(authentication);
         CookBook cookBook = new CookBook();
-        cookBook.setDate( new Date());
+        cookBook.setDate(new Date());
         cookBook.setTitleText(titleText);
-        cookBook.setFullText(convertTextWithFormatToCookBookUpdateAndSave(fullText));
+        cookBook.setFullText(convertText(fullText));
         cookBook.setIdUser(user.getId());
         cookBook.setImage(file.getBytes());
         cookBookRepository.save(cookBook);
@@ -181,38 +185,42 @@ public class _5_KitchenRoomControllers {
         menu.setBreakfast(breakfast);
         menu.setIdUser(user.getId());
         if (date.isEmpty()) {
-            LocalDate localDate = LocalDate.now();
-            java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
-            menu.setDate(dateParse);
+            menu.setDate(new Date());
         } else {
-            LocalDate localDate = LocalDate.parse(date);
-            java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
-            menu.setDate(dateParse);
+            menu.setDate(Date.from(Instant.parse(date + "T10:15:30.00Z")));
         }
         menuRepository.save(menu);
         return "redirect:/kitchen/write-menu";
     }
 
     @GetMapping("/kitchen/write-menu/{id}/remove")
-    public String menuRemove(@PathVariable(value = "id") int id) {
-        Menu menu = menuRepository.findById(id).orElseThrow(null);
-        menuRepository.delete(menu);
+    public String menuRemove(@PathVariable(value = "id") int id,
+                             Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<Menu> menuOptional = menuRepository.findByIdAndIdUser(id, user.getId());
+        menuOptional.ifPresent(menuRepository::delete);
         return "redirect:/kitchen/write-menu";
     }
 
     @GetMapping("/kitchen/write-menu/{id}/edit")
-    public String menuEdit(@PathVariable(value = "id") int id, Model model) {
-        if (!menuRepository.existsById(id)) {
-            return "redirect:/kitchen/write-menu";
+    public String menuEdit(@PathVariable(value = "id") int id,
+                           Model model,
+                           Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<Menu> menuOptional = menuRepository.findByIdAndIdUser(id, user.getId());
+        if (menuOptional.isPresent()) {
+            Menu menu = menuOptional.get();
+            MenuDTO menuDTO = new MenuDTO(
+                    menu.getId(),
+                    menu.getDate(),
+                    menu.getBreakfast(),
+                    menu.getDinner(),
+                    menu.getSupper());
+            model.addAttribute("menus", menuDTO);
+            model.addAttribute("title", KITCHEN_ROOM);
+            return "kitchen-edit-menu";
         }
-        Optional<Menu> post = menuRepository.findById(id);
-        List<Menu> res = new ArrayList<>();
-        post.ifPresent(res::add);
-        String s = post.get().getDate().toString();
-        model.addAttribute("menus", res);
-        model.addAttribute("dateString", s);
-        model.addAttribute("title", KITCHEN_ROOM);
-        return "kitchen-edit-menu";
+        return "redirect:/kitchen/write-menu";
     }
 
 
@@ -221,19 +229,22 @@ public class _5_KitchenRoomControllers {
                              @RequestParam("date") String date,
                              @RequestParam("breakfast") String breakfast,
                              @RequestParam("dinner") String dinner,
-                             @RequestParam("supper") String supper) {
-        Menu menu = menuRepository.findById(id).orElseThrow(null);
-        menu.setSupper(supper);
-        menu.setDinner(dinner);
-        menu.setBreakfast(breakfast);
-        if (date.isEmpty()) {
-            menu.setDate(menu.getDate());
-        } else {
-            LocalDate localDate = LocalDate.parse(date);
-            java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
-            menu.setDate(dateParse);
+                             @RequestParam("supper") String supper,
+                             Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<Menu> menuOptional = menuRepository.findByIdAndIdUser(id, user.getId());
+        if (menuOptional.isPresent()) {
+            Menu menu = menuOptional.get();
+            menu.setSupper(supper);
+            menu.setDinner(dinner);
+            menu.setBreakfast(breakfast);
+            if (date.isEmpty()) {
+                menu.setDate(new Date());
+            } else {
+                menu.setDate(Date.from(Instant.parse(date + "T10:15:30.00Z")));
+            }
+            menuRepository.save(menu);
         }
-        menuRepository.save(menu);
         return "redirect:/kitchen/write-menu";
     }
 
@@ -245,7 +256,6 @@ public class _5_KitchenRoomControllers {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
         List<ShopMeals> shopMealsList = shopMealsRepository.findAllByIdUser(user.getId());
-
         shopMealsList.sort(Comparator.comparing(ShopMeals::getId));
         model.addAttribute("shopMealsList", shopMealsList);
         model.addAttribute("title", KITCHEN_ROOM);
@@ -256,34 +266,25 @@ public class _5_KitchenRoomControllers {
     public String kitchenWriteShopMeal(Authentication authentication,
                                        @RequestParam("fullText") String fullText) {
         User user = getUser(authentication);
-        LocalDate localDate = LocalDate.now();
-        java.sql.Date dateParse = java.sql.Date.valueOf(localDate);
-        ShopMeals meal = new ShopMeals();
-        meal.setIdUser(user.getId());
-        meal.setDate(dateParse);
+        ShopMeals shopMeals = new ShopMeals();
+        shopMeals.setIdUser(user.getId());
+        shopMeals.setDate(new Date());
         if (fullText.isEmpty()) {
-            meal.setFullText("No Meal");
+            shopMeals.setFullText("No Meal");
         } else {
-            meal.setFullText(fullText);
+            shopMeals.setFullText(fullText);
         }
-        shopMealsRepository.save(meal);
+        shopMealsRepository.save(shopMeals);
         return "redirect:/kitchen/write-shop-meals";
     }
 
     @GetMapping("/kitchen/write-shop-meals/{id}/remove")
-    public String mealRemove(@PathVariable(value = "id") int id) {
-        ShopMeals meal = shopMealsRepository.findById(id).orElseThrow(null);
-        shopMealsRepository.delete(meal);
+    public String mealRemove(@PathVariable(value = "id") int id,
+                             Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<ShopMeals> mealsOptional = shopMealsRepository.findByIdAndIdUser(id, user.getId());
+        mealsOptional.ifPresent(shopMealsRepository::delete);
         return "redirect:/kitchen/write-shop-meals";
-    }
-
-    //TODO REGEX
-    private String REGEX(String patternRegex,
-                         String replace,
-                         String text) {
-        Pattern pattern = Pattern.compile(patternRegex);
-        Matcher matcher = pattern.matcher(text);
-        return matcher.replaceAll(replace);
     }
 
     private User getUser(Authentication authentication) {

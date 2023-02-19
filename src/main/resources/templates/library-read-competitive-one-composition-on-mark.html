@@ -32,17 +32,20 @@
                         До головної</a>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="composition, el:${compositionOne}" class="mt-2">
+                    <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
                          <form action="/library/evaluation-one-composition" method="post" enctype="multipart/form-data">
-                            <img th:src="@{${'/image/display/composition/'+ composition.id}}" style="width:100%"/>
+                             <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}"
+                                  style="width:100%"
+                                  class="rounded mx-auto d-block"
+                                  alt="IMAGE OF COMPOSITION"/>
                             <br>
-                            <h5><p th:utext="${composition.titleText}"></p></h5>
-                            <h5><p th:utext="${composition.fullText}"></p></h5>
+                            <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                            <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
                             <br>
                             <h3 class="form-signin-heading text-center">Оцініть роботу автора</h3>
                             <p>
                                 <label>
-                                    <input type="hidden" th:value="${composition.id}" name="id"
+                                    <input type="hidden" th:value="${compositionDTO.id}" name="id"
                                            class="form-control">
                                 </label>
                             </p>

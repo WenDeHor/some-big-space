@@ -13,5 +13,5 @@ public interface CookBookRepository extends JpaRepository<CookBook, Integer> {
 
     List<CookBook> findAllByIdUser(int idUser);
 
-    Optional<CookBook> findById(int id);
+    Optional<CookBook> findByIdAndIdUser(int idCookBook, int idUser);
 }

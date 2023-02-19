@@ -33,16 +33,18 @@
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="cookBook, el:${cookBooks}" class="mt-2">
-                        <img th:src="@{${'/image/display/'+ cookBook.id}}"
-                             style="width:100%"/>
+                    <div th:each="cookBookDTO, el:${cookBooks}" class="mt-2">
+                        <img th:src="'data:image/jpeg;base64,' + ${cookBookDTO.convert}"
+                             style="width:100%"
+                             class="rounded mx-auto d-block"
+                             alt="IMAGE OF COMPOSITION"/>
                         <br>
-                        <h6><p class="text-right" th:text="${#dates.format({cookBook.date}, 'dd:MM:yyyy')}"/></h6>
-                        <h4><p th:text="${cookBook.titleText}"></p></h4>
-                        <h5><p th:utext="${cookBook.fullText}"></p></h5>
-                        <a th:href="'/kitchen/read-cookbook/'+${cookBook.id}+'/edit'"
+                        <h6><p class="text-right" th:text="${#dates.format({cookBookDTO.date}, 'dd:MM:yyyy')}"></p></h6>
+                        <h4><p th:text="${cookBookDTO.titleText}"></p></h4>
+                        <h5><p th:utext="${cookBookDTO.fullText}"></p></h5>
+                        <a th:href="'/kitchen/read-cookbook/'+${cookBookDTO.id}+'/edit'"
                            class="btn btn-warning">Редагувати</a>
-                        <a th:href="'/kitchen/read-cookbook/'+${cookBook.id}+'/remove'"
+                        <a th:href="'/kitchen/read-cookbook/'+${cookBookDTO.id}+'/remove'"
                            class="btn btn-warning">Видалити</a>
                         <br>
                     </div>

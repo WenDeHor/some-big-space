@@ -52,12 +52,14 @@
                         <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                     </form>
                     <br>
-                    <div th:each="diary, el:${diaryList}" class="mt-2">
-                        <img th:src="@{${'/image/display/diary/'+ diary.id}}"
-                             style="width:100%"/>
+                    <div th:each="diaryDTO, el:${diaryList}" class="mt-2">
+                        <img th:src="'data:image/jpeg;base64,' + ${diaryDTO.image}"
+                             style="width:50%"
+                             class="rounded mx-auto d-block"
+                             alt="IMAGE OF COMPOSITION"/>
                         <br>
-                        <h4><p th:text="${diary.titleText}"></p></h4>
-                        <h5><p th:utext="${diary.fullText}"></p></h5>
+                        <h4><p th:text="${diaryDTO.titleText}"></p></h4>
+                        <h5><p th:utext="${diaryDTO.fullText}"></p></h5>
                     </div>
                 </div>
             </div>

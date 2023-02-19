@@ -46,7 +46,9 @@ public class _4_LivingRoomControllers {
 
     @GetMapping("/living/friends/family")
     public String livingAllMyFamily(Authentication authentication,
+                                    HttpServletRequest request,
                                     Model model) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
         List<Family> myFamilyList = familyRepository.findAllByIdUser(user.getId());
         model.addAttribute("myFamilyList", myFamilyList);
@@ -100,14 +102,18 @@ public class _4_LivingRoomControllers {
                                    Authentication authentication,
                                    Model model) {
         User user = getUser(authentication);
-        Optional<User> userFriend = userRepository.findOneById(id);
-        Friends newFriend = new Friends();
-        newFriend.setIdUser(user.getId());
-        newFriend.setIdFriend(id);
-        newFriend.setAddressFriend(userFriend.isPresent()
-                ? userFriend.get().getAddress()
-                : "");
-        friendsRepository.save(newFriend);
+        Optional<Friends> userFriendOptional = friendsRepository.findByIdFriendAndIdUser(id, user.getId());
+        if (!userFriendOptional.isPresent()) {//no present in my friends
+            Optional<User> userOptional = userRepository.findOneById(id);
+            if (userOptional.isPresent()) { //is user present in app
+                User userFriend = userOptional.get();
+                Friends newFriend = new Friends();
+                newFriend.setIdUser(user.getId());
+                newFriend.setIdFriend(id);
+                newFriend.setAddressFriend(userFriend.getAddress());
+                friendsRepository.save(newFriend);
+            }
+        }
         model.addAttribute("title", LIVING_ROOM);
         return "living-friends-search";
     }
@@ -117,29 +123,37 @@ public class _4_LivingRoomControllers {
                                   Authentication authentication,
                                   Model model) {
         User user = getUser(authentication);
-        Optional<User> userFriend = userRepository.findOneById(id);
-        Family newFamily = new Family();
-        newFamily.setIdUser(user.getId());
-        newFamily.setIdFamily(id);
-        newFamily.setAddressFamily(userFriend.isPresent()
-                ? userFriend.get().getAddress()
-                : "");
-        familyRepository.save(newFamily);
+        Optional<Family> userFamilyOptional = familyRepository.findByIdFamilyAndIdUser(id, user.getId());
+        if (!userFamilyOptional.isPresent()) {//no present in my family
+            Optional<User> userOptional = userRepository.findOneById(id);
+            if (userOptional.isPresent()) { //is user present in app
+                User userFamily = userOptional.get();
+                Family newFamily = new Family();
+                newFamily.setIdUser(user.getId());
+                newFamily.setIdFamily(id);
+                newFamily.setAddressFamily(userFamily.getAddress());
+                familyRepository.save(newFamily);
+            }
+        }
         model.addAttribute("title", LIVING_ROOM);
         return "living-friends-search";
     }
 
     @GetMapping("/living/friends/family/{id}/remove")
-    public String livingFamilyRemove(@PathVariable(value = "id") int id) {
-        Family family = familyRepository.findById(id).orElseThrow(null);
-        familyRepository.delete(family);
+    public String livingFamilyRemove(@PathVariable(value = "id") int id,
+                                     Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<Family> optionalFamily = familyRepository.findByIdFamilyAndIdUser(id, user.getId());
+        optionalFamily.ifPresent(familyRepository::delete);
         return "redirect:/living/friends/family";
     }
 
     @GetMapping("/living/friends/friend/{id}/remove")
-    public String livingFriendRemove(@PathVariable(value = "id") int id) {
-        Friends friend = friendsRepository.findById(id).orElseThrow(null);
-        friendsRepository.delete(friend);
+    public String livingFriendRemove(@PathVariable(value = "id") int id,
+                                     Authentication authentication) {
+        User user = getUser(authentication);
+        Optional< Friends> friendsOptional = friendsRepository.findByIdFriendAndIdUser(id, user.getId());
+        friendsOptional.ifPresent(friendsRepository::delete);
         return "redirect:/living/friends/friends";
     }
 
@@ -149,19 +163,20 @@ public class _4_LivingRoomControllers {
                                  HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        Iterable<VideoBox> allVideoBox = videoBoxRepository.findAllByIdUser(user.getId());
-        List<VideoBox> videoBoxList = new ArrayList<>();
-        allVideoBox.forEach(videoBoxList::add);
-        videoBoxList.sort(Comparator.comparing(VideoBox::getId).reversed());
-        model.addAttribute("videoBoxList", videoBoxList);
+        List<VideoBox> allVideoBox = videoBoxRepository.findAllByIdUser(user.getId()).stream()
+                .sorted(Comparator.comparing(VideoBox::getId).reversed())
+                .collect(Collectors.toList());
+        model.addAttribute("videoBoxList", allVideoBox);
         model.addAttribute("title", LIVING_ROOM);
         return "living-news-video";
     }
 
     @GetMapping("/living/news/video/{idVideoBox}/remove")
-    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") int idVideoBox) {
-        VideoBox videoBox = videoBoxRepository.findById(idVideoBox).orElseThrow(null);
-        videoBoxRepository.delete(videoBox);
+    public String livingNewsVideoRemove(@PathVariable(value = "idVideoBox") int idVideoBox,
+                                        Authentication authentication) {
+        User user = getUser(authentication);
+        Optional<VideoBox> videoBoxOptional = videoBoxRepository.findByIdAndIdUser(idVideoBox, user.getId());
+        videoBoxOptional.ifPresent(videoBoxRepository::delete);
         return "redirect:/living/news/video";
     }
 

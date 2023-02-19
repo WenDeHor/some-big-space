@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+>
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
@@ -36,20 +36,27 @@
                     </form>
                 </div>
                 <div class="col-md-8 text-center">
-                    <form action="/change/photo" method="post" enctype="multipart/form-data">
 
-                        <div class="custom-file mb-4">
-                            <input type="file" name="file" class="custom-file-input"
-                                   id="customFile"> <label class="custom-file-label"
-                                                           for="customFile">Завантажити фото</label>
+                    <form action="/change/photo" method="post" enctype="multipart/form-data">
+                        <div th:each="userPhotoDTO, el:${userPhoto}">
+                            <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${userPhotoDTO.image}"
+                                 style="width: 100%" alt="Family photo"/>
+                            <br>
+                            <div class="custom-file mb-4">
+                                <input type="file" name="file" class="custom-file-input"
+                                       id="customFile"> <label class="custom-file-label"
+                                                               for="customFile">Завантажити фото</label>
+                            </div>
+                            <br>
+                            <label for="fullText"> Опис до фото : </label>
+                            <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="20"
+                                      placeholder="Опишіть подію та емоцію, що повязана з фото. {Максимальна кількість символів - 3000} "
+                                      th:utext="${userPhotoDTO.fullText}"></textarea>
+                            <br>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                         </div>
-                        <br>
-                        <label for="fullText"> Опис до фото : </label>
-                        <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="20"
-                                  placeholder="Опишіть подію та емоцію, що повязана з фото. {Максимальна кількість символів - 3000} "></textarea>
-                        <br>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
                     </form>
+
                 </div>
             </div>
         </div>

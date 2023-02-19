@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.myhome.controllers.Utils.errorIMG;
+
 @Controller
 public class SecurityController {
     private final RegistrationService service;
@@ -40,13 +42,14 @@ public class SecurityController {
         String login = userForm.getLogin().trim().replaceAll("\\s+", "00");
         if (request.getParameterMap().containsKey("error")
                 || userPresent.isPresent()
-//                || !onlyLatinAlphabet(login)
+                || !onlyLatinAlphabet(login)
 //                || userForm.getLogin().length() < 3
 //                || userForm.getPassword().length() < 4
 //                || !emailValidator(userForm.getEmail())
         ) {
             model.addAttribute("error", true);
             model.addAttribute("title", "registration page");
+            model.addAttribute("errorIMG", errorIMG());
             return "registration-error";
         }
         service.signUp(userForm);

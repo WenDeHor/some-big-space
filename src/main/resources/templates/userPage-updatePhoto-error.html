@@ -36,14 +36,15 @@
                     </form>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="userPhoto, el:${photos}" class="mt-2">
-                        <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${userPhoto.image}" style="width: 100%"
-                             alt="Family photo"/>
-                        <br>
-                        <br>
-                        <h5><p th:utext="${userPhoto.fullText}" class="bold"></p></h5>
-                        <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Замінити фото</a>
-
+                    <div class="col-md-8">
+                        <div th:each="file:${fileSize}">
+                            <h5 class="text-left" th:style="${file>2 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір файлу : '+${file} + 'МВ. Допустимий розмір 6МВ'"></h5>
+                        </div>
+                        <div th:each="fullText:${fullTextSize}">
+                            <h5 class="text-left" th:style="${fullText>3000 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір опису : '+${fullText} + '. Допустима кількись символів 3_000'"></h5>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Currency;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class RegistrationServiceImpl implements RegistrationService {
@@ -64,11 +67,11 @@ public class RegistrationServiceImpl implements RegistrationService {
             user.setState(State.ACTIVE);
             user.setDate(date);
             usersRepository.save(user);
-            createUserPhotoOnMinePage(address);
+            createUserPhotoOnMinePage(address, userForm.getEmail());
         }
     }
 
-    private void createUserPhotoOnMinePage(String address) {
+    private void createUserPhotoOnMinePage(String address, String email) {
         byte[] inputBytes = new byte[0];
         try {
             inputBytes = Files.readAllBytes(Paths.get("src/main/resources/static/img/mine-photo.jpg"));
@@ -79,6 +82,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         userFirst.setFullText("Tell us about yourself and your family");
         userFirst.setImage(inputBytes);
         userFirst.setAddress(address);
+        userFirst.setIdUser(getUser(email).getId());
         userPhotoRepository.save(userFirst);
+    }
+
+    private User getUser(String email) {
+        return usersRepository.findOneByEmail(email).get();
     }
 }

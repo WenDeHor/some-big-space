@@ -32,14 +32,15 @@
                         До головної</a>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="composition, el:${compositionOne}" class="mt-2">
-                        <img th:src="@{${'/image/display/composition/'+ composition.id}}" style="width:100%"/>
+                    <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
+                        <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}" style="width:100%" class="rounded mx-auto d-block"
+                             alt="IMAGE OF COMPOSITION"/>
                         <br>
-                        <h5><p th:utext="${composition.titleText}"></p></h5>
-                        <h5><p th:utext="${composition.fullText}"></p></h5>
-                        <a th:href="'/library/edit-composition/'+${composition.id}+'/edit'"
+                        <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                        <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
+                        <a th:href="'/library/edit-composition/'+${compositionDTO.id}+'/edit'"
                            class="btn btn-warning">РЕДАГУВАТИ</a>
-                        <a th:href="'/library/edit-composition/'+${composition.id}+'/remove'"
+                        <a th:href="'/library/edit-composition/'+${compositionDTO.id}+'/remove'"
                            class="btn btn-warning">ВИДАЛИТИ</a>
                     </div>
                 </div>

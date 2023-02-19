@@ -16,8 +16,8 @@ public class Composition {
     private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "local_date", nullable = false)
-    private Date localDate;
+    @Column(name = "date", nullable = false)
+    private Date date;
 
     @Column(name = "genre")
     private Genre genre;
@@ -26,15 +26,15 @@ public class Composition {
     private PublicationType publicationType;
 
     @Column(name = "title_text")
-    @Size(min = 0, max = 150)
+    @Size( max = 150)
     private String titleText;
 
     @Column(name = "short_text")
-    @Size(min = 0, max = 1000)
+    @Size( max = 1000)
     private String shortText;
 
     @Column(name = "full_text")
-    @Size(min = 0, max = 20000)
+    @Size( max = 20000)
     private String fullText;
 
     @Column(name = "id_user")
@@ -50,17 +50,18 @@ public class Composition {
     public Composition() {
     }
 
-    public Composition(String titleText, String fullText, String convert) {
+    public Composition(PublicationType publicationType, String titleText, String fullText, String convert) {
+        this.publicationType=publicationType;
         this.titleText = titleText;
         this.fullText = fullText;
         this.convert = convert;
     }
 
-    public Composition(int id, Date localDate, Genre genre, PublicationType publicationType,
+    public Composition(int id, Date date, Genre genre, PublicationType publicationType,
                        String titleText, String shortText, String fullText,
                        int idUser, String convert) {
         this.id = id;
-        this.localDate = localDate;
+        this.date = date;
         this.genre = genre;
         this.publicationType = publicationType;
         this.titleText = titleText;
@@ -70,14 +71,23 @@ public class Composition {
         this.convert = convert;
     }
 
-    public Composition(int id, Date localDate, Genre genre, String titleText,
+    public Composition(int id, Date date, Genre genre, String titleText,
                        String shortText, String fullText, String convert) {
         this.id = id;
-        this.localDate = localDate;
+        this.date = date;
         this.genre = genre;
         this.titleText = titleText;
         this.shortText = shortText;
         this.fullText = fullText;
+        this.convert = convert;
+    }
+
+    public Composition(int id, Genre genre, String titleText,
+                       String shortText, String convert) {
+        this.id = id;
+        this.genre = genre;
+        this.titleText = titleText;
+        this.shortText = shortText;
         this.convert = convert;
     }
 
@@ -89,12 +99,12 @@ public class Composition {
         this.id = id;
     }
 
-    public Date getLocalDate() {
-        return localDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setLocalDate(Date localDate) {
-        this.localDate = localDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public Genre getGenre() {
@@ -168,7 +178,7 @@ public class Composition {
         Composition that = (Composition) o;
         return id == that.id &&
                 idUser == that.idUser &&
-                Objects.equals(localDate, that.localDate) &&
+                Objects.equals(date, that.date) &&
                 genre == that.genre &&
                 publicationType == that.publicationType &&
                 Objects.equals(titleText, that.titleText) &&
@@ -180,24 +190,8 @@ public class Composition {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, localDate, genre, publicationType, titleText, shortText, fullText, idUser, convert);
+        int result = Objects.hash(id, date, genre, publicationType, titleText, shortText, fullText, idUser, convert);
         result = 31 * result + Arrays.hashCode(image);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Composition{" +
-                "id=" + id +
-                ", localDate=" + localDate +
-                ", genre=" + genre +
-                ", publicationType=" + publicationType +
-                ", titleText='" + titleText + '\'' +
-                ", shortText='" + shortText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", idUser=" + idUser +
-                ", image=" + Arrays.toString(image) +
-                ", convert='" + convert + '\'' +
-                '}';
     }
 }

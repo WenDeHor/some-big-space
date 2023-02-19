@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.UUID;
 
 @Component
 public class CompressorImgToJpg {
@@ -21,8 +22,8 @@ public class CompressorImgToJpg {
     private final float ZIP_3 = 0.3f;
     private final String TMP_PATH = "src\\main\\java\\com\\myhome\\controllers\\compresor\\tmp_image\\";
 
-    public ConvertFile convert(MultipartFile multipartFile, String userEmail, int count) throws IOException {
-        String nameEnd = generateTMPImageName(userEmail, count);
+    public ConvertFile convert(MultipartFile multipartFile, String userEmail) throws IOException {
+        String nameEnd = generateTMPImageName(userEmail);
         File compressedImageFile = new File(TMP_PATH + nameEnd);
         File imageFile = convertMultipartFileToFile(multipartFile);
         Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(JPG);
@@ -49,13 +50,14 @@ public class CompressorImgToJpg {
 
     }
 
-    public boolean deleteImage(String name) {
+    public void deleteImage(String name) {
         File file = new File(TMP_PATH + name);
-        return file.delete();
+        file.delete();
     }
 
-    private String generateTMPImageName(String userEmail, int count) {
-        return userEmail + "_tmp_" + count + DOT + JPG;
+    private String generateTMPImageName(String userEmail) {
+        UUID uuid = UUID.randomUUID();
+        return userEmail + "_tmp_" + uuid + DOT + JPG;
     }
 
     private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {

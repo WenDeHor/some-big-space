@@ -32,15 +32,16 @@
                         До головної</a>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="composition, el:${compositionList}" class="mt-2">
-                        <a th:href="'/library/read-competitive-one-composition/'+${composition.id}"> <img
-                                th:src="@{${'/image/display/composition/'+ composition.id}}"
-                                style="width:100%"/></a>`
+                    <div th:each="compositionDTO, el:${compositionList}" class="mt-2">
+                        <a th:href="${compositionDTO.url}">
+                            <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${compositionDTO.image}"
+                                 style="width:100%" alt="image"/>
+                        </a>
                         <br>
                         <div>
-                            <h5><p th:utext="${composition.titleText}"></p></h5>
-                            <h6><p th:utext="${composition.genre}"></p></h6>
-                            <h5><p th:utext="${composition.shortText}"></p></h5>
+                            <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                            <h6><p th:utext="${compositionDTO.genre}"></p></h6>
+                            <h5><p th:utext="${compositionDTO.shortText}"></p></h5>
                         </div>
                         <br>
                     </div>

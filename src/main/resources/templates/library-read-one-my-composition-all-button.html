@@ -33,18 +33,19 @@
                 </div>
                 <div class="col-md-8">
                     <br>
-                    <div th:each="composition, el:${compositionOne}" class="mt-2">
-                        <img th:src="@{${'/image/display/composition/'+ composition.id}}" style="width:100%"/>
+                    <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
+                        <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}" style="width:100%" class="rounded mx-auto d-block"
+                             alt="IMAGE OF COMPOSITION"/>
                         <br>
-                        <h5><p th:utext="${composition.titleText}"></p></h5>
-                        <h5><p th:utext="${composition.fullText}"></p></h5>
-                        <a th:href="'/library/edit-composition/'+${composition.id}+'/edit'"
+                        <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                        <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
+                        <a th:href="'/library/edit-composition/'+${compositionDTO.id}+'/edit'"
                            class="btn btn-warning">РЕДАГУВАТИ</a>
-                        <a th:href="'/library/edit-composition/'+${composition.id}+'/remove'"
+                        <a th:href="'/library/edit-composition/'+${compositionDTO.id}+'/remove'"
                            class="btn btn-warning">ВИДАЛИТИ</a>
-                        <a th:href="'/library/public-composition/'+${composition.id}+'/to-coordination'"
+                        <a th:href="'/library/public-composition/'+${compositionDTO.id}+'/to-coordination'"
                            class="btn btn-warning">ПУБЛІКУВАТИ ВСІМ</a>
-                        <a th:href="'/library/public-composition/'+${composition.id}+'/to-friends'"
+                        <a th:href="'/library/public-composition/'+${compositionDTO.id}+'/to-friends'"
                            class="btn btn-warning">ПУБЛІКУВАТИ ДРУЗЯМ</a>
                     </div>
                 </div>

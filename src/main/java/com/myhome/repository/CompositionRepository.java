@@ -10,10 +10,14 @@ import java.util.Optional;
 public interface CompositionRepository extends JpaRepository<Composition, Integer> {
 
     List<Composition> findAllByIdUser(int idUser);
+    Optional<Composition> findAllByIdUserAndId(int idUser, int idComposition);
+    Optional<Composition> findOneByIdUserAndId(int idUser, int idComposition);
 
     List<Composition> findAllByPublicationType(PublicationType publicationType);
+    List<Composition> findAllByPublicationTypeAndIdUserNot(PublicationType publicationType, int idUser);
 
     Optional<Composition> findOneById(int id);
 
     List<Composition> findAllByIdIn(List<Integer> userIds);
+    List<Composition> findAllByIdUserIn(List<Integer> userIds);
 }

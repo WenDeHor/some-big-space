@@ -47,38 +47,46 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="menu, el:${menus}" class="mt-2">
-                            <td><span th:text="${#dates.format({menu.date}, 'dd:MM')}"></span></td>
-                            <td><span th:text="${#dates.dayOfWeekName({menu.date})}"></span></td>
-                            <td><span th:text="${menu.breakfast}"></span></td>
-                            <td><span th:text="${menu.dinner}"></span></td>
-                            <td><span th:text="${menu.supper}"></span></td>
+                        <tr th:each="menuDTO, el:${menus}" class="mt-2">
+                            <td><span th:text="${#dates.format({menuDTO.date}, 'dd:MM')}"></span></td>
+                            <div th:switch="${#dates.dayOfWeekName({menuDTO.date})}">
+                                <td th:case="'Monday'" class="table-success">Пн</td>
+                                <td th:case="'Tuesday'" class="table-success">Вт</td>
+                                <td th:case="'Wednesday'" class="table-success">Ср</td>
+                                <td th:case="'Thursday'" class="table-success">Чт</td>
+                                <td th:case="'Friday'" class="table-success">Пт</td>
+                                <td th:case="'Saturday'" class="table-success">Сб</td>
+                                <td th:case="'Sunday'" class="table-success">Нд</td>
+                            </div>
+                            <td><span th:text="${menuDTO.breakfast}"></span></td>
+                            <td><span th:text="${menuDTO.dinner}"></span></td>
+                            <td><span th:text="${menuDTO.supper}"></span></td>
 
-                            <td><a th:href="'/kitchen/write-menu/'+${menu.id}+'/edit'"
+                            <td><a th:href="'/kitchen/write-menu/'+${menuDTO.id}+'/edit'"
                                    class="btn btn-warning">Редагувати</a></td>
-                            <td><a th:href="'/kitchen/write-menu/'+${menu.id}+'/remove'"
+                            <td><a th:href="'/kitchen/write-menu/'+${menuDTO.id}+'/remove'"
                                    class="btn btn-warning">Видалити</a></td>
                         </tr>
 
                         </tbody>
                     </table>
                     <h2 class="text-center text-success">Редагувати меню</h2><br>
-                    <div th:each="menu, el:${menus}">
+                    <div th:each="menuDTO, el:${menus}">
                         <form method="post">
                             <table>
-                                <td><input type="date" th:value="${dateString}" name="date"></td>
+                                <td><input type="date" th:value="${menuDTO.date}" name="date"></td>
 
                                 <td>
-                                    <input type="text" th:value="${menu.breakfast}" name="breakfast"
+                                    <input type="text" th:value="${menuDTO.breakfast}" name="breakfast"
                                            class="form-control"
                                            placeholder="Сніданок">
                                 </td>
                                 <td>
-                                    <input type="text" th:value="${menu.dinner}" name="dinner" class="form-control"
+                                    <input type="text" th:value="${menuDTO.dinner}" name="dinner" class="form-control"
                                            placeholder="Обід">
                                 </td>
                                 <td>
-                                    <input type="text" th:value="${menu.supper}" name="supper" class="form-control"
+                                    <input type="text" th:value="${menuDTO.supper}" name="supper" class="form-control"
                                            placeholder="Вечеря">
                                 </td>
                             </table>

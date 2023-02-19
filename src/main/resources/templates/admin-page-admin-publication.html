@@ -59,22 +59,21 @@
                         </table>
                         <button class="btn btn-lg btn-primary btn-block" type="submit">SAVE</button>
                     </form>
-                    <div th:each="publicationPostAdmin, el:${publicationPostAdminRepositoryAll}"
+                    <div th:each="publicationPostAdminDTO, el:${publicationPostAdminRepositoryAll}"
                          class="alert alert-info mt-2">
-                        <div class="text-center">
-                            <img class="rounded"
-                                 th:src="@{${'/image/display/admin/'+ publicationPostAdmin.id}}"
-                                 style="width:80%" alt="myhome.com"/>
-                        </div>
+                        <img th:src="'data:image/jpeg;base64,' + ${publicationPostAdminDTO.convert}"
+                             style="width:50%"
+                             class="rounded mx-auto d-block"
+                             alt="IMAGE OF COMPOSITION"/>
 
-                        <h6 th:text="${#dates.format({publicationPostAdmin.date}, 'dd:MM:YYYY')}"
+                        <h6 th:text="${#dates.format({publicationPostAdminDTO.date}, 'dd:MM:YYYY')}"
                             class="text-right"></h6>
-                        <h5 class="text-center" th:text="${publicationPostAdmin.titleText}"></h5>
-                        <h6 th:utext="${publicationPostAdmin.fullText}"></h6>
+                        <h5 class="text-center" th:text="${publicationPostAdminDTO.titleText}"></h5>
+                        <h6 th:utext="${publicationPostAdminDTO.fullText}"></h6>
                         <div class="text-right">
-                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.id}+'/edit'"
+                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdminDTO.id}+'/edit'"
                                class="btn btn-outline-dark">EDIT</a>
-                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdmin.id}+'/remove'"
+                            <a th:href="'/admin-mine/admin-publications/'+${publicationPostAdminDTO.id}+'/remove'"
                                class="btn btn-outline-danger">REMOVE</a>
                         </div>
                     </div>

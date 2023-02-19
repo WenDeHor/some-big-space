@@ -12,7 +12,7 @@ import java.util.Optional;
 @EnableJpaRepositories
 public interface PublicationRepository extends JpaRepository<PublicationUser, Integer> {
     List<PublicationUser> findAllByIdUser(int idUser);
-
+    List<PublicationUser> findAllByIdUserNot(int idUser);
     Optional<PublicationUser> findOneByIdUser(int idUser);
 
 
