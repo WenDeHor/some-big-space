@@ -25,6 +25,8 @@ public class SecurityController {
     private final RegistrationService service;
     private final UserRepository userRepository;
 
+    private final String MY_HOME = "Мій дім";
+
     public SecurityController(UserRepository userRepository, RegistrationService service) {
         this.userRepository = userRepository;
         this.service = service;
@@ -32,7 +34,7 @@ public class SecurityController {
 
     @GetMapping("/registration")
     public String getRegistrationPage(Model model) {
-        model.addAttribute("title", "registration page");
+        model.addAttribute("title", MY_HOME);
         return "registration";
     }
 
@@ -48,8 +50,8 @@ public class SecurityController {
                 || !emailValidator(userForm.getEmail())
         ) {
             model.addAttribute("error", true);
-            model.addAttribute("title", "registration page");
             model.addAttribute("errorIMG", errorIMG());
+            model.addAttribute("title", MY_HOME);
             return "registration-error";
         }
         service.signUp(userForm);
@@ -75,7 +77,7 @@ public class SecurityController {
         } else if (request.getParameterMap().containsKey("error")) {
             model.addAttribute("error", true);
         }
-        model.addAttribute("title", "LOGIN");
+        model.addAttribute("title", MY_HOME);
         return "login";
     }
 
