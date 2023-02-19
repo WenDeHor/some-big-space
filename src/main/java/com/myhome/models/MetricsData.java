@@ -23,10 +23,6 @@ public class MetricsData {
     @Column(name = "date")
     private LocalDate date; //2022-07-02 18:39:31.024000
 
-//    @Column(name = "user_agent")
-//    @Size(min = 0, max = 2000)
-//    private String userAgent; //Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36
-
     @Column(name = "accept_language")
     private String acceptLanguage; //en-US,en;q=0.9,uk;q=0.8
 

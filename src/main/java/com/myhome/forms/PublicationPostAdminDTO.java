@@ -30,6 +30,13 @@ public class PublicationPostAdminDTO {
         this.convert = convert;
     }
 
+    public PublicationPostAdminDTO( Date date, String titleText, String fullText, String convert) {
+        this.date = date;
+        this.titleText = titleText;
+        this.fullText = fullText;
+        this.convert = convert;
+    }
+
     public PublicationPostAdminDTO(Date date, String titleText, String fullText, byte[] image, String convert) {
         this.date = date;
         this.titleText = titleText;

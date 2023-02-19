@@ -1,7 +1,6 @@
 package com.myhome.models;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Objects;
 
@@ -40,14 +39,11 @@ public class Evaluate {
     @Column(name = "impression")
     private Mark impression;
 
-    @Column(name = "comments")
-    @Size(max = 3000)
-    private String comments;
 
     public Evaluate() {
     }
 
-    public Evaluate(Date date, int idComposition, int idAppraiser, Mark environment, Mark characters, Mark atmosphere, Mark plot, Mark impression, @Size(max = 3000) String comments) {
+    public Evaluate(Date date, int idComposition, int idAppraiser, Mark environment, Mark characters, Mark atmosphere, Mark plot, Mark impression) {
         this.date = date;
         this.idComposition = idComposition;
         this.idAppraiser = idAppraiser;
@@ -56,7 +52,6 @@ public class Evaluate {
         this.atmosphere = atmosphere;
         this.plot = plot;
         this.impression = impression;
-        this.comments = comments;
     }
 
     public int getId() {
@@ -131,14 +126,6 @@ public class Evaluate {
         this.impression = impression;
     }
 
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -152,28 +139,11 @@ public class Evaluate {
                 characters == evaluate.characters &&
                 atmosphere == evaluate.atmosphere &&
                 plot == evaluate.plot &&
-                impression == evaluate.impression &&
-                Objects.equals(comments, evaluate.comments);
+                impression == evaluate.impression;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, idComposition, idAppraiser, environment, characters, atmosphere, plot, impression, comments);
-    }
-
-    @Override
-    public String toString() {
-        return "Evaluate{" +
-                "id=" + id +
-                ", date=" + date +
-                ", idComposition=" + idComposition +
-                ", idAppraiser=" + idAppraiser +
-                ", environment=" + environment +
-                ", characters=" + characters +
-                ", atmosphere=" + atmosphere +
-                ", plot=" + plot +
-                ", impression=" + impression +
-                ", comments='" + comments + '\'' +
-                '}';
+        return Objects.hash(id, date, idComposition, idAppraiser, environment, characters, atmosphere, plot, impression);
     }
 }

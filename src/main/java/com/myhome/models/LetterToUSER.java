@@ -108,16 +108,4 @@ public class LetterToUSER {
     public int hashCode() {
         return Objects.hash(id, date, titleText, fullText, senderAddress, recipientAddress);
     }
-
-    @Override
-    public String toString() {
-        return "LetterToUSER{" +
-                "id=" + id +
-                ", date=" + date +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", senderAddress='" + senderAddress + '\'' +
-                ", recipientAddress='" + recipientAddress + '\'' +
-                '}';
-    }
 }

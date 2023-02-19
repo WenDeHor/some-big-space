@@ -43,9 +43,9 @@ public class SecurityController {
         if (request.getParameterMap().containsKey("error")
                 || userPresent.isPresent()
                 || !onlyLatinAlphabet(login)
-//                || userForm.getLogin().length() < 3
-//                || userForm.getPassword().length() < 4
-//                || !emailValidator(userForm.getEmail())
+                || userForm.getLogin().length() < 3
+                || userForm.getPassword().length() < 4
+                || !emailValidator(userForm.getEmail())
         ) {
             model.addAttribute("error", true);
             model.addAttribute("title", "registration page");

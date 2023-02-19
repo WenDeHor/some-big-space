@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class _1_StudyRoomControllers {
@@ -102,17 +103,25 @@ public class _1_StudyRoomControllers {
                                          HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
-        List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllBySenderAddress(address).stream()
-                .map(el -> new LettersDTO(el.getId(), el.getTitleText(), el.getFullText(), buildInfoBySender(el)))
-                .sorted(Comparator.comparing(LettersDTO::getId).reversed())
+        List<LettersDTO> lettersDTOS = Stream
+                .concat(letterToUSERRepository.findAllBySenderAddress(address).stream()
+                                .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(), buildInfoBySenderToLetterToUSER(el))),
+                        letterToADMINRepository.findAllByAddressUser(address).stream()
+                                .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(), buildInfoBySenderToLetterToADMIN(el))))
+                .sorted(Comparator.comparing(LettersDTO::getDate).reversed())
                 .collect(Collectors.toList());
         model.addAttribute("letters", lettersDTOS);
         model.addAttribute("title", MY_ROOM);
         return "study-read-letters-outer";
     }
 
-    private String buildInfoBySender(LetterToUSER letter) {
+    private String buildInfoBySenderToLetterToUSER(LetterToUSER letter) {
         return "Отримувач: " + letter.getRecipientAddress() +
+                ", Дата: " + letter.getDate().toString().split("\\s")[0];
+    }
+
+    private String buildInfoBySenderToLetterToADMIN(LetterToADMIN letter) {
+        return "Отримувач: " + ADMIN +
                 ", Дата: " + letter.getDate().toString().split("\\s")[0];
     }
 
@@ -158,7 +167,11 @@ public class _1_StudyRoomControllers {
         int userId = user.getId();
         List<PublicationDTO> publications = publicationRepository.findAllByIdUserNot(userId).stream()
                 .limit(LIMIT_LIST)
-                .map(el -> new PublicationDTO(el.getId(), el.getTitleText(), el.getFullText(), info(el, user)))
+                .map(el -> new PublicationDTO(
+                        el.getId(),
+                        el.getTitleText(),
+                        el.getFullText(),
+                        info(el)))
                 .sorted(Comparator.comparing(PublicationDTO::getId).reversed())
                 .collect(Collectors.toList());
 
@@ -167,9 +180,11 @@ public class _1_StudyRoomControllers {
         return "study-read-all-publications";
     }
 
-    private String info(PublicationUser publicationUser, User user) {
-        return "Автор : " + user.getAddress() +
-                ", Дата: " + publicationUser.getDate().toString().split("\\s")[0];
+    private String info(PublicationUser publicationUser) {
+        Optional<User> userOptional = userRepository.findOneById(publicationUser.getIdUser());
+        return userOptional.map(value -> "Автор : " + value.getAddress() +
+                ", Дата: " + publicationUser.getDate().toString().split("\\s")[0])
+                .orElseGet(() -> "Дата: " + publicationUser.getDate().toString().split("\\s")[0]);
     }
 
     @GetMapping("/study/read-my-publications")

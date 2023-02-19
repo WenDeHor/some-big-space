@@ -450,7 +450,7 @@ public class _2_LibraryController {
         model.addAttribute("originalFilename", originalFilename);
         model.addAttribute("fileSize", fileSize);
 
-        model.addAttribute("title", titleText);
+        model.addAttribute("titleText", titleText);
         model.addAttribute("titleTextSize", titleTextSize);
 
         model.addAttribute("short", shortText);
@@ -458,6 +458,8 @@ public class _2_LibraryController {
 
         model.addAttribute("full", fullText);
         model.addAttribute("fullTextSize", fullTextSize);
+
+        model.addAttribute("title", LIBRARY);
         return "library-write-error-save-page";
     }
 

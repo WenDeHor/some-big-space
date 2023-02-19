@@ -112,16 +112,4 @@ public class CookBook {
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }
-
-    @Override
-    public String toString() {
-        return "CookBook{" +
-                "id=" + id +
-                ", date=" + date +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", idUser=" + idUser +
-                ", image=" + Arrays.toString(image) +
-                '}';
-    }
 }

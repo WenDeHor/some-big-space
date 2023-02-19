@@ -80,14 +80,4 @@ public class VideoBoxAdmin {
     public int hashCode() {
         return Objects.hash(id, linkToVideo, titleText, date);
     }
-
-    @Override
-    public String toString() {
-        return "VideoBoxAdmin{" +
-                "id=" + id +
-                ", linkToVideo='" + linkToVideo + '\'' +
-                ", titleText='" + titleText + '\'' +
-                ", date=" + date +
-                '}';
-    }
 }

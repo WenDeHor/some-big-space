@@ -111,16 +111,4 @@ public class Diary {
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }
-
-    @Override
-    public String toString() {
-        return "Diary{" +
-                "id=" + id +
-                ", date=" + date +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", idUser=" + idUser +
-                ", image=" + Arrays.toString(image) +
-                '}';
-    }
 }

@@ -4,6 +4,7 @@ package com.myhome.controllers;
 import com.myhome.controllers.compresor.CompressorImgToJpg;
 import com.myhome.forms.CompositionDTO;
 import com.myhome.forms.ConvertFile;
+import com.myhome.forms.PublicationPostAdminDTO;
 import com.myhome.forms.UserPhotoDTO;
 import com.myhome.models.*;
 import com.myhome.repository.*;
@@ -38,21 +39,11 @@ public class PagesControllers {
     private final MetricsService metricsService;
     private final CommentsRepository commentsRepository;
 
-
     private int constant = 1049335;
     private int limit_photo = 6; //MB
     private int limit_fullText = 3000; //chars
-
     private final String HOST_NAME = "http://localhost:8080";
-
     private final String MY_HOME = "Мій дім";
-    private final String STUDY_ROOM = "Моя кімната";
-    private final String LIBRARY_ROOM = "Читальня";
-    private final String SAFE_ROOM = "Робоча кімната";
-    private final String LIVING_ROOM = "Вітальня";
-    private final String KITCHEN_ROOM = "Кухня";
-
-    private final String LINK_BASE = "https://www.youtube.com/embed/GYrwebcKoxE?version=3&rel=1&fs=1&autohide=2&showsearch=0&showinfo=1&iv_load_policy=1&wmode=transparent";
 
     public PagesControllers(CompositionRepository compositionRepository, UserRepository userRepository, CompressorImgToJpg compressorImgToJpg, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CommentsRepository commentsRepository) {
         this.compositionRepository = compositionRepository;
@@ -74,7 +65,7 @@ public class PagesControllers {
         int sizeVideoList = videoBoxAdmins.size();
         List<CompositionDTO> compositionDTO = getCompositionWithComments();
         List<PublicationPostAdmin> publications = publicationPostAdminRepository.findAll();
-        List<PublicationPostAdmin> publicationPostAdminListTreeElements = getPublicationPostAdminList(publications);
+        List<PublicationPostAdminDTO> publicationPostAdminListTreeElements = getPublicationPostAdminList(publications);
 
         if (publicationPostAdminListTreeElements.isEmpty()) {
             model.addAttribute("publications", new ArrayList<>());
@@ -97,15 +88,14 @@ public class PagesControllers {
         return "mine-page";
     }
 
-    private List<PublicationPostAdmin> getPublicationPostAdminList(List<PublicationPostAdmin> publicationList) {
+    private List<PublicationPostAdminDTO> getPublicationPostAdminList(List<PublicationPostAdmin> publicationList) {
         return publicationList.stream()
-                .map(el -> new PublicationPostAdmin(
-                        el.getId(),
+                .map(el -> new PublicationPostAdminDTO(
                         el.getDate(),
                         el.getTitleText(),
                         el.getFullText(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
-                .sorted(Comparator.comparing(PublicationPostAdmin::getId).reversed())
+                .sorted(Comparator.comparing(PublicationPostAdminDTO::getDate).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
     }
@@ -130,24 +120,21 @@ public class PagesControllers {
                                                   Model model,
                                                   HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        Optional<Composition> compositionOne = compositionRepository.findOneById(id);
-        if (compositionOne.isPresent()) {
-            Composition composition = compositionOne
-                    .map(value -> new Composition(
-                            value.getPublicationType(),
-                            value.getTitleText(),
-                            value.getFullText(),
-                            converter(value.getImage())))
-                    .orElseGet(Composition::new);
+        Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
+        if (compositionOptional.isPresent()) {
+            Composition composition = compositionOptional.get();
             if (composition.getPublicationType().equals(PublicationType.PUBLIC_TO_COMPETITIVE)
                     || composition.getPublicationType().equals(PublicationType.PUBLIC_FOR_ALL)) {
-                model.addAttribute("compositionOne", composition);
-            } else {
-                return "redirect:/";
+                CompositionDTO compositionDTO = new CompositionDTO(
+                        composition.getDate(),
+                        composition.getTitleText(),
+                        composition.getFullText(),
+                        converter(composition.getImage()));
+                model.addAttribute("compositionOne", compositionDTO);
+                model.addAttribute("comments", findCommentsByIdComposition(id));
+                model.addAttribute("title", MY_HOME);
+                return "users-read-competitive-one-composition-index";
             }
-            model.addAttribute("title", MY_HOME);
-            model.addAttribute("comments", findCommentsByIdComposition(id));
-            return "users-read-competitive-one-composition-index";
         }
         return "redirect:/";
     }

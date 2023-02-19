@@ -94,15 +94,4 @@ public class PublicationUser {
     public int hashCode() {
         return Objects.hash(id, date, titleText, fullText, idUser);
     }
-
-    @Override
-    public String toString() {
-        return "PublicationUser{" +
-                "id=" + id +
-                ", date=" + date +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", idUser=" + idUser +
-                '}';
-    }
 }

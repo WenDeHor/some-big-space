@@ -80,14 +80,4 @@ public class ShopMeals {
     public int hashCode() {
         return Objects.hash(id, date, fullText, idUser);
     }
-
-    @Override
-    public String toString() {
-        return "ShopMeals{" +
-                "id=" + id +
-                ", date=" + date +
-                ", fullText='" + fullText + '\'' +
-                ", idUser=" + idUser +
-                '}';
-    }
 }

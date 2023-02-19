@@ -38,7 +38,7 @@
                     <br>
                 </div>
                 <div class="col-md-8">
-                    <div th:each="publicationDTO, el:${publications}" class="mt-2">
+                    <div th:each="publicationDTO, el:${publications}" class="mt-2 alert alert-info">
                         <h5  class="text-center" th:text="${publicationDTO.titleText}"></h5>
                         <p th:utext="${publicationDTO.fullText}"></p>
                         <h6 class="text-right" th:text="${publicationDTO.info}"></h6>

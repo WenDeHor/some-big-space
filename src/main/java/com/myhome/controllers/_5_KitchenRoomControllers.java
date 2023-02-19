@@ -53,7 +53,7 @@ public class _5_KitchenRoomControllers {
     public String kitchenWritePrescription(Model model,
                                            HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
-        model.addAttribute("title", "Prescription");
+        model.addAttribute("title", KITCHEN_ROOM);
         return "kitchen-write-prescription";
     }
 

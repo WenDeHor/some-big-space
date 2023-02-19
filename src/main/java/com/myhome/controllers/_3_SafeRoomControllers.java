@@ -145,6 +145,7 @@ public class _3_SafeRoomControllers {
                 .replace("<br>", "");
     }
 
+    @Transactional
     @PostMapping("/safe/edit-diary/{id}/edit")
     public String diaryUpdate(@PathVariable(value = "id") int id,
                               MultipartFile file,

@@ -108,16 +108,4 @@ public class Menu {
     public int hashCode() {
         return Objects.hash(id, date, breakfast, dinner, supper, idUser);
     }
-
-    @Override
-    public String toString() {
-        return "Menu{" +
-                "id=" + id +
-                ", date=" + date +
-                ", breakfast='" + breakfast + '\'' +
-                ", dinner='" + dinner + '\'' +
-                ", supper='" + supper + '\'' +
-                ", idUser=" + idUser +
-                '}';
-    }
 }

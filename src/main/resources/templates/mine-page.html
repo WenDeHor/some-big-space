@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+>
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
@@ -10,16 +10,17 @@
 <div class="container ">
     <div class="col-md-12">
         <br>
-        <div th:each="publicationPostAdmin, el:${publications}" class="mt-2">
-            <img class="mx-auto d-block" th:src="'data:image/jpeg;base64,' + ${publicationPostAdmin.convert}"
+        <div th:each="publicationPostAdminDTO, el:${publications}" class="mt-2">
+            <img class="mx-auto d-block" th:src="'data:image/jpeg;base64,' + ${publicationPostAdminDTO.convert}"
                  style="width:100%" alt="IMG"/>
 
             <br>
-            <!--            <h6><p class="text-right" th:text="${#dates.format({publicationPostAdmin.date}, 'dd:MM:yyyy')}"></p>-->
-            <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
-                   th:utext="${publicationPostAdmin.titleText}" style=" font-family: 'Open Sans',sans-serif;"></p></h4>
-            <h5><p class=" lh-lg " th:utext="${publicationPostAdmin.fullText}"
-                   style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
+            <h6><p class="text-right" th:text="${#dates.format({publicationPostAdminDTO.date}, 'dd:MM:yyyy')}"></p>
+                <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
+                       th:utext="${publicationPostAdminDTO.titleText}"
+                       style=" font-family: 'Open Sans',sans-serif;"></p></h4>
+                <h5><p class=" lh-lg " th:utext="${publicationPostAdminDTO.fullText}"
+                       style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
         </div>
         <div th:each="compositionDTO, el:${compositionWithComments}" class="mt-2">
 

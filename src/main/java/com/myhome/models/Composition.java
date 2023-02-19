@@ -44,23 +44,10 @@ public class Composition {
     @Column(name = "Image", length = Integer.MAX_VALUE)
     private byte[] image;
 
-    @Column(name = "convert")
-    private String convert;
-
     public Composition() {
     }
 
-    public Composition(PublicationType publicationType, String titleText, String fullText, String convert) {
-        this.publicationType=publicationType;
-        this.titleText = titleText;
-        this.fullText = fullText;
-        this.convert = convert;
-    }
-
-    public Composition(int id, Date date, Genre genre, PublicationType publicationType,
-                       String titleText, String shortText, String fullText,
-                       int idUser, String convert) {
-        this.id = id;
+    public Composition(Date date, Genre genre, PublicationType publicationType, @Size(max = 150) String titleText, @Size(max = 1000) String shortText, @Size(max = 20000) String fullText, int idUser, byte[] image) {
         this.date = date;
         this.genre = genre;
         this.publicationType = publicationType;
@@ -68,27 +55,7 @@ public class Composition {
         this.shortText = shortText;
         this.fullText = fullText;
         this.idUser = idUser;
-        this.convert = convert;
-    }
-
-    public Composition(int id, Date date, Genre genre, String titleText,
-                       String shortText, String fullText, String convert) {
-        this.id = id;
-        this.date = date;
-        this.genre = genre;
-        this.titleText = titleText;
-        this.shortText = shortText;
-        this.fullText = fullText;
-        this.convert = convert;
-    }
-
-    public Composition(int id, Genre genre, String titleText,
-                       String shortText, String convert) {
-        this.id = id;
-        this.genre = genre;
-        this.titleText = titleText;
-        this.shortText = shortText;
-        this.convert = convert;
+        this.image = image;
     }
 
     public int getId() {
@@ -163,14 +130,6 @@ public class Composition {
         this.image = image;
     }
 
-    public String getConvert() {
-        return convert;
-    }
-
-    public void setConvert(String convert) {
-        this.convert = convert;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -184,13 +143,12 @@ public class Composition {
                 Objects.equals(titleText, that.titleText) &&
                 Objects.equals(shortText, that.shortText) &&
                 Objects.equals(fullText, that.fullText) &&
-                Arrays.equals(image, that.image) &&
-                Objects.equals(convert, that.convert);
+                Arrays.equals(image, that.image);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, date, genre, publicationType, titleText, shortText, fullText, idUser, convert);
+        int result = Objects.hash(id, date, genre, publicationType, titleText, shortText, fullText, idUser);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }

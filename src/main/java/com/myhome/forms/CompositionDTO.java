@@ -32,6 +32,13 @@ public class CompositionDTO {
         this.image = image;
     }
 
+    public CompositionDTO(Date date, String titleText, String fullText,  String image) {
+        this.date = date;
+        this.titleText = titleText;
+        this.fullText = fullText;
+        this.image = image;
+    }
+
     public CompositionDTO(int id, String titleText, String fullText, String image) {
         this.id = id;
         this.titleText = titleText;

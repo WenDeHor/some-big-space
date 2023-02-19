@@ -30,27 +30,22 @@ public class PublicationPostAdmin {
     @Column(name = "Image", length = Integer.MAX_VALUE, nullable = true)
     private byte[] image;
 
-    @Column(name = "convert")
-    private String convert;
 
     public PublicationPostAdmin() {
     }
 
-    public PublicationPostAdmin(int id, Date date, String titleText, String fullText, String convert) {
+    public PublicationPostAdmin(int id, Date date, String titleText, String fullText) {
         this.id = id;
         this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
-        this.image = image;
-        this.convert = convert;
     }
 
-    public PublicationPostAdmin(Date date, String titleText, String fullText, byte[] image, String convert) {
+    public PublicationPostAdmin(Date date, String titleText, String fullText, byte[] image) {
         this.date = date;
         this.titleText = titleText;
         this.fullText = fullText;
         this.image = image;
-        this.convert = convert;
     }
 
     public int getId() {
@@ -93,14 +88,6 @@ public class PublicationPostAdmin {
         this.image = image;
     }
 
-    public String getConvert() {
-        return convert;
-    }
-
-    public void setConvert(String convert) {
-        this.convert = convert;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -110,26 +97,13 @@ public class PublicationPostAdmin {
                 Objects.equals(date, that.date) &&
                 Objects.equals(titleText, that.titleText) &&
                 Objects.equals(fullText, that.fullText) &&
-                Arrays.equals(image, that.image) &&
-                Objects.equals(convert, that.convert);
+                Arrays.equals(image, that.image);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, date, titleText, fullText, convert);
+        int result = Objects.hash(id, date, titleText, fullText);
         result = 31 * result + Arrays.hashCode(image);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "PublicationPostAdmin{" +
-                "id=" + id +
-                ", date=" + date +
-                ", titleText='" + titleText + '\'' +
-                ", fullText='" + fullText + '\'' +
-                ", image=" + Arrays.toString(image) +
-                ", convert='" + convert + '\'' +
-                '}';
     }
 }

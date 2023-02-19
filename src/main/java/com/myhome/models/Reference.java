@@ -96,15 +96,4 @@ public class Reference {
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }
-
-    @Override
-    public String toString() {
-        return "Reference{" +
-                "id=" + id +
-                ", url='" + url + '\'' +
-                ", idUser=" + idUser +
-                ", titleText='" + titleText + '\'' +
-                ", image=" + Arrays.toString(image) +
-                '}';
-    }
 }

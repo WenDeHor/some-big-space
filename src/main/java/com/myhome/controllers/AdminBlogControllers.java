@@ -20,8 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
@@ -32,25 +30,24 @@ public class AdminBlogControllers {
     private final VideoBoxAdminRepository videoBoxAdminRepository;
     private final LetterToUSERRepository letterToUSERRepository;
     private final CompositionRepository compositionRepository;
-    private final ImageRepository imageRepository;
     private final LetterToADMINRepository letterToADMINRepository;
     private final MetricsService metricsService;
     private final CompressorImgToJpg compressorImgToJpg;
 
     private final String ADMIN = "ADMIN from New_Apple";
+    private final String ADMIN_PAGE = "ADMIN_PAGE";
 
 
     private final String YOUTUBE = "https://www.youtube.com/embed/";
 
 
-    public AdminBlogControllers(UserRepository userRepository, PublicationRepository publicationRepository, PublicationPostAdminRepository publicationPostAdminRepository, VideoBoxAdminRepository videoBoxAdminRepository, LetterToUSERRepository letterToUSERRepository, CompositionRepository compositionRepository, ImageRepository imageRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
+    public AdminBlogControllers(UserRepository userRepository, PublicationRepository publicationRepository, PublicationPostAdminRepository publicationPostAdminRepository, VideoBoxAdminRepository videoBoxAdminRepository, LetterToUSERRepository letterToUSERRepository, CompositionRepository compositionRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
         this.userRepository = userRepository;
         this.publicationRepository = publicationRepository;
         this.publicationPostAdminRepository = publicationPostAdminRepository;
         this.videoBoxAdminRepository = videoBoxAdminRepository;
         this.letterToUSERRepository = letterToUSERRepository;
         this.compositionRepository = compositionRepository;
-        this.imageRepository = imageRepository;
         this.letterToADMINRepository = letterToADMINRepository;
         this.metricsService = metricsService;
         this.compressorImgToJpg = compressorImgToJpg;
@@ -65,7 +62,7 @@ public class AdminBlogControllers {
             long countUsers = allUsers.size();
             model.addAttribute("countUsers", countUsers);
             model.addAttribute("allUsers", allUsers);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page";
         }
         return "redirect:/";
@@ -89,7 +86,7 @@ public class AdminBlogControllers {
             long countComposition = compositionDTOList.size();
             model.addAttribute("countComposition", countComposition);
             model.addAttribute("compositionList", compositionDTOList);
-            model.addAttribute("title", "Competitive Composition");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-competitive";
         }
         return "redirect:/";
@@ -137,18 +134,19 @@ public class AdminBlogControllers {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
             Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
-            if (!compositionOptional.isPresent()) {
-                return "redirect:/admin-mine/users-competitive";
+            if(compositionOptional.isPresent()){
+                Composition composition = compositionOptional.get();
+                CompositionDTO compositionDTO = new CompositionDTO(
+                        composition.getId(),
+                        composition.getTitleText(),
+                        convertText(composition.getShortText()),
+                        convertText(composition.getFullText()),
+                        converterImage(composition.getImage()));
+                model.addAttribute("title", ADMIN_PAGE);
+                model.addAttribute("compositionOne", compositionDTO);
+                return "admin-read-one-composition";
             }
-            Composition composition = compositionOptional.get();
-            CompositionDTO compositionDTO = new CompositionDTO(
-                    composition.getId(),
-                    composition.getTitleText(),
-                    convertText(composition.getShortText()),
-                    convertText(composition.getFullText()),
-                    converterImage(composition.getImage()));
-            model.addAttribute("compositionOne", compositionDTO);
-            return "admin-read-one-composition";
+            return "redirect:/admin-mine/users-competitive";
         }
         return "redirect:/";
     }
@@ -157,23 +155,7 @@ public class AdminBlogControllers {
         return Base64.getEncoder().encodeToString(img);
     }
 
-//    //TODO USER Composition
-//    @Transactional
-//    @GetMapping("/admin-mine/users-composition")
-//    public String adminUsersComposition(Model model,
-//                                        Authentication authentication) {
-//        User user = getUser(authentication);
-//        if (user.getRole().equals(Role.ADMIN)) {
-//            List<Composition> compositionList = compositionRepository.findAll();
-//            long countComposition = compositionList.size();
-//            model.addAttribute("countComposition", countComposition);
-//            model.addAttribute("compositionList", compositionList);
-//            model.addAttribute("title", "All Composition");
-//            return "admin-read-all-user-composition";
-//        }
-//        return "redirect:/";
-//    }
-
+    //TODO USER Composition
     @Transactional
     @GetMapping("/admin-mine/users-composition/{id}/read")
     public String publicationReadOne(@PathVariable(value = "id") int id,
@@ -182,12 +164,13 @@ public class AdminBlogControllers {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
 
-            Optional<Composition> compositionOne = compositionRepository.findOneById(id);
-            if (!compositionOne.isPresent()) {
-                return "redirect:/admin-mine/users-competitive";
+            Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
+            if (compositionOptional.isPresent()) {
+                model.addAttribute("compositionOne", compositionOptional.get());
+                model.addAttribute("title", ADMIN_PAGE);
+                return "admin-read-one-composition";
             }
-            model.addAttribute("compositionOne", compositionOne.get());
-            return "admin-read-one-composition";
+            return "redirect:/admin-mine/users-competitive";
         }
         return "redirect:/";
     }
@@ -205,7 +188,7 @@ public class AdminBlogControllers {
             PublicationPostAdmin publicationPostAdmin = new PublicationPostAdmin();
             publicationPostAdmin.setDate(date);
             publicationPostAdmin.setTitleText(titleText);
-            publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
+            publicationPostAdmin.setFullText(convertText(fullText));
             publicationPostAdmin.setImage(convert.img);
             publicationPostAdminRepository.save(publicationPostAdmin);
             compressorImgToJpg.deleteImage(convert.nameStart);
@@ -213,10 +196,6 @@ public class AdminBlogControllers {
             return "redirect:/admin-mine/admin-publications";
         }
         return "redirect:/";
-    }
-
-    private int countId(int count) {
-        return ++count;
     }
 
     @Transactional
@@ -235,6 +214,7 @@ public class AdminBlogControllers {
                         convertText(publicationPostAdmin.getFullText()),
                         converterImage(publicationPostAdmin.getImage()));
                 model.addAttribute("publicationPostAdminList", publicationPostAdminDTO);
+                model.addAttribute("title", ADMIN_PAGE);
                 return "admin-page-admin-edit-publication";
             }
             return "redirect:/admin-mine/admin-publications";
@@ -258,7 +238,7 @@ public class AdminBlogControllers {
             long countPublications = publicationRepository.count();
             model.addAttribute("countPublications", countPublications);
             model.addAttribute("allPublications", allPublications);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-user-publication";
         }
         return "redirect:/";
@@ -270,14 +250,13 @@ public class AdminBlogControllers {
                                   Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            if (!publicationRepository.existsById(idUserPublication)) {
-                return "redirect:/admin-mine/admin-publications";
-            }
             Optional<PublicationUser> post = publicationRepository.findById(idUserPublication);
-            List<PublicationUser> res = new ArrayList<>();
-            post.ifPresent(res::add);
-            model.addAttribute("publication", res);
-            return "admin-mine-read-user-publication";
+            if (post.isPresent()) {
+                model.addAttribute("title", ADMIN_PAGE);
+                model.addAttribute("publication", post.get());
+                return "admin-mine-read-user-publication";
+            }
+            return "redirect:/admin-mine/admin-publications";
         }
         return "redirect:/";
     }
@@ -299,49 +278,27 @@ public class AdminBlogControllers {
                             converterImage(el.getImage())))
                     .sorted(Comparator.comparing(PublicationPostAdminDTO::getId).reversed())
                     .collect(Collectors.toList());
-
             long countPublications = publicationPostAdminRepository.count();
-
             model.addAttribute("countPublications", countPublications);
             model.addAttribute("publicationPostAdminRepositoryAll", publicationPostAdminRepositoryAll);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-admin-publication";
         }
         return "redirect:/";
     }
 
-    //TODO SAVE
-    private String convertTextWithFormatToSave(String fullText) {
-        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text1);
-    }
-
     @Transactional
     @GetMapping("/admin-mine/admin-publications/{id}/remove")
     public String adminPublicationRemove(@PathVariable(value = "id") int id,
-                                         Model model,
                                          Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findById(id).orElseThrow(null);
-            publicationPostAdminRepository.delete(publicationPostAdmin);
+            Optional<PublicationPostAdmin> publicationPostAdminOptional = publicationPostAdminRepository.findById(id);
+            publicationPostAdminOptional.ifPresent(publicationPostAdminRepository::delete);
             return "redirect:/admin-mine/admin-publications";
         }
         return "redirect:/";
     }
-
-    //TODO READ EDIT
-//    private List<PublicationPostAdmin> convertTextWithFormatEdit(List<PublicationPostAdmin> publicationPostAdminList) {
-//        List<PublicationPostAdmin> list = new ArrayList<>();
-//        for (PublicationPostAdmin publicationPostAdmin : publicationPostAdminList) {
-//            String fullText = publicationPostAdmin.getFullText();
-//            String trim1 = fullText.replace("&#160&#160 ", "");
-//            String trim2 = trim1.replace("<br>", "");
-//            publicationPostAdmin.setFullText(trim2);
-//            list.add(publicationPostAdmin);
-//        }
-//        return list;
-//    }
 
     @Transactional
     @PostMapping("/admin-mine/admin-publications/{id}/edit")
@@ -352,19 +309,21 @@ public class AdminBlogControllers {
                                          Authentication authentication) throws IOException {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            PublicationPostAdmin publicationPostAdmin = publicationPostAdminRepository.findById(id).orElseThrow(null);
-            publicationPostAdmin.setTitleText(titleText);
-            publicationPostAdmin.setFullText(convertTextWithFormatToSave(fullText));
-            publicationPostAdmin.setDate(new Date());
-            if (Objects.equals(file.getContentType(), "application/octet-stream")) {
-                Optional<PublicationPostAdmin> byId = publicationPostAdminRepository.findById(id);
-                byte[] image = byId.get().getImage();
-                publicationPostAdmin.setImage(image);
-            } else {
-                publicationPostAdmin.setImage(file.getBytes());
+            Optional<PublicationPostAdmin> publicationPostAdminOptional = publicationPostAdminRepository.findById(id);
+            if (publicationPostAdminOptional.isPresent()) {
+                PublicationPostAdmin publicationPostAdmin = publicationPostAdminOptional.get();
+                publicationPostAdmin.setTitleText(titleText);
+                publicationPostAdmin.setFullText(convertText(fullText));
+                publicationPostAdmin.setDate(new Date());
+                ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
+                if (!Objects.equals(file.getContentType(), "application/octet-stream")) { //new photo
+                    publicationPostAdmin.setImage(convert.img);
+                }
+                publicationPostAdminRepository.save(publicationPostAdmin);
+                compressorImgToJpg.deleteImage(convert.nameStart);
+                compressorImgToJpg.deleteImage(convert.nameEnd);
+                return "redirect:/admin-mine/admin-publications";
             }
-            publicationPostAdminRepository.save(publicationPostAdmin);
-            return "redirect:/admin-mine/admin-publications";
         }
         return "redirect:/";
     }
@@ -377,7 +336,7 @@ public class AdminBlogControllers {
             List<VideoBoxAdmin> allByAddressAdmin = videoBoxAdminRepository.findAllById(user.getId());
             allByAddressAdmin.sort(Comparator.comparing(VideoBoxAdmin::getId).reversed());
             model.addAttribute("videoBoxAdminList", allByAddressAdmin);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-video-publication";
         }
         return "redirect:/";
@@ -419,8 +378,8 @@ public class AdminBlogControllers {
                                         Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            VideoBoxAdmin videoBoxAdmin = videoBoxAdminRepository.findById(idVideoBox).orElseThrow(null);
-            videoBoxAdminRepository.delete(videoBoxAdmin);
+            Optional<VideoBoxAdmin> videoBoxAdminOptional = videoBoxAdminRepository.findById(idVideoBox);
+            videoBoxAdminOptional.ifPresent(videoBoxAdminRepository::delete);
             return "redirect:/admin-mine/admin-video";
         }
         return "redirect:/";
@@ -433,15 +392,13 @@ public class AdminBlogControllers {
                                             Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            if (!videoBoxAdminRepository.existsById(id)) {
-                return "redirect:/admin-mine/admin-video";
+            Optional<VideoBoxAdmin> videoBoxAdminOptional = videoBoxAdminRepository.findById(id);
+            if (videoBoxAdminOptional.isPresent()) {
+                model.addAttribute("videoBoxAdminArrayList", videoBoxAdminOptional.get());
+                model.addAttribute("title", ADMIN_PAGE);
+                return "admin-page-edit-video-publication";
             }
-            Optional<VideoBoxAdmin> videoBoxAdminRepositoryById = videoBoxAdminRepository.findById(id);
-            List<VideoBoxAdmin> videoBoxAdminArrayList = new ArrayList<>();
-            videoBoxAdminRepositoryById.ifPresent(videoBoxAdminArrayList::add);
-            videoBoxAdminArrayList.sort(Comparator.comparing(VideoBoxAdmin::getId).reversed());
-            model.addAttribute("videoBoxAdminArrayList", videoBoxAdminArrayList);
-            return "admin-page-edit-video-publication";
+            return "redirect:/admin-mine/admin-video";
         }
         return "redirect:/";
     }
@@ -477,7 +434,7 @@ public class AdminBlogControllers {
                     .sorted(Comparator.comparing(LetterToADMIN::getDate).reversed())
                     .collect(Collectors.toList());
             model.addAttribute("adminLetters", letterToADMINS);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-read-user-letters-enter";
         }
         return "redirect:/";
@@ -493,7 +450,7 @@ public class AdminBlogControllers {
                     .sorted(Comparator.comparing(LetterToUSER::getDate).reversed())
                     .collect(Collectors.toList());
             model.addAttribute("adminLetters", letterFromADMINS);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-read-user-letters-outer";
         }
         return "redirect:/";
@@ -504,19 +461,16 @@ public class AdminBlogControllers {
                                    Model model) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            String adminAddress = findUserAddress(authentication);
-            model.addAttribute("adminAddress", adminAddress);
-            model.addAttribute("title", "Admin Page");
+            model.addAttribute("adminAddress", user.getAddress());
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-write-to-user-letters";
         }
         return "redirect:/";
     }
 
     @PostMapping("/admin-mine/write-letters/send")
-    public String adminLetterSend(LetterToUSER letterToUSER,
-                                  @RequestParam String titleText,
+    public String adminLetterSend(@RequestParam String titleText,
                                   @RequestParam String fullText,
-                                  @RequestParam String senderAddress,
                                   @RequestParam String recipientAddress,
                                   Authentication authentication) {
         User user = getUser(authentication);
@@ -528,12 +482,14 @@ public class AdminBlogControllers {
         return "redirect:/";
     }
 
-    private LetterToUSER createLetterToUSER(String titleText, String fullText, String recipientAddress, User
-            user) {
+    private LetterToUSER createLetterToUSER(String titleText,
+                                            String fullText,
+                                            String recipientAddress,
+                                            User user) {
         LetterToUSER userSendLetterToUSER = new LetterToUSER();
         userSendLetterToUSER.setDate(new Date());
         userSendLetterToUSER.setTitleText(titleText);
-        userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+        userSendLetterToUSER.setFullText(convertText(fullText));
         userSendLetterToUSER.setSenderAddress(user.getAddress());
         userSendLetterToUSER.setRecipientAddress(recipientAddress);
         return userSendLetterToUSER;
@@ -545,9 +501,13 @@ public class AdminBlogControllers {
                                        Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            Optional<LetterToADMIN> letter1 = letterToADMINRepository.findById(id);
-            model.addAttribute("letter", letter1.get());
-            return "admin-page-read-user-letters-fulltext-enter";
+            Optional<LetterToADMIN> letterOptional = letterToADMINRepository.findById(id);
+            if (letterOptional.isPresent()) {
+                model.addAttribute("letter", letterOptional.get());
+                model.addAttribute("title", ADMIN_PAGE);
+                return "admin-page-read-user-letters-fulltext-enter";
+            }
+            return "redirect:/admin-mine/read-letters/enter-letters";
         }
         return "redirect:/";
     }
@@ -558,9 +518,13 @@ public class AdminBlogControllers {
                                        Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            Optional<LetterToUSER> letter1 = letterToUSERRepository.findById(id);
-            model.addAttribute("letter", letter1.get());
-            return "admin-page-read-user-letters-fulltext-outer";
+            Optional<LetterToUSER> letterOptional = letterToUSERRepository.findById(id);
+            if (letterOptional.isPresent()) {
+                model.addAttribute("letter", letterOptional.get());
+                model.addAttribute("title", ADMIN_PAGE);
+                return "admin-page-read-user-letters-fulltext-outer";
+            }
+            return "redirect:/admin-mine/read-letters/outer-letters";
         }
         return "redirect:/";
     }
@@ -572,15 +536,14 @@ public class AdminBlogControllers {
                                          Model model) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            Optional<LetterToADMIN> letter = letterToADMINRepository.findById(id);
-
-            if (letter.get().getAddressUser() == null) {
-                return "redirect:/admin-mine/read-letters/enter-letters";
+            Optional<LetterToADMIN> letterOptional = letterToADMINRepository.findById(id);
+            if (letterOptional.isPresent()) {
+                model.addAttribute("senderAddress", letterOptional.get().getAddressUser());
+                model.addAttribute("adminAddress", user.getAddress());
+                model.addAttribute("title", ADMIN_PAGE);
+                return "admin-page-write-to-user-letters-answer";
             }
-            model.addAttribute("senderAddress", letter.get().getAddressUser());
-            model.addAttribute("adminAddress", user.getAddress());
-            model.addAttribute("title", "Admin Page");
-            return "admin-page-write-to-user-letters-answer";
+            return "redirect:/admin-mine/read-letters/enter-letters";
         }
         return "redirect:/";
     }
@@ -623,7 +586,7 @@ public class AdminBlogControllers {
         if (user.getRole().equals(Role.ADMIN)) {
             Optional<LetterToADMIN> letterOptional = letterToADMINRepository.findById(idLetter);
             letterOptional.ifPresent(letterToADMIN -> model.addAttribute("letterReadOne", letterToADMIN));
-            model.addAttribute("title", "Read User Letter");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-read-one-letter";
         }
         return "redirect:/";
@@ -640,17 +603,10 @@ public class AdminBlogControllers {
                     .sorted(Comparator.comparing(MetricsDTO::getDate).reversed())
                     .collect(Collectors.toList());
             model.addAttribute("metrics", allMetricsDTOs);
-            model.addAttribute("title", "Metrics");
+            model.addAttribute("title", ADMIN_PAGE);
             return "admin-page-metrics";
         }
         return "redirect:/";
-    }
-
-    //TODO REGEX
-    private String REGEX(String patternRegex, String replace, String text) {
-        Pattern pattern = Pattern.compile(patternRegex);
-        Matcher matcher = pattern.matcher(text);
-        return matcher.replaceAll(replace);
     }
 
     private String findUserAddress(Authentication authentication) {
@@ -665,5 +621,4 @@ public class AdminBlogControllers {
         String userName = details.getUsername();
         return userRepository.findOneByEmail(userName).get();
     }
-
 }

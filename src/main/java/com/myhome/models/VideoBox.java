@@ -15,9 +15,6 @@ public class VideoBox {
     @Column(name = "link_to_video")
     private String linkToVideo;
 
-    @Column(name = "title_text")
-    private String titleText;
-
     @Column(name = "id_user")
     private int idUser;
 
@@ -27,9 +24,8 @@ public class VideoBox {
     public VideoBox() {
     }
 
-    public VideoBox(String linkToVideo, String titleText, int idUser, Date date) {
+    public VideoBox(String linkToVideo, int idUser, Date date) {
         this.linkToVideo = linkToVideo;
-        this.titleText = titleText;
         this.idUser = idUser;
         this.date = date;
     }
@@ -48,14 +44,6 @@ public class VideoBox {
 
     public void setLinkToVideo(String linkToVideo) {
         this.linkToVideo = linkToVideo;
-    }
-
-    public String getTitleText() {
-        return titleText;
-    }
-
-    public void setTitleText(String titleText) {
-        this.titleText = titleText;
     }
 
     public int getIdUser() {
@@ -82,24 +70,12 @@ public class VideoBox {
         return id == videoBox.id &&
                 idUser == videoBox.idUser &&
                 Objects.equals(linkToVideo, videoBox.linkToVideo) &&
-                Objects.equals(titleText, videoBox.titleText) &&
                 Objects.equals(date, videoBox.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, linkToVideo, titleText, idUser, date);
-    }
-
-    @Override
-    public String toString() {
-        return "VideoBox{" +
-                "id=" + id +
-                ", linkToVideo='" + linkToVideo + '\'' +
-                ", titleText='" + titleText + '\'' +
-                ", idUser=" + idUser +
-                ", date=" + date +
-                '}';
+        return Objects.hash(id, linkToVideo, idUser, date);
     }
 }
 
