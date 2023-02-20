@@ -1,121 +1,125 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Читальня. Пишемо, творимо, публікуємо.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/library/read-all-competitive-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Читати усі історії</a>
-                    <a href="/library/read-all-my-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої історії</a>
-                    <a href="/library/read-friends-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Історії моїх друзів</a>
-                    <a href="/library/wright-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Написати історію</a>
-                    <a href="/user-page"
-                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
-                        До головної</a>
-                </div>
-                <div class="col-md-8">
-                    <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
-                         <form action="/library/evaluation-one-composition" method="post" enctype="multipart/form-data">
-                             <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}"
-                                  style="width:100%"
-                                  class="rounded mx-auto d-block"
-                                  alt="IMAGE OF COMPOSITION"/>
-                            <br>
-                            <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
-                            <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
-                            <br>
-                            <h3 class="form-signin-heading text-center">Оцініть роботу автора</h3>
-                            <p>
-                                <label>
-                                    <input type="hidden" th:value="${compositionDTO.id}" name="id"
-                                           class="form-control">
-                                </label>
-                            </p>
-                            <p>
-                                <label for="environment">Оточення та світ</label>
-                                <select class="form-control" id="environment" name="environment">
-                                    <option>Не має оцінки</option>
-                                    <option>Описані в достатній мірі</option>
-                                    <option>Описані не детально</option>
-                                    <option>Опис відсутній</option>
-                                </select>
-                            </p>
-                            <p>
-                                <label for="characters">Персонажі</label>
-                                <select class="form-control" id="characters" name="characters">
-                                    <option>Не має оцінки</option>
-                                    <option>Описані в достатній мірі</option>
-                                    <option>Описані не детально</option>
-                                    <option>Опис відсутній</option>
-                                </select>
-                            </p>
-                            <p>
-                                <label for="atmosphere">Атмосфера твору</label>
-                                <select class="form-control" id="atmosphere" name="atmosphere">
-                                    <option>Не має оцінки</option>
-                                    <option>Детально прописано світ</option>
-                                    <option>Вибірково описано</option>
-                                    <option>Описи відсутні</option>
-                                </select>
-                            </p>
-                            <p>
-                                <label for="plot">Сюжет</label>
-                                <select class="form-control" id="plot" name="plot">
-                                    <option>Не має оцінки</option>
-                                    <option>Сюжет складний (багато загадок)</option>
-                                    <option>Багато не розкритих подій</option>
-                                    <option>Є нерозкриті деталі</option>
-                                    <option>Сюжет простий</option>
-                                    <option>Повністю не завершений</option>
-                                </select>
-                            </p>
-                            <p>
-                                <label for="impression">Загальне враження</label>
-                                <select class="form-control" id="impression" name="impression">
-                                    <option>Не має оцінки</option>
-                                    <option>Відчуваю захоплення та співпереживання</option>
-                                    <option>Відчуття розгубленості</option>
-                                    <option>Хочеться плакати</option>
-                                    <option>Довелося задуматись</option>
-                                    <option>Немаю вражень</option>
-                                </select>
-                            </p>
-                            <br>
-                            <label>Коментарі. </label>
-                            <label for="comments"> Висловте свої вражеття: </label>
-                            <textarea id="comments" name="comments" class="form-control" rows="10" cols="20"
-                                      placeholder="Напишіть тут свій коментар {максимальна кількість символів - 3000} "></textarea>
-                            <br>
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">ОЦІНИТИ</button>
-                        </form>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Читальня. Пишемо, творимо, публікуємо.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/library/read-all-competitive-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Читати усі історії</a>
+                        <a href="/library/read-all-my-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Мої історії</a>
+                        <a href="/library/read-friends-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Історії моїх друзів</a>
+                        <a href="/library/wright-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Написати історію</a>
+                        <a href="/user-page"
+                           class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                            До головної</a>
+                    </div>
+                    <div class="col-md-8">
+                        <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
+                            <form action="/library/evaluation-one-composition" method="post"
+                                  enctype="multipart/form-data">
+                                <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}"
+                                     style="width:100%"
+                                     class="rounded mx-auto d-block"
+                                     alt="IMAGE OF COMPOSITION"/>
+                                <br>
+                                <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                                <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
+                                <br>
+                                <h3 class="form-signin-heading text-center">Оцініть роботу автора</h3>
+                                <p>
+                                    <label>
+                                        <input type="hidden" th:value="${compositionDTO.id}" name="id"
+                                               class="form-control">
+                                    </label>
+                                </p>
+                                <p>
+                                    <label for="environment">Оточення та світ</label>
+                                    <select class="form-control" id="environment" name="environment">
+                                        <option>Не має оцінки</option>
+                                        <option>Описані в достатній мірі</option>
+                                        <option>Описані не детально</option>
+                                        <option>Опис відсутній</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="characters">Персонажі</label>
+                                    <select class="form-control" id="characters" name="characters">
+                                        <option>Не має оцінки</option>
+                                        <option>Описані в достатній мірі</option>
+                                        <option>Описані не детально</option>
+                                        <option>Опис відсутній</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="atmosphere">Атмосфера твору</label>
+                                    <select class="form-control" id="atmosphere" name="atmosphere">
+                                        <option>Не має оцінки</option>
+                                        <option>Детально прописано світ</option>
+                                        <option>Вибірково описано</option>
+                                        <option>Описи відсутні</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="plot">Сюжет</label>
+                                    <select class="form-control" id="plot" name="plot">
+                                        <option>Не має оцінки</option>
+                                        <option>Сюжет складний (багато загадок)</option>
+                                        <option>Багато не розкритих подій</option>
+                                        <option>Є нерозкриті деталі</option>
+                                        <option>Сюжет простий</option>
+                                        <option>Повністю не завершений</option>
+                                    </select>
+                                </p>
+                                <p>
+                                    <label for="impression">Загальне враження</label>
+                                    <select class="form-control" id="impression" name="impression">
+                                        <option>Не має оцінки</option>
+                                        <option>Відчуваю захоплення та співпереживання</option>
+                                        <option>Відчуття розгубленості</option>
+                                        <option>Хочеться плакати</option>
+                                        <option>Довелося задуматись</option>
+                                        <option>Немаю вражень</option>
+                                    </select>
+                                </p>
+                                <br>
+                                <label>Коментарі. </label>
+                                <label for="comments"> Висловте свої вражеття: </label>
+                                <textarea id="comments" name="comments" class="form-control" rows="10" cols="20"
+                                          placeholder="Напишіть тут свій коментар {максимальна кількість символів - 3000} "></textarea>
+                                <br>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">ОЦІНИТИ</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

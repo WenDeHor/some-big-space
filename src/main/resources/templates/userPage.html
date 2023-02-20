@@ -1,59 +1,63 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
+
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Мій дім - оселя для Вас, рідних та близьких.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12 ">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/study"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Моя кімната</a>
-                    <a href="/library"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Читальня</a>
-                    <a href="/safe"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Робоча кімната</a>
-                    <a href="/living"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Вітальня</a>
-                    <a href="/kitchen"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Кухня</a>
-                    <br>
-                    <form action="/logout" method="post">
-                        <button class="btn btn-lg btn-secondary btn-block" type="submit">Вийти в світ</button>
-                    </form>
-                </div>
-                <div class="col-md-8">
-                    <div th:each="userPhoto, el:${photos}" class="mt-2">
-                        <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${userPhoto.image}" style="width: 100%"
-                             alt="Family photo"/>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Мій дім - оселя для Вас, рідних та близьких.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12 ">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/study"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Моя кімната</a>
+                        <a href="/library"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Читальня</a>
+                        <a href="/safe"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Робоча кімната</a>
+                        <a href="/living"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Вітальня</a>
+                        <a href="/kitchen"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Кухня</a>
                         <br>
-                        <br>
-                        <h5><p th:utext="${userPhoto.fullText}" class="bold"></p></h5>
-                        <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Замінити фото</a>
+                        <form action="/logout" method="post">
+                            <button class="btn btn-lg btn-secondary btn-block" type="submit">Вийти в світ</button>
+                        </form>
+                    </div>
+                    <div class="col-md-8">
+                        <div th:each="userPhoto, el:${photos}" class="mt-2">
+                            <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${userPhoto.image}"
+                                 style="width: 100%"
+                                 alt="Family photo"/>
+                            <br>
+                            <br>
+                            <h5><p th:utext="${userPhoto.fullText}" class="bold"></p></h5>
+                            <a href="/change/photo" class="btn btn-secondary btn-lg btn-block">Замінити фото</a>
 
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

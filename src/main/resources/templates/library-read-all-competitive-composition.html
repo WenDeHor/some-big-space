@@ -1,59 +1,62 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Читальня. Пишемо, творимо, публікуємо.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/library/read-all-competitive-composition"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
-                        Читати усі історії</a>
-                    <a href="/library/read-all-my-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої історії</a>
-                    <a href="/library/read-friends-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Історії моїх друзів</a>
-                    <a href="/library/wright-composition"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Написати історію</a>
-                    <a href="/user-page"
-                       class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
-                        До головної</a>
-                </div>
-                <div class="col-md-8">
-                    <div th:each="compositionDTO, el:${compositionList}" class="mt-2">
-                        <a th:href="${compositionDTO.url}">
-                            <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${compositionDTO.image}"
-                                 style="width:100%" alt="image"/>
-                        </a>
-                        <br>
-                        <div>
-                            <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
-                            <h6><p th:utext="${compositionDTO.genre}"></p></h6>
-                            <h5><p th:utext="${compositionDTO.shortText}"></p></h5>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Читальня. Пишемо, творимо, публікуємо.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/library/read-all-competitive-composition"
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                            Читати усі історії</a>
+                        <a href="/library/read-all-my-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Мої історії</a>
+                        <a href="/library/read-friends-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Історії моїх друзів</a>
+                        <a href="/library/wright-composition"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Написати історію</a>
+                        <a href="/user-page"
+                           class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                            До головної</a>
+                    </div>
+                    <div class="col-md-8">
+                        <div th:each="compositionDTO, el:${compositionList}" class="mt-2">
+                            <a th:href="${compositionDTO.url}">
+                                <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${compositionDTO.image}"
+                                     style="width:100%" alt="image"/>
+                            </a>
+                            <br>
+                            <div>
+                                <h5><p th:utext="${compositionDTO.titleText}"></p></h5>
+                                <h6><p th:utext="${compositionDTO.genre}"></p></h6>
+                                <h5><p th:utext="${compositionDTO.shortText}"></p></h5>
+                            </div>
+                            <br>
                         </div>
-                        <br>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

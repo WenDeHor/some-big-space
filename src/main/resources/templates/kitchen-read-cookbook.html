@@ -1,62 +1,66 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Кухня. Місце для смаколиків, рецептів та кулінарних вподобань.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/kitchen/read-cookbook"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
-                        Кулінарна книга</a>
-                    <a href="/kitchen/write-prescription"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Записати рецепт</a>
-                    <a href="/kitchen/write-menu"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Моє меню</a>
-                    <a href="/kitchen/write-shop-meals"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Придбати в магазині</a>
-                    <a href="/user-page"
-                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
-                        До головної</a>
-                    <br>
-                </div>
-                <div class="col-md-8">
-                    <div th:each="cookBookDTO, el:${cookBooks}" class="mt-2">
-                        <img th:src="'data:image/jpeg;base64,' + ${cookBookDTO.convert}"
-                             style="width:100%"
-                             class="rounded mx-auto d-block"
-                             alt="IMAGE OF COMPOSITION"/>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Кухня. Місце для смаколиків, рецептів та кулінарних вподобань.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/kitchen/read-cookbook"
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                            Кулінарна книга</a>
+                        <a href="/kitchen/write-prescription"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Записати рецепт</a>
+                        <a href="/kitchen/write-menu"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Моє меню</a>
+                        <a href="/kitchen/write-shop-meals"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Придбати в магазині</a>
+                        <a href="/user-page"
+                           class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                            До головної</a>
                         <br>
-                        <h6><p class="text-right" th:text="${#dates.format({cookBookDTO.date}, 'dd:MM:yyyy')}"></p></h6>
-                        <h4><p th:text="${cookBookDTO.titleText}"></p></h4>
-                        <h5><p th:utext="${cookBookDTO.fullText}"></p></h5>
-                        <a th:href="'/kitchen/read-cookbook/'+${cookBookDTO.id}+'/edit'"
-                           class="btn btn-warning">Редагувати</a>
-                        <a th:href="'/kitchen/read-cookbook/'+${cookBookDTO.id}+'/remove'"
-                           class="btn btn-warning">Видалити</a>
-                        <br>
+                    </div>
+                    <div class="col-md-8">
+                        <div th:each="cookBookDTO, el:${cookBooks}" class="mt-2">
+                            <img th:src="'data:image/jpeg;base64,' + ${cookBookDTO.convert}"
+                                 style="width:100%"
+                                 class="rounded mx-auto d-block"
+                                 alt="IMAGE OF COMPOSITION"/>
+                            <br>
+                            <h6><p class="text-right" th:text="${#dates.format({cookBookDTO.date}, 'dd:MM:yyyy')}"></p>
+                            </h6>
+                            <h4><p th:text="${cookBookDTO.titleText}"></p></h4>
+                            <h5><p th:utext="${cookBookDTO.fullText}"></p></h5>
+                            <a th:href="'/kitchen/read-cookbook/'+${cookBookDTO.id}+'/edit'"
+                               class="btn btn-warning">Редагувати</a>
+                            <a th:href="'/kitchen/read-cookbook/'+${cookBookDTO.id}+'/remove'"
+                               class="btn btn-warning">Видалити</a>
+                            <br>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

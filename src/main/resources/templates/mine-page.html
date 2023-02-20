@@ -1,48 +1,51 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
->
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
+<body style="height: 100%">
 <div th:insert="blocks/heder-mine::header-mine"></div>
-<div class="container ">
-    <div class="col-md-12">
-        <br>
-        <div th:each="publicationPostAdminDTO, el:${publications}" class="mt-2">
-            <img class="mx-auto d-block" th:src="'data:image/jpeg;base64,' + ${publicationPostAdminDTO.convert}"
-                 style="width:100%" alt="IMG"/>
-
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <div class="col-md-12">
             <br>
-            <h6><p class="text-right" th:text="${#dates.format({publicationPostAdminDTO.date}, 'dd:MM:yyyy')}"></p></h6>
+            <div th:each="publicationPostAdminDTO, el:${publications}" class="mt-2">
+                <img class="mx-auto d-block" th:src="'data:image/jpeg;base64,' + ${publicationPostAdminDTO.convert}"
+                     style="width:100%" alt="IMG"/>
+
+                <br>
+                <h6><p class="text-right" th:text="${#dates.format({publicationPostAdminDTO.date}, 'dd:MM:yyyy')}"></p>
+                </h6>
                 <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
                        th:utext="${publicationPostAdminDTO.titleText}"
                        style=" font-family: 'Open Sans',sans-serif;"></p></h4>
                 <h5><p class=" lh-lg " th:utext="${publicationPostAdminDTO.fullText}"
                        style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
-        </div>
-        <div th:each="compositionDTO, el:${compositionWithComments}" class="mt-2">
+            </div>
+            <div th:each="compositionDTO, el:${compositionWithComments}" class="mt-2">
 
-            <a th:href="${compositionDTO.url}">
-                <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}"
-                     style="width:50%"
-                     class="rounded mx-auto d-block"
-                     alt="IMAGE OF COMPOSITION"/>
-            </a>
+                <a th:href="${compositionDTO.url}">
+                    <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}"
+                         style="width:50%"
+                         class="rounded mx-auto d-block"
+                         alt="IMAGE OF COMPOSITION"/>
+                </a>
 
-            <h6><p class="text-right" th:text="${#dates.format({compositionDTO.date}, 'dd:MM:yyyy')}"></p></h6>
-            <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
-                   th:utext="${compositionDTO.titleText}" style=" font-family: 'Open Sans',sans-serif;"></p></h4>
-            <h5><p class=" lh-lg " th:utext="${compositionDTO.shortText}"
-                   style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
-        </div>
-        <br>
-        <br>
-        <div class="text-center">
-            <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
-                <div class="form-group">
-                    <button type="button" class="btn btn-outline-info">
+                <h6><p class="text-right" th:text="${#dates.format({compositionDTO.date}, 'dd:MM:yyyy')}"></p></h6>
+                <h4><p class="text-center text-uppercase lh-lg fw-bold font-family-sans-serif"
+                       th:utext="${compositionDTO.titleText}" style=" font-family: 'Open Sans',sans-serif;"></p></h4>
+                <h5><p class=" lh-lg " th:utext="${compositionDTO.shortText}"
+                       style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
+            </div>
+            <br>
+            <br>
+            <div class="text-center">
+                <nav class="navbar navbar-expand-lg navbar-light justify-content-center">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-outline-info">
                          <span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                              class="bi bi-envelope-plus" viewBox="0 0 16 16">
@@ -58,28 +61,29 @@
                         </svg>
                             <a href="/login" style="text-decoration: none">До творчої майстерні</a>
                          </span>
-                    </button>
-                </div>
-            </nav>
-        </div>
-        <br>
-        <br>
-        <div th:each="videoBoxAdmin, el:${videoBoxAdmin}">
-            <div class="embed-responsive embed-responsive-16by9 ">
-                <iframe class="embed-responsive-item "
-                        th:src="${videoBoxAdmin.linkToVideo}"></iframe>
+                        </button>
+                    </div>
+                </nav>
             </div>
             <br>
-            <h5 class="text-center text-uppercase fw-bold lh-base font-family-sans-serif alert"
-                th:text="${videoBoxAdmin.titleText}"></h5>
             <br>
+            <div th:each="videoBoxAdmin, el:${videoBoxAdmin}">
+                <div class="embed-responsive embed-responsive-16by9 ">
+                    <iframe class="embed-responsive-item "
+                            th:src="${videoBoxAdmin.linkToVideo}"></iframe>
+                </div>
+                <br>
+                <h5 class="text-center text-uppercase fw-bold lh-base font-family-sans-serif alert"
+                    th:text="${videoBoxAdmin.titleText}"></h5>
+                <br>
+            </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

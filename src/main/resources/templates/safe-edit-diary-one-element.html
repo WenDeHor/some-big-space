@@ -1,72 +1,75 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
->
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Робоча кімната - місце для наших спогадів та посилань на сервіси, що є важливими для нас.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/safe/read-save-diary"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Читати щоденник</a>
-                    <a href="/safe/edit-diary"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Редагувати щоденник</a>
-                    <a href="/safe/read-save-edit-reference"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої сервіси</a>
-                    <a href="/user-page"
-                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
-                        До головної</a>
-                    <br>
-                </div>
-                <div class="col-md-8">
-                    <div th:each="diaryDTO, el:${diaryList}">
-                        <form method="post" enctype="multipart/form-data">
-                            <img th:src="'data:image/jpeg;base64,' + ${diaryDTO.image}"
-                                 style="width:100%"
-                                 class="rounded mx-auto d-block"
-                                 alt="IMAGE OF COMPOSITION"/>
-                            <br>
-                            <div class="custom-file mb-4">
-                                <input type="file" name="file" class="custom-file-input"
-                                       id="customFile"> <label class="custom-file-label"
-                                                               for="customFile">Завантажити фото</label>
-                            </div>
-                            <p>
-                                <label>Загловок</label>
-                                <input type="text" th:value="${diaryDTO.titleText}" name="titleText"
-                                       class="form-control"
-                                       placeholder="Місце для Вашого заголовку">
-                            </p>
-                            <br>
-                            <label>Ваші спогади та емоції</label>
-                            <label for="fullText"> місце для розповіді : </label>
-                            <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                      placeholder="Місце для Ваших сподагдів та історій {максимальна кількість символів - 3000} "
-                                      th:utext="${diaryDTO.fullText}"></textarea> <br>
-                            <br>
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">Обновити</button>
-                        </form>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Робоча кімната - місце для наших спогадів та посилань на сервіси, що є важливими для нас.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/safe/read-save-diary"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Читати щоденник</a>
+                        <a href="/safe/edit-diary"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Редагувати щоденник</a>
+                        <a href="/safe/read-save-edit-reference"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Мої сервіси</a>
+                        <a href="/user-page"
+                           class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                            До головної</a>
+                        <br>
+                    </div>
+                    <div class="col-md-8">
+                        <div th:each="diaryDTO, el:${diaryList}">
+                            <form method="post" enctype="multipart/form-data">
+                                <img th:src="'data:image/jpeg;base64,' + ${diaryDTO.image}"
+                                     style="width:100%"
+                                     class="rounded mx-auto d-block"
+                                     alt="IMAGE OF COMPOSITION"/>
+                                <br>
+                                <div class="custom-file mb-4">
+                                    <input type="file" name="file" class="custom-file-input"
+                                           id="customFile"> <label class="custom-file-label"
+                                                                   for="customFile">Завантажити фото</label>
+                                </div>
+                                <p>
+                                    <label>Загловок</label>
+                                    <input type="text" th:value="${diaryDTO.titleText}" name="titleText"
+                                           class="form-control"
+                                           placeholder="Місце для Вашого заголовку">
+                                </p>
+                                <br>
+                                <label>Ваші спогади та емоції</label>
+                                <label for="fullText"> місце для розповіді : </label>
+                                <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
+                                          placeholder="Місце для Ваших сподагдів та історій {максимальна кількість символів - 3000} "
+                                          th:utext="${diaryDTO.fullText}"></textarea> <br>
+                                <br>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">Обновити</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

@@ -134,7 +134,7 @@ public class AdminBlogControllers {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
             Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
-            if(compositionOptional.isPresent()){
+            if (compositionOptional.isPresent()) {
                 Composition composition = compositionOptional.get();
                 CompositionDTO compositionDTO = new CompositionDTO(
                         composition.getId(),
@@ -446,7 +446,8 @@ public class AdminBlogControllers {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
             List<LetterToUSER> letterFromADMINS = letterToUSERRepository.findAll().stream()
-                    .filter(el -> el.getSenderAddress().equals(ADMIN))
+                    .filter(el -> el.getSenderAddress().equals(ADMIN)
+                            || el.getSenderAddress().equals("1 from New_Apple")) //TODO remove after create real post
                     .sorted(Comparator.comparing(LetterToUSER::getDate).reversed())
                     .collect(Collectors.toList());
             model.addAttribute("adminLetters", letterFromADMINS);

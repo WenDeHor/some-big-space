@@ -1,81 +1,85 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
-<div class="container"><br>
-    <div class="row">
-        <div class="album col-md-12" >
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/admin-mine/users"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Users data</a>
-                    <a href="/admin-mine/users-competitive"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Users Competitive</a>
-                    <a href="/admin-mine/admin-publications"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Admin publications</a>
-                    <a href="/admin-mine/admin-video"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Admin Video</a>
-                    <a href="/admin-mine/read-letters/enter-letters"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
-                        My letters</a>
-                    <a href="/admin-mine/write-letters/send"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        To write a letter</a>
-                    <a href="/admin-mine/read-metrics"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Metrics</a>
-                    <br>
-                    <form action="/logout" method="post">
-                        <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
-                    </form>
-                </div>
-                <div class="col-md-8">
-                    <form action="/admin-mine/write-letters/answer" method="POST">
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/admin-mine/users"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Users data</a>
+                        <a href="/admin-mine/users-competitive"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Users Competitive</a>
+                        <a href="/admin-mine/admin-publications"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Admin publications</a>
+                        <a href="/admin-mine/admin-video"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Admin Video</a>
+                        <a href="/admin-mine/read-letters/enter-letters"
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                            My letters</a>
+                        <a href="/admin-mine/write-letters/send"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            To write a letter</a>
+                        <a href="/admin-mine/read-metrics"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Metrics</a>
+                        <br>
+                        <form action="/logout" method="post">
+                            <button class="btn btn-lg btn-info btn-block" type="submit">LOGOUT</button>
+                        </form>
+                    </div>
+                    <div class="col-md-8">
+                        <form action="/admin-mine/write-letters/answer" method="POST">
 
-                        <!--                        senderAddress-->
-                        <p>
-                            <label>RECIPIENT</label>
-                            <input type="text" th:value="${senderAddress}" name="recipientAddress" class="form-control"
-                                   placeholder="Recipient's address">
-                        </p>
-                        <p>
-                            <label>SENDER</label>
-                            <input type="text" th:value="${adminAddress}" name="senderAddress" class="form-control"
-                                   placeholder="Sender's address">
-                        </p>
-                        <br>
-                        <br>
-                        <p>
-                            <label>TITLE</label>
-                            <input type="text" name="titleText" class="form-control"
-                                   placeholder="TITLE NAME">
-                        </p>
-                        <br>
-                        <label>PLACE TO LETTER</label>
-                        <label for="fullText"> tell us you story : </label>
-                        <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                  placeholder="WRITE A LETTER {character limit up to 3000} "></textarea>
-                        <br>
-                        <br>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
-                    </form>
+                            <!--                        senderAddress-->
+                            <p>
+                                <label>RECIPIENT</label>
+                                <input type="text" th:value="${senderAddress}" name="recipientAddress"
+                                       class="form-control"
+                                       placeholder="Recipient's address">
+                            </p>
+                            <p>
+                                <label>SENDER</label>
+                                <input type="text" th:value="${adminAddress}" name="senderAddress" class="form-control"
+                                       placeholder="Sender's address">
+                            </p>
+                            <br>
+                            <br>
+                            <p>
+                                <label>TITLE</label>
+                                <input type="text" name="titleText" class="form-control"
+                                       placeholder="TITLE NAME">
+                            </p>
+                            <br>
+                            <label>PLACE TO LETTER</label>
+                            <label for="fullText"> tell us you story : </label>
+                            <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
+                                      placeholder="WRITE A LETTER {character limit up to 3000} "></textarea>
+                            <br>
+                            <br>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">SAND</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

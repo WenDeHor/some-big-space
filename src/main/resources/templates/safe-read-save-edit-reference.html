@@ -1,87 +1,91 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
->
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Робоча кімната - місце для наших спогадів та посилань на сервіси, що є важливими для нас.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/safe/read-save-diary"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Читати щоденник</a>
-                    <a href="/safe/edit-diary"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Редагувати щоденник</a>
-                    <a href="/safe/read-save-edit-reference"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої сервіси</a>
-                    <a href="/user-page"
-                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
-                        До головної</a>
-                    <br>
-                </div>
-                <div class="col-md-8">
-                    <table class="table">
-                        <thead class="thead-light">
-                        <tr>
-                            <th><h5>Зображення</h5></th>
-                            <th><h5>Назва</h5></th>
-                            <th><h5>Видалення</h5></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="referenceDTO, el:${referenceList}" class="mt-2">
-                            <td>
-                                <a th:href="${referenceDTO.url}">
-                                    <img class="mx-auto d-block" th:src="'data:image/jpg;base64,' + ${referenceDTO.image}"
-                                         style="width:20%" alt="Error content letterToADMIN"/>
-                                </a>
-                            </td>
-                            <td>
-                                <h5><p th:text="${referenceDTO.titleText}"/></h5>
-                            </td>
-                            <td><a th:href="'/safe/read-save-edit-reference/'+${referenceDTO.id}+'/remove'"
-                                   class="btn btn-warning">Видалити</a></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                    <br>
-                    <form action="/safe/read-save-edit-reference" method="post" enctype="multipart/form-data">
-                        <table>
-                            <div class="custom-file mb-4">
-                                <input type="file" name="file" class="custom-file-input"
-                                       id="customFile"> <label class="custom-file-label"
-                                                               for="customFile">Завантажати зображення</label>
-                            </div>
-                            <h1>
-                                <input type="text" name="url" class="form-control"
-                                       placeholder="Вставити посилання">
-                            </h1>
-                            <h1>
-                                <input type="text" name="titleText" class="form-control"
-                                       placeholder="Назва посилання">
-                            </h1>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Робоча кімната - місце для наших спогадів та посилань на сервіси, що є важливими для нас.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/safe/read-save-diary"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Читати щоденник</a>
+                        <a href="/safe/edit-diary"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Редагувати щоденник</a>
+                        <a href="/safe/read-save-edit-reference"
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                            Мої сервіси</a>
+                        <a href="/user-page"
+                           class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                            До головної</a>
+                        <br>
+                    </div>
+                    <div class="col-md-8">
+                        <table class="table">
+                            <thead class="thead-light">
+                            <tr>
+                                <th><h5>Зображення</h5></th>
+                                <th><h5>Назва</h5></th>
+                                <th><h5>Видалення</h5></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="referenceDTO, el:${referenceList}" class="mt-2">
+                                <td>
+                                    <a th:href="${referenceDTO.url}">
+                                        <img class="mx-auto d-block"
+                                             th:src="'data:image/jpg;base64,' + ${referenceDTO.image}"
+                                             style="width:20%" alt="Error content letterToADMIN"/>
+                                    </a>
+                                </td>
+                                <td>
+                                    <h5><p th:text="${referenceDTO.titleText}"/></h5>
+                                </td>
+                                <td><a th:href="'/safe/read-save-edit-reference/'+${referenceDTO.id}+'/remove'"
+                                       class="btn btn-warning">Видалити</a></td>
+                            </tr>
+                            </tbody>
                         </table>
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
-                    </form>
+                        <br>
+                        <form action="/safe/read-save-edit-reference" method="post" enctype="multipart/form-data">
+                            <table>
+                                <div class="custom-file mb-4">
+                                    <input type="file" name="file" class="custom-file-input"
+                                           id="customFile"> <label class="custom-file-label"
+                                                                   for="customFile">Завантажати зображення</label>
+                                </div>
+                                <h1>
+                                    <input type="text" name="url" class="form-control"
+                                           placeholder="Вставити посилання">
+                                </h1>
+                                <h1>
+                                    <input type="text" name="titleText" class="form-control"
+                                           placeholder="Назва посилання">
+                                </h1>
+                            </table>
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

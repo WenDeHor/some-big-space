@@ -1,42 +1,47 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
+<body style="height: 100%">
 <div th:insert="blocks/heder-mine::header-mine"></div>
-<div class="container ">
-    <div class="col-md-12">
-        <br>
-        <form action="/users/send-letter" method="post">
-            <table>
-                <h3 class="text-center">Лист до компанії</h3>
-                <br>
-                <label for="userPost">Пошта </label>
-                <textarea id="userPost" name="userPost" class="form-control" rows="2" cols="20"
-                          placeholder="Вкажіть електронну пошту по якій компанія зможе з Вами зв'язатися. Розмір до 100 символів"
-                          required></textarea>
-                <br>
-                <label for="titleText">Тема листа </label>
-                <textarea id="titleText" name="titleText" class="form-control" rows="10" cols="20"
-                          placeholder="Коротко опишіть зміст листа. Розмір до 100 символів " required></textarea>
-                <br>
-                <label for="fullText">Текст листа </label>
-                <textarea id="fullText" name="fullText" class="form-control" rows="20" cols="20"
-                          placeholder="Місце для тексту Вашого листа. Розмір до 20_000 символів " required></textarea>
-                <br>
-            </table>
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Надіслати</button>
-        </form>
-        <br>
-        <br>
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <div class="col-md-12">
+            <br>
+            <form action="/users/send-letter" method="post">
+                <table>
+                    <h3 class="text-center">Лист до компанії</h3>
+                    <br>
+                    <label for="userPost">Пошта </label>
+                    <textarea id="userPost" name="userPost" class="form-control" rows="2" cols="20"
+                              placeholder="Вкажіть електронну пошту по якій компанія зможе з Вами зв'язатися. Розмір до 100 символів"
+                              required></textarea>
+                    <br>
+                    <label for="titleText">Тема листа </label>
+                    <textarea id="titleText" name="titleText" class="form-control" rows="10" cols="20"
+                              placeholder="Коротко опишіть зміст листа. Розмір до 100 символів " required></textarea>
+                    <br>
+                    <label for="fullText">Текст листа </label>
+                    <textarea id="fullText" name="fullText" class="form-control" rows="20" cols="20"
+                              placeholder="Місце для тексту Вашого листа. Розмір до 20_000 символів "
+                              required></textarea>
+                    <br>
+                </table>
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Надіслати</button>
+            </form>
+            <br>
+            <br>
+        </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

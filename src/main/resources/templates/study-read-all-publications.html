@@ -1,59 +1,60 @@
 <!DOCTYPE HTML>
-<!--<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">-->
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-
-<body>
-<div class="container"><br>
-    <h5 class="d-flex justify-content-center " style="color: #095979">
-        Моя кімната. Пишемо, спілкуємось та публікуємо.
-    </h5>
-    <br>
-    <div class="row">
-        <div class="album col-md-12">
-            <div class="row col-md-12">
-                <div class="col-md-4">
-                    <a href="/study/enter-letters"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої листи</a>
-                    <a href="/study/write-letter"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Написати листа</a>
-                    <a href="/study/read-all-publications"
-                       class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
-                        Усі публікації</a>
-                    <a href="/study/read-my-publications"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Мої публікації</a>
-                    <a href="/study/write-publication"
-                       class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
-                        Написати публікацію</a>
-                    <a href="/user-page"
-                       class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
-                        До головної</a>
-                    <br>
-                </div>
-                <div class="col-md-8">
-                    <div th:each="publicationDTO, el:${publications}" class="mt-2 alert alert-info">
-                        <h5  class="text-center" th:text="${publicationDTO.titleText}"></h5>
-                        <p th:utext="${publicationDTO.fullText}"></p>
-                        <h6 class="text-right" th:text="${publicationDTO.info}"></h6>
+<body style="height: 100%">
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <h5 class="d-flex justify-content-center " style="color: #095979">
+            Моя кімната. Пишемо, спілкуємось та публікуємо.
+        </h5>
+        <br>
+        <div class="row">
+            <div class="album col-md-12">
+                <div class="row col-md-12">
+                    <div class="col-md-4">
+                        <a href="/study/enter-letters"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Мої листи</a>
+                        <a href="/study/write-letter"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Написати листа</a>
+                        <a href="/study/read-all-publications"
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                            Усі публікації</a>
+                        <a href="/study/read-my-publications"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Мої публікації</a>
+                        <a href="/study/write-publication"
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                            Написати публікацію</a>
+                        <a href="/user-page"
+                           class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
+                            До головної</a>
                         <br>
                     </div>
-                    <br>
+                    <div class="col-md-8">
+                        <div th:each="publicationDTO, el:${publications}" class="mt-2 alert alert-info">
+                            <h5 class="text-center" th:text="${publicationDTO.titleText}"></h5>
+                            <p th:utext="${publicationDTO.fullText}"></p>
+                            <h6 class="text-right" th:text="${publicationDTO.info}"></h6>
+                            <br>
+                        </div>
+                        <br>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>

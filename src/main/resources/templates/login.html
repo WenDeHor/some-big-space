@@ -1,47 +1,50 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+style="height: 100%">
 
 <head th:insert="blocks/library::library">
     <title th:text="${title}"></title>
 </head>
-<body>
+<body style="height: 100%">
 <div th:insert="blocks/heder-mine::header-mine"></div>
-<div class="container">
-    <form class="form-sign" method="post" action="/login">
-        <!-- error message -->
-        <div th:if="${param.error}">
-            <div class="alert alert-danger">Помилкова пошта або адреса
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <form class="form-sign" method="post" action="/login">
+            <!-- error message -->
+            <div th:if="${param.error}">
+                <div class="alert alert-danger">Помилкова пошта або адреса
+                </div>
             </div>
-        </div>
-        <!-- logout message -->
-        <div th:if="${param.logout}">
-            <div class="alert alert-info">Успішно</div>
-        </div>
+            <!-- logout message -->
+            <div th:if="${param.logout}">
+                <div class="alert alert-info">Успішно</div>
+            </div>
 
-        <h5 class="d-flex justify-content-center " style="color: #095979">
-            Вхід до будинку</h5>
-        <p>
-            <label for="username">Введіть свою електронну скриньку</label>
-            <input type="text" id="username" name="username" class="form-control"
-                   placeholder="Місце для електронної скриньки" required>
-        </p>
-        <p>
-            <label for="password">Пароль</label>
-            <input type="password" id="password" name="password" class="form-control"
-                   placeholder="Місце для Вашого паролю" required>
-        </p>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top: 50px">
-            Увійти до будинку
-        </button>
-        <a href="/registration" class="btn btn-info btn-lg btn-block" role="button"
-           style="margin-bottom: 50px">Перейти на сторінку з реєстрації</a>
-    </form>
-</div>
-<br>
-<br>
-<div>
-    <footer th:insert="blocks/footer-first::footer-first"></footer>
+            <h5 class="d-flex justify-content-center " style="color: #095979">
+                Вхід до будинку</h5>
+            <p>
+                <label for="username">Введіть свою електронну скриньку</label>
+                <input type="text" id="username" name="username" class="form-control"
+                       placeholder="Місце для електронної скриньки" required>
+            </p>
+            <p>
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" class="form-control"
+                       placeholder="Місце для Вашого паролю" required>
+            </p>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top: 50px">
+                Увійти до будинку
+            </button>
+            <a href="/registration" class="btn btn-info btn-lg btn-block" role="button"
+               style="margin-bottom: 50px">Перейти на сторінку з реєстрації</a>
+        </form>
+    </div>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
 </div>
 </body>
 </html>
