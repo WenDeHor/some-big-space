@@ -72,7 +72,7 @@ public class _3_SafeRoomControllers {
         Diary diary = new Diary();
         diary.setDate(new Date());
         diary.setTitleText(titleText);
-        diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
+        diary.setFullText(convertTextToSave(fullText));
         diary.setIdUser(user.getId());
         ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
         diary.setImage(convert.img);
@@ -80,11 +80,6 @@ public class _3_SafeRoomControllers {
         compressorImgToJpg.deleteImage(convert.nameStart);
         compressorImgToJpg.deleteImage(convert.nameEnd);
         return "redirect:/safe/read-save-diary";
-    }
-
-    private String convertTextWithFormatToDiarySaveAndEdit(String fullText) {
-        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text1);
     }
 
     @DeleteMapping("/safe/edit-diary/{id}/remove")
@@ -105,7 +100,7 @@ public class _3_SafeRoomControllers {
                 .map(el -> new DiaryDTO(
                         el.getId(),
                         el.getTitleText(),
-                        el.getFullText(),
+                        convertTextToEdit(el.getFullText()),
                         converterImage(el.getImage())))
                 .sorted(Comparator.comparing(DiaryDTO::getId).reversed())
                 .collect(toList());
@@ -129,20 +124,14 @@ public class _3_SafeRoomControllers {
             Diary diary = diaryOptional.get();
             DiaryDTO diaryDTO = new DiaryDTO(
                     diary.getId(),
-                    convertText(diary.getTitleText()),
-                    convertText(diary.getFullText()),
+                    diary.getTitleText(),
+                    convertTextToEdit(diary.getFullText()),
                     converterImage(diary.getImage()));
             model.addAttribute("title", SAFE_ROOM);
             model.addAttribute("diaryList", diaryDTO);
             return "safe-edit-diary-one-element";
         }
         return "redirect:/safe/edit-diary";
-    }
-
-    private String convertText(String text) {
-        return text
-                .replace("&#160&#160 ", "")
-                .replace("<br>", "");
     }
 
     @Transactional
@@ -157,7 +146,7 @@ public class _3_SafeRoomControllers {
         if (diaryOptional.isPresent()) {
             Diary diary = diaryOptional.get();
             diary.setTitleText(titleText);
-            diary.setFullText(convertTextWithFormatToDiarySaveAndEdit(fullText));
+            diary.setFullText(convertTextToSave(fullText));
             diary.setDate(diary.getDate());
             if (!Objects.equals(file.getContentType(), "application/octet-stream")) {     //new Photo
                 ConvertFile convert = compressorImgToJpg.convert(file, String.valueOf(diary.getIdUser()));
@@ -223,18 +212,26 @@ public class _3_SafeRoomControllers {
         return "redirect:/safe/read-save-edit-reference";
     }
 
-    //TODO REGEX
-    private String REGEX(String patternRegex,
-                         String replace,
-                         String text) {
+    private User getUser(Authentication authentication) {
+        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
+        String userName = details.getUsername();
+        return userRepository.findOneByEmail(userName).get();
+    }
+
+    private String convertTextToSave(String fullText) {
+        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text);
+    }
+
+    private String REGEX(String patternRegex, String replace, String text) {
         Pattern pattern = Pattern.compile(patternRegex);
         Matcher matcher = pattern.matcher(text);
         return matcher.replaceAll(replace);
     }
 
-    private User getUser(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        return userRepository.findOneByEmail(userName).get();
+    private String convertTextToEdit(String text) {
+        return text
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
     }
 }

@@ -72,7 +72,7 @@ public class _1_StudyRoomControllers {
             LetterToADMIN userSendLetterToADMIN = new LetterToADMIN();
             userSendLetterToADMIN.setDate(new Date());
             userSendLetterToADMIN.setTitleText(titleText);
-            userSendLetterToADMIN.setFullText(convertTextWithFormatToSave(fullText));
+            userSendLetterToADMIN.setFullText(convertTextToSave(fullText));
             userSendLetterToADMIN.setAddressUser(user.getAddress());
             letterToADMINRepository.save(userSendLetterToADMIN);
         } else {
@@ -86,15 +86,10 @@ public class _1_StudyRoomControllers {
         LetterToUSER userSendLetterToUSER = new LetterToUSER();
         userSendLetterToUSER.setDate(new Date());
         userSendLetterToUSER.setTitleText(titleText);
-        userSendLetterToUSER.setFullText(convertTextWithFormatToSave(fullText));
+        userSendLetterToUSER.setFullText(convertTextToSave(fullText));
         userSendLetterToUSER.setSenderAddress(user.getAddress());
         userSendLetterToUSER.setRecipientAddress(recipientAddress);
         return userSendLetterToUSER;
-    }
-
-    private String convertTextWithFormatToSave(String fullText) {
-        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text);
     }
 
     @GetMapping("/study/outer-letters")
@@ -127,8 +122,8 @@ public class _1_StudyRoomControllers {
 
     @GetMapping("/study/outer-letters/{idLetter}/remove")
     public String letterRemoveByOuter(@PathVariable(value = "idLetter") int idLetter) {
-        LetterToUSER letter = letterToUSERRepository.findById(idLetter).orElseThrow(null);
-        letterToUSERRepository.delete(letter);
+        Optional<LetterToUSER> letterOptional = letterToUSERRepository.findById(idLetter);
+        letterOptional.ifPresent(letterToUSERRepository::delete);
         return "redirect:/study/outer-letters";
     }
 
@@ -152,8 +147,8 @@ public class _1_StudyRoomControllers {
 
     @GetMapping("/study/enter-letters/{idLetter}/remove")
     public String letterRemoveByEnter(@PathVariable(value = "idLetter") int idLetter) {
-        LetterToUSER letter = letterToUSERRepository.findById(idLetter).orElseThrow(null);
-        letterToUSERRepository.delete(letter);
+        Optional<LetterToUSER> letterOptional = letterToUSERRepository.findById(idLetter);
+        letterOptional.ifPresent(letterToUSERRepository::delete);
         return "redirect:/study/enter-letters";
     }
 
@@ -204,31 +199,23 @@ public class _1_StudyRoomControllers {
 
     @GetMapping("/study/publication/{idPublication}/remove")
     public String publicationRemove(@PathVariable(value = "idPublication") int idPublication) {
-        PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
-        publicationRepository.delete(publicationUser);
+        Optional<PublicationUser> publicationUserOptional = publicationRepository.findById(idPublication);
+        publicationUserOptional.ifPresent(publicationRepository::delete);
         return "redirect:/study/read-my-publications";
     }
 
     @GetMapping("/study/publication/{idPublication}/edit")
     public String publicationEdit(@PathVariable(value = "idPublication") int idPublication,
                                   Model model) {
-        if (!publicationRepository.existsById(idPublication)) {
-            return "redirect:/study/read-my-publications";
+        Optional<PublicationUser> userPublicationOptional = publicationRepository.findById(idPublication);
+        if (userPublicationOptional.isPresent()) {
+            PublicationUser publicationUser = userPublicationOptional.get();
+            publicationUser.setFullText(convertTextToEdit(publicationUser.getFullText()));
+            model.addAttribute("title", MY_ROOM);
+            model.addAttribute("publication", publicationUser);
+            return "study-edit-publications";
         }
-        Optional<PublicationUser> userPublication = publicationRepository.findById(idPublication);
-        PublicationUser publicationUser = userPublication.orElseGet(PublicationUser::new);
-        model.addAttribute("title", MY_ROOM);
-        model.addAttribute("publication", convertTextWithFormatPublicationEdit(publicationUser));
-        return "study-edit-publications";
-    }
-
-    private PublicationUser convertTextWithFormatPublicationEdit(PublicationUser publication) {
-        String fullText = publication.getFullText();
-        String trim = fullText
-                .replace("&#160&#160 ", "")
-                .replace("<br>", "");
-        publication.setFullText(trim);
-        return publication;
+        return "redirect:/study/read-my-publications";
     }
 
     @PostMapping("/study/publication/{idPublication}/edit")
@@ -237,7 +224,7 @@ public class _1_StudyRoomControllers {
                                     @RequestParam String fullText) {
         PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
         publicationUser.setTitleText(titleText);
-        publicationUser.setFullText(convertTextWithFormatToSave(fullText));
+        publicationUser.setFullText(convertTextToSave(fullText));
         publicationUser.setDate(new Date());
         publicationRepository.save(publicationUser);
         return "redirect:/study/read-my-publications";
@@ -258,7 +245,7 @@ public class _1_StudyRoomControllers {
         publicationUser.setIdUser(user.getId());
         publicationUser.setDate(new Date());
         publicationUser.setTitleText(titleText);
-        publicationUser.setFullText(convertTextWithFormatToSave(fullText));
+        publicationUser.setFullText(convertTextToSave(fullText));
         publicationRepository.save(publicationUser);
         return "redirect:/study/read-my-publications";
     }
@@ -276,10 +263,20 @@ public class _1_StudyRoomControllers {
         return userRepository.findOneByEmail(userName).get();
     }
 
-    //TODO REGEX
+    private String convertTextToSave(String fullText) {
+        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text);
+    }
+
     private String REGEX(String patternRegex, String replace, String text) {
         Pattern pattern = Pattern.compile(patternRegex);
         Matcher matcher = pattern.matcher(text);
         return matcher.replaceAll(replace);
+    }
+
+    private String convertTextToEdit(String text) {
+        return text
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
     }
 }

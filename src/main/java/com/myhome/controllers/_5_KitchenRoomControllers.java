@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
@@ -68,8 +70,8 @@ public class _5_KitchenRoomControllers {
                 .map(el -> new CookBookDTO(
                         el.getId(),
                         el.getDate(),
-                        convertText(el.getTitleText()),
-                        convertText(el.getFullText()),
+                        el.getTitleText(),
+                        el.getFullText(),
                         converterImage(el.getImage())
                 ))
                 .sorted(Comparator.comparing(CookBookDTO::getId).reversed())
@@ -79,16 +81,11 @@ public class _5_KitchenRoomControllers {
         return "kitchen-read-cookbook";
     }
 
-    private String convertText(String text) {
-        return text
-                .replace("&#160&#160 ", "")
-                .replace("<br>", "");
-    }
-
     private String converterImage(byte[] img) {
         return Base64.getEncoder().encodeToString(img);
     }
 
+    @Transactional
     @GetMapping("/kitchen/read-cookbook/{id}/remove")
     public String cookBookRemove(@PathVariable(value = "id") int id,
                                  Authentication authentication) {
@@ -98,6 +95,7 @@ public class _5_KitchenRoomControllers {
         return "redirect:/kitchen/read-cookbook";
     }
 
+    @Transactional
     @GetMapping("/kitchen/read-cookbook/{id}/edit")
     public String cookBookEdit(@PathVariable(value = "id") int id,
                                Model model,
@@ -108,8 +106,8 @@ public class _5_KitchenRoomControllers {
             CookBook cookBook = cookBookOptional.get();
             CookBookDTO cookBookDTO = new CookBookDTO(
                     cookBook.getId(),
-                    convertText(cookBook.getTitleText()),
-                    convertText(cookBook.getFullText()),
+                    cookBook.getTitleText(),
+                    convertTextToEdit(cookBook.getFullText()),
                     converterImage(cookBook.getImage()));
             model.addAttribute("cookBook", cookBookDTO);
             model.addAttribute("title", KITCHEN_ROOM);
@@ -118,6 +116,7 @@ public class _5_KitchenRoomControllers {
         return "redirect:/kitchen/read-cookbook";
     }
 
+    @Transactional
     @PostMapping("/kitchen/read-cookbook/{id}/edit")
     public String cookBookUpdate(@PathVariable(value = "id") int id,
                                  MultipartFile file,
@@ -129,7 +128,7 @@ public class _5_KitchenRoomControllers {
         if (cookBookOptional.isPresent()) {
             CookBook cookBook = cookBookOptional.get();
             cookBook.setTitleText(titleText);
-            cookBook.setFullText(convertText(fullText));
+            cookBook.setFullText(convertTextToSave(fullText));
             cookBook.setDate(new Date());
             if (!Objects.equals(file.getContentType(), "application/octet-stream")) { //new Photo
                 ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
@@ -151,7 +150,7 @@ public class _5_KitchenRoomControllers {
         CookBook cookBook = new CookBook();
         cookBook.setDate(new Date());
         cookBook.setTitleText(titleText);
-        cookBook.setFullText(convertText(fullText));
+        cookBook.setFullText(convertTextToSave(fullText));
         cookBook.setIdUser(user.getId());
         cookBook.setImage(file.getBytes());
         cookBookRepository.save(cookBook);
@@ -223,7 +222,6 @@ public class _5_KitchenRoomControllers {
         return "redirect:/kitchen/write-menu";
     }
 
-
     @PostMapping("/kitchen/write-menu/{id}/edit")
     public String menuUpdate(@PathVariable(value = "id") int id,
                              @RequestParam("date") String date,
@@ -292,5 +290,23 @@ public class _5_KitchenRoomControllers {
         String userEmail = details.getUsername();
         Optional<User> oneByEmail = userRepository.findOneByEmail(userEmail);
         return oneByEmail.get();
+    }
+
+
+    private String convertTextToSave(String fullText) {
+        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text);
+    }
+
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
+    }
+
+    private String convertTextToEdit(String text) {
+        return text
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
     }
 }

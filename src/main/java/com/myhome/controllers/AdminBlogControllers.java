@@ -20,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
@@ -139,8 +141,8 @@ public class AdminBlogControllers {
                 CompositionDTO compositionDTO = new CompositionDTO(
                         composition.getId(),
                         composition.getTitleText(),
-                        convertText(composition.getShortText()),
-                        convertText(composition.getFullText()),
+                        composition.getShortText(),
+                        composition.getFullText(),
                         converterImage(composition.getImage()));
                 model.addAttribute("title", ADMIN_PAGE);
                 model.addAttribute("compositionOne", compositionDTO);
@@ -188,7 +190,7 @@ public class AdminBlogControllers {
             PublicationPostAdmin publicationPostAdmin = new PublicationPostAdmin();
             publicationPostAdmin.setDate(date);
             publicationPostAdmin.setTitleText(titleText);
-            publicationPostAdmin.setFullText(convertText(fullText));
+            publicationPostAdmin.setFullText(convertTextToSave(fullText));
             publicationPostAdmin.setImage(convert.img);
             publicationPostAdminRepository.save(publicationPostAdmin);
             compressorImgToJpg.deleteImage(convert.nameStart);
@@ -210,8 +212,8 @@ public class AdminBlogControllers {
                 PublicationPostAdmin publicationPostAdmin = publicationPostAdminOptional.get();
                 PublicationPostAdminDTO publicationPostAdminDTO = new PublicationPostAdminDTO(
                         publicationPostAdmin.getId(),
-                        convertText(publicationPostAdmin.getTitleText()),
-                        convertText(publicationPostAdmin.getFullText()),
+                        publicationPostAdmin.getTitleText(),
+                        convertTextToEdit(publicationPostAdmin.getFullText()),
                         converterImage(publicationPostAdmin.getImage()));
                 model.addAttribute("publicationPostAdminList", publicationPostAdminDTO);
                 model.addAttribute("title", ADMIN_PAGE);
@@ -245,7 +247,7 @@ public class AdminBlogControllers {
     }
 
     @GetMapping("/admin-mine/users-publications/{idUserPublication}/read")
-    public String publicationEdit(@PathVariable(value = "idUserPublication") int idUserPublication,
+    public String publicationRead(@PathVariable(value = "idUserPublication") int idUserPublication,
                                   Model model,
                                   Authentication authentication) {
         User user = getUser(authentication);
@@ -273,8 +275,8 @@ public class AdminBlogControllers {
                     .map(el -> new PublicationPostAdminDTO(
                             el.getId(),
                             el.getDate(),
-                            convertText(el.getTitleText()),
-                            convertText(el.getFullText()),
+                            el.getTitleText(),
+                            el.getFullText(),
                             converterImage(el.getImage())))
                     .sorted(Comparator.comparing(PublicationPostAdminDTO::getId).reversed())
                     .collect(Collectors.toList());
@@ -313,15 +315,17 @@ public class AdminBlogControllers {
             if (publicationPostAdminOptional.isPresent()) {
                 PublicationPostAdmin publicationPostAdmin = publicationPostAdminOptional.get();
                 publicationPostAdmin.setTitleText(titleText);
-                publicationPostAdmin.setFullText(convertText(fullText));
+                publicationPostAdmin.setFullText(convertTextToSave(fullText));
                 publicationPostAdmin.setDate(new Date());
-                ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
+
                 if (!Objects.equals(file.getContentType(), "application/octet-stream")) { //new photo
+                    ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
                     publicationPostAdmin.setImage(convert.img);
+                    compressorImgToJpg.deleteImage(convert.nameStart);
+                    compressorImgToJpg.deleteImage(convert.nameEnd);
                 }
                 publicationPostAdminRepository.save(publicationPostAdmin);
-                compressorImgToJpg.deleteImage(convert.nameStart);
-                compressorImgToJpg.deleteImage(convert.nameEnd);
+
                 return "redirect:/admin-mine/admin-publications";
             }
         }
@@ -476,7 +480,7 @@ public class AdminBlogControllers {
                                   Authentication authentication) {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            LetterToUSER adminLetterToUSER = createLetterToUSER(titleText, fullText, recipientAddress, user);
+            LetterToUSER adminLetterToUSER = createLetterToUSER(titleText, convertTextToSave(fullText), recipientAddress, user);
             letterToUSERRepository.save(adminLetterToUSER);
             return "redirect:/admin-mine/read-letters/enter-letters";
         }
@@ -490,7 +494,7 @@ public class AdminBlogControllers {
         LetterToUSER userSendLetterToUSER = new LetterToUSER();
         userSendLetterToUSER.setDate(new Date());
         userSendLetterToUSER.setTitleText(titleText);
-        userSendLetterToUSER.setFullText(convertText(fullText));
+        userSendLetterToUSER.setFullText(fullText);
         userSendLetterToUSER.setSenderAddress(user.getAddress());
         userSendLetterToUSER.setRecipientAddress(recipientAddress);
         return userSendLetterToUSER;
@@ -559,7 +563,7 @@ public class AdminBlogControllers {
 
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
-            LetterToUSER adminLetterToUSER = createLetterToUSER(titleText, fullText, recipientAddress, user);
+            LetterToUSER adminLetterToUSER = createLetterToUSER(titleText, convertTextToSave(fullText), recipientAddress, user);
             letterToUSERRepository.save(adminLetterToUSER);
             return "redirect:/admin-mine/read-letters/enter-letters";
         }
@@ -610,16 +614,26 @@ public class AdminBlogControllers {
         return "redirect:/";
     }
 
-    private String findUserAddress(Authentication authentication) {
-        UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = details.getUsername();
-        Optional<User> oneByEmail = userRepository.findOneByEmail(userName);
-        return oneByEmail.get().getAddress();
-    }
-
     private User getUser(Authentication authentication) {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
         return userRepository.findOneByEmail(userName).get();
+    }
+
+    private String convertTextToSave(String fullText) {
+        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text);
+    }
+
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
+    }
+
+    private String convertTextToEdit(String text) {
+        return text
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
     }
 }

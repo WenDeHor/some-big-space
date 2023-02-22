@@ -152,26 +152,19 @@ public class _2_LibraryController {
                                      Model model) {
         User user = getUser(authentication);
         Optional<Composition> compositionOptional = compositionRepository.findAllByIdUserAndId(user.getId(), id);
-        if (!compositionOptional.isPresent()) {
-            return "redirect:/library/read-all-my-composition";
-        } else {
+        if (compositionOptional.isPresent()) {
             Composition composition = compositionOptional.get();
             CompositionDTO compositionDTO = new CompositionDTO(
                     composition.getId(),
                     composition.getTitleText(),
-                    convertText(composition.getShortText()),
-                    convertText(composition.getFullText()),
+                    convertTextToEdit(composition.getShortText()),
+                    convertTextToEdit(composition.getFullText()),
                     converterImage(composition.getImage()));
             model.addAttribute("composition", compositionDTO);
             model.addAttribute("title", LIBRARY);
             return "library-edit-one-composition";
         }
-    }
-
-    private String convertText(String text) {
-        return text
-                .replace("&#160&#160 ", "")
-                .replace("<br>", "");
+        return "redirect:/library/read-all-my-composition";
     }
 
     @Transactional
@@ -189,8 +182,8 @@ public class _2_LibraryController {
             Composition composition = compositionOptional.get();
             composition.setGenre(getGenre(genre));
             composition.setTitleText(titleText);
-            composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
-            composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
+            composition.setShortText(convertTextToSave(shortText));
+            composition.setFullText(convertTextToSave(fullText));
             composition.setDate(composition.getDate());
 
             if (isNotPresentImage(file)) {// new photo
@@ -245,7 +238,6 @@ public class _2_LibraryController {
         if (compositionOptional.isPresent()) {
             compositionOptional.get().setPublicationType(PublicationType.PUBLIC_TO_FRIENDS);
             compositionRepository.save(compositionOptional.get());
-            return "redirect:/library/read-all-my-composition";
         }
         return "redirect:/library/read-all-my-composition";
     }
@@ -264,7 +256,7 @@ public class _2_LibraryController {
             CompositionDTO compositionDTO = new CompositionDTO(
                     composition.getId(),
                     composition.getTitleText(),
-                    convertText(composition.getFullText()),
+                    composition.getFullText(),
                     converterImage(composition.getImage()));
             User user = getUser(authentication);
             Optional<Evaluate> byIdAppraiser = evaluateRepository.findByIdAppraiserAndIdComposition(user.getId(), id);
@@ -316,7 +308,7 @@ public class _2_LibraryController {
         Comments commentsOfComposition = new Comments();
         commentsOfComposition.setIdComposition(id);
         commentsOfComposition.setIdUser(user.getId());
-        commentsOfComposition.setComments(convertTextWithFormatToCompositionSaveAndEdit(comments));
+        commentsOfComposition.setComments(convertTextToSave(comments));
 
         evaluateRepository.save(evaluate);
         commentsRepository.save(commentsOfComposition);
@@ -340,7 +332,7 @@ public class _2_LibraryController {
                 .map(composition -> new CompositionDTO(
                         composition.getId(),
                         composition.getTitleText(),
-                        convertText(composition.getShortText()),
+                        composition.getShortText(),
                         composition.getGenre(),
                         HOST_NAME + "/library/read-friend-one-composition/" + composition.getId(),
                         converterImage(composition.getImage())))
@@ -410,8 +402,8 @@ public class _2_LibraryController {
             composition.setGenre(getGenre(genre));
             composition.setPublicationType(PublicationType.NO_PUBLIC);
             composition.setTitleText(titleText);
-            composition.setShortText(convertTextWithFormatToCompositionSaveAndEdit(shortText));
-            composition.setFullText(convertTextWithFormatToCompositionSaveAndEdit(fullText));
+            composition.setShortText(convertTextToSave(shortText));
+            composition.setFullText(convertTextToSave(fullText));
             composition.setIdUser(user.getId());
             ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
             composition.setImage(convert.img);
@@ -463,20 +455,6 @@ public class _2_LibraryController {
         return "library-write-error-save-page";
     }
 
-    private String convertTextWithFormatToCompositionSaveAndEdit(String fullText) {
-        String text1 = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
-        return REGEX("(\\A)", "&#160&#160 ", text1);
-    }
-
-    //TODO REGEX
-    private String REGEX(String patternRegex,
-                         String replace,
-                         String text) {
-        Pattern pattern = Pattern.compile(patternRegex);
-        Matcher matcher = pattern.matcher(text);
-        return matcher.replaceAll(replace);
-    }
-
     private Genre getGenre(String genreString) {
         Map<String, Genre> genreMap = new HashMap<>();
         genreMap.put("FANTASY", Genre.FANTASY);
@@ -490,5 +468,22 @@ public class _2_LibraryController {
         UserDetailsImpl details = (UserDetailsImpl) authentication.getPrincipal();
         String userName = details.getUsername();
         return userRepository.findOneByEmail(userName).get();
+    }
+
+    private String convertTextToSave(String fullText) {
+        String text = REGEX("(\\n\\r*)", "<br>&#160&#160 ", fullText);
+        return REGEX("(\\A)", "&#160&#160 ", text);
+    }
+
+    private String REGEX(String patternRegex, String replace, String text) {
+        Pattern pattern = Pattern.compile(patternRegex);
+        Matcher matcher = pattern.matcher(text);
+        return matcher.replaceAll(replace);
+    }
+
+    private String convertTextToEdit(String text) {
+        return text
+                .replace("&#160&#160 ", "")
+                .replace("<br>", "");
     }
 }

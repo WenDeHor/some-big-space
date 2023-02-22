@@ -35,27 +35,25 @@
                         <br>
                     </div>
                     <div class="col-md-8">
-                        <h3 class="form-signin-heading">Редагувати рецепт</h3>
                         <div th:each="cookBookDTO, el:${cookBook}">
                             <form method="post" enctype="multipart/form-data">
                                 <img th:src="'data:image/jpeg;base64,' + ${cookBookDTO.convert}"
                                      style="width:100%"
                                      class="rounded mx-auto d-block"
-                                     alt="IMAGE OF COMPOSITION"/>
+                                     alt="IMAGE"/>
+                                <br>
                                 <div class="custom-file mb-4">
                                     <input type="file" name="file" class="custom-file-input"
                                            id="customFile"> <label class="custom-file-label"
                                                                    for="customFile">Добавити фото</label>
                                 </div>
                                 <p>
-                                    <label>Назва страви</label>
+                                    <label>Назва страви :</label>
                                     <input type="text" th:value="${cookBookDTO.titleText}" name="titleText"
                                            class="form-control"
                                            placeholder="Назва страви">
                                 </p>
-                                <br>
-                                <label>Перелік інгрідієнтів та рецептура</label>
-                                <label for="fullText"> записати рецепт : </label>
+                                <label for="fullText"> Перелік інгрідієнтів та рецептура : </label>
                                 <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
                                           placeholder="Записати рецепт {Максимальна кількість символів - 3000}"
                                           th:utext="${cookBookDTO.fullText}"></textarea> <br>
