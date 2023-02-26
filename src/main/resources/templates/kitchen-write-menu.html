@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
       style="height: 100%">
 
 <head th:insert="blocks/library::library">
@@ -71,24 +70,36 @@
                         </table>
 
                         <h5 class="text-center" style="color: #095979">Меню на наступний день</h5><br>
-                        <form action="/kitchen/write-menu" method="post" enctype="multipart/form-data">
-                            <table>
-                                <td><input type="date" name="date"></td>
-                                <td><h1>
-                                    <input type="text" name="breakfast" class="form-control"
-                                           placeholder="Сніданок">
-                                </h1></td>
-                                <td><h1>
-                                    <input type="text" name="dinner" class="form-control"
-                                           placeholder="Обід">
-                                </h1></td>
-                                <td><h1>
-                                    <input type="text" name="supper" class="form-control"
-                                           placeholder="Вечеря">
-                                </h1></td>
-                            </table>
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
-                        </form>
+                        <div th:each="menu, el:${menuWithError}" class="mt-2">
+                            <form action="/kitchen/write-menu" method="post" enctype="multipart/form-data">
+                                <table>
+                                    <div class="alert alert-danger" th:if="${error.one == '1'}">
+                                        Кількість символів сніданку більша 50
+                                    </div>
+                                    <div class="alert alert-danger" th:if="${error.two == '2'}">
+                                        Кількість символів обіду більша 50
+                                    </div>
+                                    <div class="alert alert-danger" th:if="${error.three == '3'}">
+                                        Кількість символів вечері більша 50
+                                    </div>
+                                    <td><input type="date" th:value="${menu.date}" name="date"></td>
+                                    <td><h1>
+                                        <input type="text" th:value="${menu.breakfast}" name="breakfast"
+                                               class="form-control"
+                                               placeholder="Сніданок">
+                                    </h1></td>
+                                    <td><h1>
+                                        <input type="text" th:value="${menu.dinner}" name="dinner" class="form-control"
+                                               placeholder="Обід">
+                                    </h1></td>
+                                    <td><h1>
+                                        <input type="text" th:value="${menu.supper}" name="supper" class="form-control"
+                                               placeholder="Вечеря">
+                                    </h1></td>
+                                </table>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">Зберегти</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -3,11 +3,9 @@ package com.myhome.controllers;
 import com.myhome.controllers.compresor.CompressorImgToJpg;
 import com.myhome.forms.ConvertFile;
 import com.myhome.forms.CookBookDTO;
+import com.myhome.forms.ErrorMessage;
 import com.myhome.forms.MenuDTO;
-import com.myhome.models.CookBook;
-import com.myhome.models.Menu;
-import com.myhome.models.ShopMeals;
-import com.myhome.models.User;
+import com.myhome.models.*;
 import com.myhome.repository.CookBookRepository;
 import com.myhome.repository.MenuRepository;
 import com.myhome.repository.ShopMealsRepository;
@@ -41,6 +39,10 @@ public class _5_KitchenRoomControllers {
     private final MetricsService metricsService;
     private final CompressorImgToJpg compressorImgToJpg;
     private final String KITCHEN_ROOM = "Кухня";
+    private int constant = 1049335;
+    private int limit_photo = 6; //MB
+    private int limit_titleText = 1000; //chars
+    private int limit_fullText = 3000; //chars
 
     public _5_KitchenRoomControllers(ShopMealsRepository shopMealsRepository, UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
         this.shopMealsRepository = shopMealsRepository;
@@ -122,7 +124,11 @@ public class _5_KitchenRoomControllers {
                                  MultipartFile file,
                                  Authentication authentication,
                                  @RequestParam String titleText,
-                                 @RequestParam String fullText) throws IOException {
+                                 @RequestParam String fullText,
+                                 Model model) throws IOException {
+        if (validatorCookBook(titleText, fullText, file)) {
+            return saveCookBookWithError(file, titleText, fullText, model);
+        }
         User user = getUser(authentication);
         Optional<CookBook> cookBookOptional = cookBookRepository.findByIdAndIdUser(id, user.getId());
         if (cookBookOptional.isPresent()) {
@@ -141,11 +147,47 @@ public class _5_KitchenRoomControllers {
         return "redirect:/kitchen/read-cookbook";
     }
 
+    private boolean validatorCookBook(String titleText, String fullText, MultipartFile file) throws IOException {
+        return file.getBytes().length / constant > limit_photo
+                || titleText.toCharArray().length > limit_titleText
+                || fullText.toCharArray().length > limit_fullText;
+    }
+
+    private String saveCookBookWithError(MultipartFile file,
+                                         String titleText,
+                                         String fullText,
+                                         Model model) throws IOException {
+        String stile = "crimson";
+        String originalFilename = file.getOriginalFilename();
+        int fileSize = file.getBytes().length / constant;
+        int titleTextSize = titleText.toCharArray().length;
+        int fullTextSize = fullText.toCharArray().length;
+        if (file.getBytes().length / constant > limit_photo) {
+            model.addAttribute("stile", stile);
+        }
+
+        model.addAttribute("originalFilename", originalFilename);
+        model.addAttribute("fileSize", fileSize);
+
+        model.addAttribute("titleText", titleText);
+        model.addAttribute("titleTextSize", titleTextSize);
+
+        model.addAttribute("fullText", fullText);
+        model.addAttribute("fullTextSize", fullTextSize);
+
+        model.addAttribute("title", KITCHEN_ROOM);
+        return "kitchen-edit-cookbook-with-error";
+    }
+
     @PostMapping("/kitchen/write-prescription")
     public String kitchenWritePrescriptionAdd(Authentication authentication,
                                               MultipartFile file,
                                               @RequestParam("titleText") String titleText,
-                                              @RequestParam("fullText") String fullText) throws IOException {
+                                              @RequestParam("fullText") String fullText,
+                                              Model model) throws IOException {
+        if (validatorCookBook(titleText, fullText, file)) {
+            return saveCookBookWithError(file, titleText, fullText, model);
+        }
         User user = getUser(authentication);
         CookBook cookBook = new CookBook();
         cookBook.setDate(new Date());
@@ -167,6 +209,8 @@ public class _5_KitchenRoomControllers {
         List<Menu> allMenuByAddress = menuRepository.findAllByIdUser(user.getId());
         allMenuByAddress.sort(Comparator.comparing(Menu::getId));
         model.addAttribute("allMenuByAddress", allMenuByAddress);
+        model.addAttribute("error", new ErrorMessage("", "", ""));
+        model.addAttribute("menuWithError", new Menu());
         model.addAttribute("title", KITCHEN_ROOM);
         return "kitchen-write-menu";
     }
@@ -176,7 +220,12 @@ public class _5_KitchenRoomControllers {
                                    @RequestParam("date") String date,
                                    @RequestParam("breakfast") String breakfast,
                                    @RequestParam("dinner") String dinner,
-                                   @RequestParam("supper") String supper) {
+                                   @RequestParam("supper") String supper,
+                                   Model model) {
+        ErrorMessage validator = validatorMenu(breakfast, dinner, supper);
+        if (validator.getOne().length() > 0 || validator.getTwo().length() > 0 || validator.getThree().length() > 0) {
+            return menuWithError(authentication, date, breakfast, dinner, supper, model, validator);
+        }
         User user = getUser(authentication);
         Menu menu = new Menu();
         menu.setSupper(supper);
@@ -190,6 +239,51 @@ public class _5_KitchenRoomControllers {
         }
         menuRepository.save(menu);
         return "redirect:/kitchen/write-menu";
+    }
+
+    private ErrorMessage validatorMenu(String breakfast,
+                                       String dinner,
+                                       String supper) {
+        ErrorMessage errorMessage = new ErrorMessage("", "", "");
+
+        if (breakfast.length() > 50) {
+            errorMessage.setOne("1");
+        }
+        if (dinner.length() > 50) {
+            errorMessage.setTwo("2");
+        }
+        if (supper.length() > 50) {
+            errorMessage.setThree("3");
+        }
+        return errorMessage;
+    }
+
+    private String menuWithError(Authentication authentication,
+                                 String date,
+                                 String breakfast,
+                                 String dinner,
+                                 String supper,
+                                 Model model,
+                                 ErrorMessage errors) {
+        Menu menu = new Menu();
+        if (date.isEmpty()) {
+            menu.setDate(new Date());
+        } else {
+            menu.setDate(Date.from(Instant.parse(date + "T10:15:30.00Z")));
+        }
+        menu.setBreakfast(breakfast);
+        menu.setDinner(dinner);
+        menu.setSupper(supper);
+
+        User user = getUser(authentication);
+        List<Menu> allMenuByAddress = menuRepository.findAllByIdUser(user.getId());
+        allMenuByAddress.sort(Comparator.comparing(Menu::getId));
+        model.addAttribute("allMenuByAddress", allMenuByAddress);
+
+        model.addAttribute("title", KITCHEN_ROOM);
+        model.addAttribute("error", errors);
+        model.addAttribute("menuWithError", menu);
+        return "kitchen-write-menu";
     }
 
     @GetMapping("/kitchen/write-menu/{id}/remove")
@@ -256,13 +350,21 @@ public class _5_KitchenRoomControllers {
         List<ShopMeals> shopMealsList = shopMealsRepository.findAllByIdUser(user.getId());
         shopMealsList.sort(Comparator.comparing(ShopMeals::getId));
         model.addAttribute("shopMealsList", shopMealsList);
+
+        model.addAttribute("error",  new ErrorMessage(""));
+        model.addAttribute("shopMealsWithError", new ShopMeals());
         model.addAttribute("title", KITCHEN_ROOM);
         return "kitchen-write-shop-meals";
     }
 
     @PostMapping("/kitchen/write-shop-meal")
     public String kitchenWriteShopMeal(Authentication authentication,
+                                       Model model,
                                        @RequestParam("fullText") String fullText) {
+        ErrorMessage validator = validatorShopMeal(fullText);
+        if (validator.getOne().length() > 0) {
+            return shopMealsWithError(authentication, fullText, model, validator);
+        }
         User user = getUser(authentication);
         ShopMeals shopMeals = new ShopMeals();
         shopMeals.setIdUser(user.getId());
@@ -274,6 +376,33 @@ public class _5_KitchenRoomControllers {
         }
         shopMealsRepository.save(shopMeals);
         return "redirect:/kitchen/write-shop-meals";
+    }
+
+    private ErrorMessage validatorShopMeal(String fullText) {
+        ErrorMessage errorMessage = new ErrorMessage("");
+        if (fullText.length() > 100) {
+            errorMessage.setOne("1");
+        }
+        return errorMessage;
+    }
+
+    private String shopMealsWithError(Authentication authentication,
+                                      String fullText,
+                                      Model model,
+                                      ErrorMessage errors) {
+        ShopMeals shopMeals = new ShopMeals();
+        shopMeals.setFullText(fullText);
+
+        User user = getUser(authentication);
+        List<ShopMeals> shopMealsList = shopMealsRepository.findAllByIdUser(user.getId());
+        shopMealsList.sort(Comparator.comparing(ShopMeals::getId));
+        model.addAttribute("shopMealsList", shopMealsList);
+
+
+        model.addAttribute("title", KITCHEN_ROOM);
+        model.addAttribute("error", errors);
+        model.addAttribute("shopMealsWithError", shopMeals);
+        return "kitchen-write-shop-meals";
     }
 
     @GetMapping("/kitchen/write-shop-meals/{id}/remove")

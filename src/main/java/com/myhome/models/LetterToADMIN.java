@@ -31,7 +31,7 @@ public class LetterToADMIN {
     private String titleText;
 
     @Column(name = "full_text")
-    @Size(max = 20000)
+    @Size(max = 3000)
     private String fullText;
 
     public LetterToADMIN() {

@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
       style="height: 100%">
 
 <head th:insert="blocks/library::library">
@@ -35,9 +34,9 @@
                         <table class="table">
                             <thead class="thead-light">
                             <tr>
-                                <th><h5>Зображення</h5></th>
-                                <th><h5>Назва</h5></th>
-                                <th><h5>Видалення</h5></th>
+                                <th style="width: 30%"><h5>Зображення</h5></th>
+                                <th style="width: 50%"><h5>Назва</h5></th>
+                                <th style="width: 20%"><h5>Видалення</h5></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -46,11 +45,11 @@
                                     <a th:href="${referenceDTO.url}">
                                         <img class="mx-auto d-block"
                                              th:src="'data:image/jpg;base64,' + ${referenceDTO.image}"
-                                             style="width:20%" alt="Error content letterToADMIN"/>
+                                             style="width:40%" alt="Error content letterToADMIN"/>
                                     </a>
                                 </td>
                                 <td>
-                                    <h5><p th:text="${referenceDTO.titleText}"/></h5>
+                                    <h5><p th:text="${referenceDTO.titleText}"></p></h5>
                                 </td>
                                 <td><a th:href="'/safe/read-save-edit-reference/'+${referenceDTO.id}+'/remove'"
                                        class="btn btn-warning">Видалити</a></td>

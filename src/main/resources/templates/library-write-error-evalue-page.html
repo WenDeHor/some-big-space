@@ -34,20 +34,16 @@
                             До головної</a>
                     </div>
                     <div class="col-md-8">
-                        <div th:each="compositionDTO, el:${compositionOne}" class="mt-2">
-                            <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}" style="width:100%"
-                                 class="rounded mx-auto d-block"
-                                 alt="IMAGE OF COMPOSITION"/>
-                            <br>
-                            <h5><p class="font-weight-bold text-center" th:utext="${compositionDTO.titleText}"></p></h5>
-                            <h5><p th:utext="${compositionDTO.fullText}"></p></h5>
-                            <br>
+                        <div th:each="comments:${commentsTextSize}">
+                            <h5 class="text-left" th:style="${comments>3000 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір Вашого коментаря : '+${comments} + ' симовлів. Допустима кількись символів 3_000'"></h5>
                         </div>
-                        <div th:each="el:${comments}" class="alert mt-2 alert-info">
-                            <h5><p class=" lh-lg " th:utext="${el}"
-                                   style=" font-family: 'Open Sans',sans-serif; line-height: 1.5"></p></h5>
-                        </div>
+                        <br>
+                        <button class="btn btn-lg btn-primary btn-block" onclick="window.history.back()">Повернутися
+                            назад
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>

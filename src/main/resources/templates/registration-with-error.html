@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      style="height: 100%">
+
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+<body style="height: 100%">
+<div th:insert="blocks/heder-mine::header-mine"></div>
+<div class="wrapper" style="min-height: 100%; display: flex; flex-direction: column">
+    <div class="container" style="padding:30px; flex: 1 1 auto">
+        <div th:each="user, el:${userWithError}">
+            <form class="form-sign" method="post" action="/registration">
+                <h5 class="d-flex justify-content-center " style="color: #095979">
+                    Реєстрація</h5>
+                <div class="alert alert-danger" th:if="${error.two == '2'}">Ім’я та прізвище введено не латиницею</div>
+                <div class="alert alert-danger" th:if="${error.three == '3'}">Кількість символів меньша трьох</div>
+                <p>
+                    <label for="login">Моє повне імя та прізвище</label>
+                    <input type="text" id="login" name="login" class="form-control"
+                           th:value="${user.login}"
+                           placeholder="Введіть своє імя та прізвище латинецею" required>
+                </p>
+                <p>
+                    <label for="settlement">Виберіть віртуальне поселення</label>
+                    <select class="form-control" id="settlement" name="settlement">
+                        <div th:if="${user.settlement == 'New_Apple'}">
+                            <option>New_Apple</option>
+                            <option>Oxilion</option>
+                            <option>Old_Horogat</option>
+                            <option>Monterey</option>
+                        </div>
+                        <div th:if="${user.settlement == 'Oxilion'}">
+                            <option>Oxilion</option>
+                            <option>New_Apple</option>
+                            <option>Old_Horogat</option>
+                            <option>Monterey</option>
+                        </div>
+                        <div th:if="${user.settlement == 'Old_Horogat'}">
+                            <option>Old_Horogat</option>
+                            <option>New_Apple</option>
+                            <option>Oxilion</option>
+                            <option>Monterey</option>
+                        </div>
+                        <div th:if="${user.settlement == 'Monterey'}">
+                            <option>Monterey</option>
+                            <option>New_Apple</option>
+                            <option>Oxilion</option>
+                            <option>Old_Horogat</option>
+                        </div>
+                    </select>
+                </p>
+                <div class="alert alert-danger" th:if="${error.one == '1'}">Дана пошта уже зареєстрована</div>
+                <div class="alert alert-danger" th:if="${error.five == '5'}">Електронна скринька помилкова</div>
+                <p>
+                    <label for="email">Введіть електронну скриньку</label>
+                    <input type="text" id="email" name="email" class="form-control"
+                           th:value="${user.email}"
+                           placeholder="Введіть персональну електронну скриньку"
+                           required>
+                </p>
+                <div class="alert alert-danger" th:if="${error.four == '4'}">Кількість символів меньша чотирьох</div>
+                <p>
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="Введіть пароль" required>
+                </p>
+
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Зареєструватись</button>
+            </form>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div>
+        <footer th:insert="blocks/footer-first::footer-first"></footer>
+    </div>
+</div>
+</body>
+</html>
+
+
+

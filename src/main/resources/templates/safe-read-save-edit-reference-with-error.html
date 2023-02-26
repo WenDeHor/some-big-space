@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
       style="height: 100%">
 
 <head th:insert="blocks/library::library">
@@ -21,10 +20,10 @@
                            class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                             Читати щоденник</a>
                         <a href="/safe/edit-diary"
-                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                             Редагувати щоденник</a>
                         <a href="/safe/read-save-edit-reference"
-                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                             Мої сервіси</a>
                         <a href="/user-page"
                            class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
@@ -32,21 +31,24 @@
                         <br>
                     </div>
                     <div class="col-md-8">
-                        <div th:each="diaryDTO, el:${diaryList}" class="mt-2">
-                            <img th:src="'data:image/jpeg;base64,' + ${diaryDTO.image}"
-                                 style="width:100%"
-                                 class="rounded mx-auto d-block"
-                                 alt="IMAGE"/>
-                            <br>
-                            <h4><p th:utext="${diaryDTO.titleText}"></p></h4>
-                            <!--                        <h6><p th:text="${#dates.format({diary.localDate}, 'dd-MM-yyyy')}"/></h6>-->
-                            <h5><p th:utext="${diaryDTO.fullText}"></p></h5>
-                            <a th:href="'/safe/edit-diary/'+${diaryDTO.id}+'/edit'"
-                               class="btn btn-warning"> Редагувати</a>
-                            <a th:href="'/safe/edit-diary/'+${diaryDTO.id}+'/remove'"
-                               class="btn btn-warning">Видалити</a>
-                            <br>
+                        <div th:each="file:${fileSize}">
+                            <h5 class="text-left" th:style="${file>6 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір фото : '+${file} + 'МВ. Допустимий розмір 6МВ'"></h5>
                         </div>
+                        <br>
+                        <div th:each="titleText:${titleTextSize}">
+                            <h5 class="text-left" th:style="${titleText>50 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір заголовку : '+${titleText} + '. Допустима кількись символів 50'"></h5>
+                        </div>
+                        <br>
+                        <div th:each="url:${urlTextSize}">
+                            <h5 class="text-left" th:style="${url>2000 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Кількість символів посилання : '+${url} + '. Допустима кількись символів 2_000'"></h5>
+                        </div>
+                        <br>
+                        <button class="btn btn-lg btn-primary btn-block" onclick="window.history.back()">
+                            Повернутися назад
+                        </button>
                     </div>
                 </div>
             </div>

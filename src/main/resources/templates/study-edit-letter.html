@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
       style="height: 100%">
 
 <head th:insert="blocks/library::library">
@@ -21,13 +20,13 @@
                            class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                             Мої листи</a>
                         <a href="/study/write-letter"
-                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
+                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
                             Написати листа</a>
                         <a href="/study/read-all-publications"
                            class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                             Усі публікації</a>
                         <a href="/study/read-my-publications"
-                           class="btn btn-warning btn-lg btn-block text-left font-weight-bold" role="button">
+                           class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
                             Мої публікації</a>
                         <a href="/study/write-publication"
                            class="btn btn-info btn-lg btn-block text-left font-weight-bold" role="button">
@@ -38,22 +37,38 @@
                         <br>
                     </div>
                     <div class="col-md-8">
-                        <div th:each="publicationUser, el:${publication}">
-                            <form method="post">
-                                <div class="alert alert-danger" th:if="${error.one == '1'}">Перевищення довжини заголовку в 100 символів</div>
+                        <div th:each="letterToUSER, el:${editUserLetter}">
+                            <form action="/study/write-letter/send" method="post">
+                                <div class="alert alert-danger" th:if="${error.one == '1'}">Помилкова адреса отримувача</div>
+                                <p>
+                                    <label for="recipientAddress">Отримувач</label>
+                                    <input id="recipientAddress" type="text"
+                                           th:value="${letterToUSER.recipientAddress}"
+                                           name="recipientAddress"
+                                           class="form-control"
+                                           placeholder="Місце для адреси отримувача" required>
+                                </p>
+
+                                <label>Відправник</label>
+                                <div>
+                                    <h6 class="text-left" th:text="${letterToUSER.senderAddress}"></h6>
+                                </div>
+                                <br>
+                                <div class="alert alert-danger" th:if="${error.two == '2'}">Перевищення довжини заголовку в 100 символів</div>
                                 <p>
                                     <label for="titleText"> Заголовок : </label>
-                                    <input id="titleText" type="text" th:value="${publicationUser.titleText}" name="titleText" class="form-control"
+                                    <input id="titleText" type="text"
+                                           th:value="${letterToUSER.titleText}" name="titleText" class="form-control"
                                            placeholder="Місце для загловку" required>
                                 </p>
                                 <br>
-                                <div class="alert alert-danger" th:if="${error.two == '2'}"> Перевищення довжини публікації в 3 000 символів</div>
-                                <label for="fullText"> Місце для ваших публікацій : </label>
+                                <div class="alert alert-danger" th:if="${error.tree == '3'}"> Перевищення довжини листа в 3 000 символів</div>
+                                <label for="fullText">Лист : </label>
                                 <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                          placeholder="Місце для основного тексту публікації {максимальна кількість символів публікації - 3000} "
-                                          th:text="${publicationUser.fullText}" required></textarea> <br>
+                                          placeholder="Місце для основного тексту листа {максимальна кількість символів - 3000}"
+                                          th:text="${letterToUSER.fullText}" required></textarea> <br>
                                 <br>
-                                <button class="btn btn-lg btn-primary btn-block" type="submit">Обновити</button>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">Відправити</button>
                             </form>
                         </div>
                     </div>

@@ -18,7 +18,7 @@ public class PublicationUser {
     private Date date;
 
     @Column(name = "title_text")
-    @Size(max = 1000)
+    @Size(max = 100)
     private String titleText;
 
     @Column(name = "full_text")

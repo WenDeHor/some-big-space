@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
       style="height: 100%">
 
 <head th:insert="blocks/library::library">
@@ -40,9 +39,9 @@
                     <div class="col-md-8">
                         <form action="/study/write-letter/send" method="post">
                             <p>
-                                <label>Отримувач</label>
-                                <input type="text" name="recipientAddress" class="form-control"
-                                       placeholder="Місце для адреси отримувача">
+                                <label for="recipientAddress">Отримувач</label>
+                                <input id="recipientAddress" type="text" name="recipientAddress" class="form-control"
+                                       placeholder="Місце для адреси отримувача" required>
                             </p>
 
                             <label>Відправник</label>
@@ -51,15 +50,14 @@
                             </div>
                             <br>
                             <p>
-                                <label>Заголовок</label>
-                                <input type="text" name="titleText" class="form-control"
-                                       placeholder="Місце для заголовку">
+                                <label for="titleText"> Заголовок :</label>
+                                <input id="titleText" type="text" name="titleText" class="form-control"
+                                       placeholder="Місце для заголовку" required>
                             </p>
                             <br>
-                            <label>Лист</label>
-                            <label for="fullText"> місе для вашого листа : </label>
+                            <label for="fullText">Лист : </label>
                             <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                      placeholder="Місце для основного тексту листа {максимальна кількість символів - 3000} "></textarea>
+                                      placeholder="Місце для основного тексту листа {максимальна кількість символів - 3000}" required></textarea>
                             <br>
                             <br>
                             <button class="btn btn-lg btn-primary btn-block" type="submit">Відправити</button>

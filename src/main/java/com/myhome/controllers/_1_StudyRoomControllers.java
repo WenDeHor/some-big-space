@@ -1,5 +1,6 @@
 package com.myhome.controllers;
 
+import com.myhome.forms.ErrorMessage;
 import com.myhome.forms.LettersDTO;
 import com.myhome.forms.PublicationDTO;
 import com.myhome.models.LetterToADMIN;
@@ -66,8 +67,13 @@ public class _1_StudyRoomControllers {
     public String letterSend(@RequestParam String titleText,
                              @RequestParam String fullText,
                              @RequestParam String recipientAddress,
-                             Authentication authentication) {
+                             Authentication authentication,
+                             Model model) {
         User user = getUser(authentication);
+        ErrorMessage validator = validatorLetter(titleText, fullText, recipientAddress);
+        if (validator.getOne().length() > 0 || validator.getTwo().length() > 0 || validator.getThree().length() > 0) {
+            return letterEdit(titleText, fullText, recipientAddress, user, model, validator);
+        }
         if (recipientAddress.equals(ADMIN)) {
             LetterToADMIN userSendLetterToADMIN = new LetterToADMIN();
             userSendLetterToADMIN.setDate(new Date());
@@ -76,20 +82,48 @@ public class _1_StudyRoomControllers {
             userSendLetterToADMIN.setAddressUser(user.getAddress());
             letterToADMINRepository.save(userSendLetterToADMIN);
         } else {
-            LetterToUSER userSendLetterToUSER = createLetterToUSER(titleText, fullText, recipientAddress, user);
+            LetterToUSER userSendLetterToUSER = createLetterToUSER(titleText, convertTextToSave(fullText), recipientAddress, user);
             letterToUSERRepository.save(userSendLetterToUSER);
+            return "redirect:/study/outer-letters";
         }
         return "redirect:/study/outer-letters";
+    }
+
+    private ErrorMessage validatorLetter(String titleText,
+                                         String fullText,
+                                         String recipientAddress) {
+        Optional<User> isUserPresent = userRepository.findOneByAddress(recipientAddress.trim());
+        ErrorMessage errorMessage = new ErrorMessage("", "", "");
+
+        if (recipientAddress.length() > 50 || !isUserPresent.isPresent()) {
+            errorMessage.setOne("1");
+        }
+        if (titleText.length() > 100) {
+            errorMessage.setTwo("2");
+        }
+        if (fullText.length() > 3000) {
+            errorMessage.setThree("3");
+        }
+        return errorMessage;
     }
 
     private LetterToUSER createLetterToUSER(String titleText, String fullText, String recipientAddress, User user) {
         LetterToUSER userSendLetterToUSER = new LetterToUSER();
         userSendLetterToUSER.setDate(new Date());
         userSendLetterToUSER.setTitleText(titleText);
-        userSendLetterToUSER.setFullText(convertTextToSave(fullText));
+        userSendLetterToUSER.setFullText(fullText);
         userSendLetterToUSER.setSenderAddress(user.getAddress());
         userSendLetterToUSER.setRecipientAddress(recipientAddress);
         return userSendLetterToUSER;
+    }
+
+    private String letterEdit(String titleText, String fullText, String recipientAddress, User user, Model model, ErrorMessage errors) {
+        LetterToUSER editUserLetter = createLetterToUSER(titleText, fullText, recipientAddress, user);
+        editUserLetter.setSenderAddress(user.getAddress());
+        model.addAttribute("title", MY_ROOM);
+        model.addAttribute("error", errors);
+        model.addAttribute("editUserLetter", editUserLetter);
+        return "study-edit-letter";
     }
 
     @GetMapping("/study/outer-letters")
@@ -100,9 +134,11 @@ public class _1_StudyRoomControllers {
         String address = findUserAddress(authentication);
         List<LettersDTO> lettersDTOS = Stream
                 .concat(letterToUSERRepository.findAllBySenderAddress(address).stream()
-                                .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(), buildInfoBySenderToLetterToUSER(el))),
+                                .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(),
+                                        buildInfoBySenderToLetterToUSER(el), el.getRecipientAddress())),
                         letterToADMINRepository.findAllByAddressUser(address).stream()
-                                .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(), buildInfoBySenderToLetterToADMIN(el))))
+                                .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(),
+                                        buildInfoBySenderToLetterToADMIN(el), ADMIN)))
                 .sorted(Comparator.comparing(LettersDTO::getDate).reversed())
                 .collect(Collectors.toList());
         model.addAttribute("letters", lettersDTOS);
@@ -120,10 +156,10 @@ public class _1_StudyRoomControllers {
                 ", Дата: " + letter.getDate().toString().split("\\s")[0];
     }
 
-    @GetMapping("/study/outer-letters/{idLetter}/remove")
-    public String letterRemoveByOuter(@PathVariable(value = "idLetter") int idLetter) {
-        Optional<LetterToUSER> letterOptional = letterToUSERRepository.findById(idLetter);
-        letterOptional.ifPresent(letterToUSERRepository::delete);
+    @GetMapping("/study/outer-letters/{idLetter}/remove/by-user/{email}")
+    public String letterRemoveByOuter(@PathVariable(value = "idLetter") int idLetter,
+                                      @PathVariable(value = "email") String email) {
+        removeLetter(idLetter, email);
         return "redirect:/study/outer-letters";
     }
 
@@ -145,11 +181,21 @@ public class _1_StudyRoomControllers {
                 ", Дата: " + letter.getDate().toString().split("\\s")[0];
     }
 
-    @GetMapping("/study/enter-letters/{idLetter}/remove")
-    public String letterRemoveByEnter(@PathVariable(value = "idLetter") int idLetter) {
-        Optional<LetterToUSER> letterOptional = letterToUSERRepository.findById(idLetter);
-        letterOptional.ifPresent(letterToUSERRepository::delete);
+    @GetMapping("/study/enter-letters/{idLetter}/remove/by-user/{email}")
+    public String letterRemoveByEnter(@PathVariable(value = "idLetter") int idLetter,
+                                      @PathVariable(value = "email") String email) {
+        removeLetter(idLetter, email);
         return "redirect:/study/enter-letters";
+    }
+
+    private void removeLetter(int idLetter, String email) {
+        if (email.equals(ADMIN)) {
+            Optional<LetterToADMIN> letterToADMIN = letterToADMINRepository.findById(idLetter);
+            letterToADMIN.ifPresent(letterToADMINRepository::delete);
+        } else {
+            Optional<LetterToUSER> letterOptional = letterToUSERRepository.findById(idLetter);
+            letterOptional.ifPresent(letterToUSERRepository::delete);
+        }
     }
 
     //TODO Publications
@@ -212,6 +258,7 @@ public class _1_StudyRoomControllers {
             PublicationUser publicationUser = userPublicationOptional.get();
             publicationUser.setFullText(convertTextToEdit(publicationUser.getFullText()));
             model.addAttribute("title", MY_ROOM);
+            model.addAttribute("error", new ErrorMessage("", ""));
             model.addAttribute("publication", publicationUser);
             return "study-edit-publications";
         }
@@ -221,12 +268,20 @@ public class _1_StudyRoomControllers {
     @PostMapping("/study/publication/{idPublication}/edit")
     public String publicationUpdate(@PathVariable(value = "idPublication") int idPublication,
                                     @RequestParam String titleText,
-                                    @RequestParam String fullText) {
-        PublicationUser publicationUser = publicationRepository.findById(idPublication).orElseThrow(null);
-        publicationUser.setTitleText(titleText);
-        publicationUser.setFullText(convertTextToSave(fullText));
-        publicationUser.setDate(new Date());
-        publicationRepository.save(publicationUser);
+                                    @RequestParam String fullText,
+                                    Model model) {
+        ErrorMessage validator = validatorPublication(titleText, fullText);
+        if (validator.getOne().length() > 0 || validator.getTwo().length() > 0) {
+            return publicationWithError(titleText, fullText, model, validator);
+        }
+        Optional<PublicationUser> publicationUserOptional = publicationRepository.findById(idPublication);
+        if (publicationUserOptional.isPresent()) {
+            PublicationUser publicationUser = publicationUserOptional.get();
+            publicationUser.setTitleText(titleText);
+            publicationUser.setFullText(convertTextToSave(fullText));
+            publicationUser.setDate(new Date());
+            publicationRepository.save(publicationUser);
+        }
         return "redirect:/study/read-my-publications";
     }
 
@@ -239,8 +294,14 @@ public class _1_StudyRoomControllers {
     @PostMapping("/study/publication/add")
     public String blogPublicationAdd(@RequestParam String titleText,
                                      @RequestParam String fullText,
-                                     Authentication authentication) {
+                                     Authentication authentication,
+                                     Model model) {
         User user = getUser(authentication);
+        ErrorMessage validator = validatorPublication(titleText, fullText);
+        if (validator.getOne().length() > 0 || validator.getTwo().length() > 0) {
+            return publicationWithError(titleText, fullText, model, validator);
+        }
+
         PublicationUser publicationUser = new PublicationUser();
         publicationUser.setIdUser(user.getId());
         publicationUser.setDate(new Date());
@@ -248,6 +309,28 @@ public class _1_StudyRoomControllers {
         publicationUser.setFullText(convertTextToSave(fullText));
         publicationRepository.save(publicationUser);
         return "redirect:/study/read-my-publications";
+    }
+
+    private ErrorMessage validatorPublication(String titleText,
+                                              String fullText) {
+        ErrorMessage errorMessage = new ErrorMessage("", "");
+        if (titleText.length() > 100) {
+            errorMessage.setOne("1");
+        }
+        if (fullText.length() > 3000) {
+            errorMessage.setTwo("2");
+        }
+        return errorMessage;
+    }
+
+    private String publicationWithError(String titleText, String fullText, Model model, ErrorMessage errors) {
+        PublicationUser publicationUser = new PublicationUser();
+        publicationUser.setTitleText(titleText);
+        publicationUser.setFullText(fullText);
+        model.addAttribute("title", MY_ROOM);
+        model.addAttribute("error", errors);
+        model.addAttribute("publication", publicationUser);
+        return "study-edit-publications";
     }
 
     private String findUserAddress(Authentication authentication) {

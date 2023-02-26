@@ -1,6 +1,7 @@
 package com.myhome.controllers;
 
 
+import com.myhome.forms.ErrorMessage;
 import com.myhome.forms.UserForm;
 import com.myhome.models.User;
 import com.myhome.repository.UserRepository;
@@ -17,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.myhome.controllers.Utils.errorIMG;
 
 @Controller
 public class SecurityController {
@@ -42,20 +41,54 @@ public class SecurityController {
     public String registration(UserForm userForm, Model model, HttpServletRequest request) {
         Optional<User> userPresent = userRepository.findOneByEmail(userForm.getEmail());
         String login = userForm.getLogin().trim().replaceAll("\\s+", "00");
-        if (request.getParameterMap().containsKey("error")
-                || userPresent.isPresent()
-                || !onlyLatinAlphabet(login)
-                || userForm.getLogin().length() < 3
-                || userForm.getPassword().length() < 4
-                || !emailValidator(userForm.getEmail())
-        ) {
-            model.addAttribute("error", true);
-            model.addAttribute("errorIMG", errorIMG());
-            model.addAttribute("title", MY_HOME);
-            return "registration-error";
+
+        ErrorMessage validator = validatorRegistration(userPresent, userForm, login);
+        if (validator.getOne().length() > 0
+                || validator.getTwo().length() > 0
+                || validator.getThree().length() > 0
+                || validator.getFour().length() > 0
+                || validator.getFive().length() > 0) {
+            return registrationWithError(userForm, validator, model);
         }
+        model.addAttribute("title", MY_HOME);
         service.signUp(userForm);
         return "redirect:/login";
+    }
+
+    private String registrationWithError(UserForm userForm,
+                                         ErrorMessage errors,
+                                         Model model) {
+        User userWithError = new User();
+        userWithError.setLogin(userForm.getLogin());
+        userWithError.setEmail(userForm.getEmail());
+        userWithError.setSettlement(userForm.getSettlement());
+        model.addAttribute("title", MY_HOME);
+        model.addAttribute("error", errors);
+        model.addAttribute("userWithError", userWithError);
+        return "registration-with-error";
+    }
+
+    private ErrorMessage validatorRegistration(Optional<User> userPresent,
+                                               UserForm userForm,
+                                               String login) {
+        ErrorMessage errorMessage = new ErrorMessage("", "", "", "", "");
+        if (userPresent.isPresent()) {
+            errorMessage.setOne("1");
+        }
+        if (!onlyLatinAlphabet(login)) {
+            errorMessage.setTwo("2");
+        }
+        if (userForm.getLogin().length() < 3) {
+            errorMessage.setThree("3");
+        }
+        if (userForm.getPassword().length() < 4) {
+            errorMessage.setFour("4");
+        }
+        if (!emailValidator(userForm.getEmail())) {
+            errorMessage.setFive("5");
+        }
+
+        return errorMessage;
     }
 
     private boolean onlyLatinAlphabet(String userLogin) {

@@ -34,6 +34,7 @@ public class _4_LivingRoomControllers {
     private final FamilyRepository familyRepository;
 
     private final String LIVING_ROOM = "Вітальня";
+    private int limit_url = 2000; //chars
 
     private final MetricsService metricsService;
 
@@ -155,7 +156,7 @@ public class _4_LivingRoomControllers {
     public String livingFriendRemove(@PathVariable(value = "id") int id,
                                      Authentication authentication) {
         User user = getUser(authentication);
-        Optional< Friends> friendsOptional = friendsRepository.findByIdFriendAndIdUser(id, user.getId());
+        Optional<Friends> friendsOptional = friendsRepository.findByIdFriendAndIdUser(id, user.getId());
         friendsOptional.ifPresent(friendsRepository::delete);
         return "redirect:/living/friends/friends";
     }
@@ -193,8 +194,11 @@ public class _4_LivingRoomControllers {
 
     @PostMapping("/living/news/add/video")
     public String livingNewsAddVideo(Authentication authentication,
-                                     @RequestParam("linkToVideo") String linkToVideo) {
-
+                                     @RequestParam("linkToVideo") String linkToVideo,
+                                     Model model) {
+        if (validatorNewsAddVideo(linkToVideo)) {
+            return saveNewsAddVideoWithError( linkToVideo, model);
+        }
         User user = getUser(authentication);
         String url = createURL(parseNormalURL(linkToVideo));
 
@@ -204,6 +208,19 @@ public class _4_LivingRoomControllers {
         videoBox.setDate(new Date());
         videoBoxRepository.save(videoBox);
         return "redirect:/living/news/video";
+    }
+
+    private boolean validatorNewsAddVideo(String url) {
+        return url.toCharArray().length > limit_url;
+    }
+
+    private String saveNewsAddVideoWithError(String url,
+                                          Model model) {
+        int fullTextSize = url.toCharArray().length;
+        model.addAttribute("url", url);
+        model.addAttribute("urlTextSize", fullTextSize);
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-news-video-with-error";
     }
 
     private String createURL(String nameURL) {

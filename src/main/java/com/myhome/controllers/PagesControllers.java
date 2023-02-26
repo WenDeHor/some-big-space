@@ -2,10 +2,7 @@ package com.myhome.controllers;
 
 
 import com.myhome.controllers.compresor.CompressorImgToJpg;
-import com.myhome.forms.CompositionDTO;
-import com.myhome.forms.ConvertFile;
-import com.myhome.forms.PublicationPostAdminDTO;
-import com.myhome.forms.UserPhotoDTO;
+import com.myhome.forms.*;
 import com.myhome.models.*;
 import com.myhome.repository.*;
 import com.myhome.security.UserDetailsImpl;
@@ -312,29 +309,60 @@ public class PagesControllers {
     @PostMapping("/users/send-letter")
     public String sendLetter(@RequestParam("userPost") String userPost,
                              @RequestParam("titleText") String titleText,
-                             @RequestParam("fullText") String fullText) {
-        if (userPost.toCharArray().length > 100
-                || titleText.toCharArray().length > 100
-                || fullText.toCharArray().length > 20000) {
-            return "redirect:/error-letter";
-        } else {
-            LetterToADMIN letterToADMIN = new LetterToADMIN();
-            letterToADMIN.setDate(new Date());
-            letterToADMIN.setEmail(userPost);
-            letterToADMIN.setTitleText(titleText);
-            letterToADMIN.setFullText(fullText);
-            letterToADMINRepository.save(letterToADMIN);
-            return "redirect:/";
+                             @RequestParam("fullText") String fullText,
+                             Model model) {
+
+        ErrorMessage validator = validatorRegistration(userPost, titleText, fullText);
+        if (validator.getOne().length() > 0
+                || validator.getTwo().length() > 0
+                || validator.getThree().length() > 0) {
+            return letterWithError(userPost, titleText, fullText, model, validator);
         }
+        LetterToADMIN letterToADMIN = new LetterToADMIN();
+        letterToADMIN.setDate(new Date());
+        letterToADMIN.setEmail(userPost);
+        letterToADMIN.setTitleText(titleText);
+        letterToADMIN.setFullText(fullText);
+        letterToADMINRepository.save(letterToADMIN);
+        return "redirect:/";
     }
 
-    @GetMapping("/registration-error")
-    public String registrationError(Model model,
-                                    HttpServletRequest request) {
-        metricsService.startMetricsCheck(request, request.getRequestURI());
+    private String letterWithError(String userPost,
+                                   String titleText,
+                                   String fullText,
+                                   Model model,
+                                   ErrorMessage validator) {
+        LettersDTO lettersDTO = new LettersDTO();
+        lettersDTO.setEmail(userPost);
+        lettersDTO.setTitleText(titleText);
+        lettersDTO.setFullText(fullText);
         model.addAttribute("title", MY_HOME);
-        model.addAttribute("title", "Registration-error");
-        return "registration-error";
+        model.addAttribute("error", validator);
+        model.addAttribute("letters", lettersDTO);
+        return "users-write-letter-with-error";
+    }
+
+    private ErrorMessage validatorRegistration(String userPost,
+                                               String titleText,
+                                               String fullText) {
+        ErrorMessage errorMessage = new ErrorMessage("", "", "");
+        if (!emailValidator(userPost)) {
+            errorMessage.setOne("1");
+        }
+        if (titleText.length() > 100) {
+            errorMessage.setTwo("2");
+        }
+        if (fullText.length() > 3000) {
+            errorMessage.setThree("3");
+        }
+        return errorMessage;
+    }
+
+    private boolean emailValidator(String email) {
+        String EMAIL_REGEX = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
+        Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+        Matcher matcher = EMAIL_PATTERN.matcher(email);
+        return matcher.matches();
     }
 
     private User getUser(Authentication authentication) {

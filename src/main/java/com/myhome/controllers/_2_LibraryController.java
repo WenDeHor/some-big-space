@@ -43,6 +43,7 @@ public class _2_LibraryController {
     private int limit_titleText = 150; //chars
     private int limit_shortText = 1000; //chars
     private int limit_fullText = 20000; //chars
+    private int limit_comment = 3000; //chars
     private final String LIBRARY = "Читальня";
     private final String HOST_NAME = "http://localhost:8080";
 
@@ -175,25 +176,30 @@ public class _2_LibraryController {
                                     @RequestParam String genre,
                                     @RequestParam String titleText,
                                     @RequestParam String shortText,
-                                    @RequestParam String fullText) throws IOException {
-        User user = getUser(authentication);
-        Optional<Composition> compositionOptional = compositionRepository.findOneByIdUserAndId(user.getId(), id);
-        if (compositionOptional.isPresent()) {
-            Composition composition = compositionOptional.get();
-            composition.setGenre(getGenre(genre));
-            composition.setTitleText(titleText);
-            composition.setShortText(convertTextToSave(shortText));
-            composition.setFullText(convertTextToSave(fullText));
-            composition.setDate(composition.getDate());
+                                    @RequestParam String fullText,
+                                    Model model) throws IOException {
+        if (checkData(file, titleText, shortText, fullText)) {
+            return getErrorPage(file, titleText, shortText, fullText, model);
+        } else {
+            User user = getUser(authentication);
+            Optional<Composition> compositionOptional = compositionRepository.findOneByIdUserAndId(user.getId(), id);
+            if (compositionOptional.isPresent()) {
+                Composition composition = compositionOptional.get();
+                composition.setGenre(getGenre(genre));
+                composition.setTitleText(titleText);
+                composition.setShortText(convertTextToSave(shortText));
+                composition.setFullText(convertTextToSave(fullText));
+                composition.setDate(composition.getDate());
 
-            if (isNotPresentImage(file)) {// new photo
-                ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
-                composition.setImage(convert.img);
-                compressorImgToJpg.deleteImage(convert.nameStart);
-                compressorImgToJpg.deleteImage(convert.nameEnd);
+                if (isNotPresentImage(file)) {// new photo
+                    ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
+                    composition.setImage(convert.img);
+                    compressorImgToJpg.deleteImage(convert.nameStart);
+                    compressorImgToJpg.deleteImage(convert.nameEnd);
+                }
+                compositionRepository.save(composition);
+                return "redirect:/library/read-all-my-composition";
             }
-            compositionRepository.save(composition);
-            return "redirect:/library/read-all-my-composition";
         }
         return "redirect:/library/read-all-my-composition";
     }
@@ -202,6 +208,7 @@ public class _2_LibraryController {
         return !Objects.equals(file.getContentType(), "application/octet-stream");
     }
 
+    @Transactional
     @GetMapping("/library/edit-composition/{id}/remove")
     public String compositionRemove(@PathVariable(value = "id") Integer id,
                                     Authentication authentication) {
@@ -292,27 +299,44 @@ public class _2_LibraryController {
                                  @RequestParam("atmosphere") String atmosphere,
                                  @RequestParam("plot") String plot,
                                  @RequestParam("impression") String impression,
-                                 @RequestParam("comments") String comments) {
-        User user = getUser(authentication);
+                                 @RequestParam("comments") String comments,
+                                 Model model) {
+        if (checkEvaluationComments(comments)) {
+            return getErrorPageByEvaluation(comments, model);
+        } else {
+            User user = getUser(authentication);
+            Evaluate evaluate = new Evaluate();
+            evaluate.setDate(new Date());
+            evaluate.setIdComposition(id);
+            evaluate.setIdAppraiser(user.getId());
+            evaluate.setEnvironment(getMarkFromFactory("ENVIRONMENT", environment));
+            evaluate.setCharacters(getMarkFromFactory("CHARACTERS", characters));
+            evaluate.setAtmosphere(getMarkFromFactory("ATMOSPHERE", atmosphere));
+            evaluate.setPlot(getMarkFromFactory("PLOT", plot));
+            evaluate.setImpression(getMarkFromFactory("IMPRESSION", impression));
 
-        Evaluate evaluate = new Evaluate();
-        evaluate.setDate(new Date());
-        evaluate.setIdComposition(id);
-        evaluate.setIdAppraiser(user.getId());
-        evaluate.setEnvironment(getMarkFromFactory("ENVIRONMENT", environment));
-        evaluate.setCharacters(getMarkFromFactory("CHARACTERS", characters));
-        evaluate.setAtmosphere(getMarkFromFactory("ATMOSPHERE", atmosphere));
-        evaluate.setPlot(getMarkFromFactory("PLOT", plot));
-        evaluate.setImpression(getMarkFromFactory("IMPRESSION", impression));
+            Comments commentsOfComposition = new Comments();
+            commentsOfComposition.setIdComposition(id);
+            commentsOfComposition.setIdUser(user.getId());
+            commentsOfComposition.setComments(convertTextToSave(comments));
 
-        Comments commentsOfComposition = new Comments();
-        commentsOfComposition.setIdComposition(id);
-        commentsOfComposition.setIdUser(user.getId());
-        commentsOfComposition.setComments(convertTextToSave(comments));
+            evaluateRepository.save(evaluate);
+            commentsRepository.save(commentsOfComposition);
+            return "redirect:/library/read-all-competitive-composition";
+        }
+    }
 
-        evaluateRepository.save(evaluate);
-        commentsRepository.save(commentsOfComposition);
-        return "redirect:/library/read-all-competitive-composition";
+    private boolean checkEvaluationComments(String comments) {
+        return comments.toCharArray().length > limit_comment;
+    }
+
+    private String getErrorPageByEvaluation(String comments,
+                                            Model model) {
+        int commentsTextSize = comments.toCharArray().length;
+        model.addAttribute("comments", comments);
+        model.addAttribute("commentsTextSize", commentsTextSize);
+        model.addAttribute("title", LIBRARY);
+        return "library-write-error-evalue-page";
     }
 
     @Transactional
@@ -392,7 +416,6 @@ public class _2_LibraryController {
                                   @RequestParam("titleText") String titleText,
                                   @RequestParam("shortText") String shortText,
                                   @RequestParam("fullText") String fullText) throws IOException {
-
         if (checkData(file, titleText, shortText, fullText)) {
             return getErrorPage(file, titleText, shortText, fullText, model);
         } else {
@@ -410,8 +433,8 @@ public class _2_LibraryController {
             compositionRepository.save(composition);
             compressorImgToJpg.deleteImage(convert.nameStart);
             compressorImgToJpg.deleteImage(convert.nameEnd);
-            return "redirect:/library/read-all-my-composition";
         }
+        return "redirect:/library/read-all-my-composition";
     }
 
     private boolean checkData(MultipartFile file,

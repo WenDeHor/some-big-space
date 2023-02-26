@@ -64,17 +64,23 @@
                         </table>
                         <br><br>
                         <h5 class="d-flex justify-content-center " style="color: #095979">
-                            Добавити продукт</h5>
+                            Добавити продукти</h5>
                         <br>
-                        <form action="/kitchen/write-shop-meal" method="post">
-                            <div class="form-floating">
-                                <h2>
-                                    <input type="text" name="fullText" class="form-control"
-                                           placeholder="Вписати що потрібно придбати" required>
-                                </h2>
-                            </div>
-                            <button class="btn btn-lg btn-primary btn-block" type="submit">Добавити до переліку</button>
-                        </form>
+                        <div th:each="shopMeals, el:${shopMealsWithError}" class="mt-2">
+                            <form action="/kitchen/write-shop-meal" method="post">
+                                <div class="form-floating">
+                                    <div class="alert alert-danger" th:if="${error.one == '1'}">
+                                        Кількість символів більша 100
+                                    </div>
+                                    <h2>
+                                        <input type="text" name="fullText" class="form-control"
+                                               placeholder="Внести до переліку закупівлі" required>
+                                    </h2>
+                                </div>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">Добавити до переліку
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

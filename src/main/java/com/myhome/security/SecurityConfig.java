@@ -33,7 +33,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 //                .antMatchers("/blog/**").hasRole("ADMIN")
 //                .antMatchers("/resources/**", "/static/**", "/css/**", "/*.css", "/templates/**", "/blocks/**").permitAll()                      @GetMapping("/users/read-competitive-one-composition-index/{id}") , "/insert-db"
-                .antMatchers("/", "/login", "/registration", "/registration-error", "/users/write/letter", "/users/send-letter", "/error-letter","/users/read-competitive-one-composition-index/**").permitAll()
+                .antMatchers("/", "/login", "/registration", "/users/write/letter", "/users/send-letter", "/users/read-competitive-one-composition-index/**").permitAll()
                 .antMatchers("/img/**", "/*.jpg", "/*.png", "/*.css").permitAll()
                 .anyRequest()
                 .authenticated()

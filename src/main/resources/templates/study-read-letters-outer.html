@@ -56,11 +56,11 @@
                             </li>
                         </ul>
                         <br>
-                        <div th:each="el:${letters}" class="alert alert-info">
-                            <h5 class="text-center font-weight-bold" th:text="${el.titleText}"></h5>
-                            <h5 th:utext="${el.fullText}"></h5>
-                            <h6 class="text-right" th:text="${el.info}"></h6>
-                            <a th:href="'/study/outer-letters/'+${el.id}+'/remove'"
+                        <div th:each="lettersDTO, el:${letters}" class="alert alert-info">
+                            <h5 class="text-center font-weight-bold" th:text="${lettersDTO.titleText}"></h5>
+                            <h5 th:utext="${lettersDTO.fullText}"></h5>
+                            <h6 class="text-right" th:text="${lettersDTO.info}"></h6>
+                            <a th:href="'/study/outer-letters/'+${lettersDTO.id}+'/remove/by-user/'+${lettersDTO.email}"
                                class="btn btn-outline-warning btn-block font-weight-bold">Видалити</a>
                         </div>
                     </div>
