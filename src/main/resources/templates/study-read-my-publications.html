@@ -36,6 +36,8 @@
                            class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
                             До головної</a>
                         <br>
+                        <div th:insert="blocks/buttons-read-my-publications::buttons"></div>
+                        <br>
                     </div>
                     <div class="col-md-8">
                         <div th:each="publicationUser, el:${publicationUser}" class="alert alert-info mt-2">

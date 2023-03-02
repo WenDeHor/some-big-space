@@ -1,5 +1,6 @@
 package com.myhome.controllers;
 
+import com.myhome.forms.Buttons;
 import com.myhome.models.Family;
 import com.myhome.models.Friends;
 import com.myhome.models.User;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 @Controller
 public class _4_LivingRoomControllers {
@@ -167,12 +170,63 @@ public class _4_LivingRoomControllers {
                                  HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<VideoBox> allVideoBox = videoBoxRepository.findAllByIdUser(user.getId()).stream()
-                .sorted(Comparator.comparing(VideoBox::getId).reversed())
-                .collect(Collectors.toList());
-        model.addAttribute("videoBoxList", allVideoBox);
+        List<VideoBox> dtos = getAllVideoBox(user);
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<VideoBox> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("videoBoxList", basePage);
         model.addAttribute("title", LIVING_ROOM);
         return "living-news-video";
+    }
+
+    @GetMapping("/living/news/video/{offset}")
+    public String livingNewVideoByPages(@PathVariable(value = "offset") int offset,
+                                        Authentication authentication,
+                                        Model model,
+                                        HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        List<VideoBox> dtos = getAllVideoBox(user);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<VideoBox> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("videoBoxList", offsetList);
+            model.addAttribute("title", LIVING_ROOM);
+            return "living-news-video";
+        }
+        List<VideoBox> offsetList = getOffsetListVideoBox(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("videoBoxList", offsetList);
+        model.addAttribute("title", LIVING_ROOM);
+        return "living-news-video";
+    }
+
+    private List<VideoBox> getOffsetListVideoBox(List<VideoBox> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
+    }
+
+    private String getCountPage(int size) {
+        if (size < 60) {
+            char[] chars = String.valueOf(size).toCharArray();
+            if (chars.length < 2) {
+                return "10";
+            }
+            return Integer.parseInt(String.valueOf(chars[0])) + 1 + "0";
+        }
+        return "60";
+    }
+
+    private List<VideoBox> getAllVideoBox(User user) {
+        return videoBoxRepository.findAllByIdUser(user.getId()).stream()
+                .sorted(Comparator.comparing(VideoBox::getId).reversed())
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/living/news/video/{idVideoBox}/remove")
@@ -197,7 +251,7 @@ public class _4_LivingRoomControllers {
                                      @RequestParam("linkToVideo") String linkToVideo,
                                      Model model) {
         if (validatorNewsAddVideo(linkToVideo)) {
-            return saveNewsAddVideoWithError( linkToVideo, model);
+            return saveNewsAddVideoWithError(linkToVideo, model);
         }
         User user = getUser(authentication);
         String url = createURL(parseNormalURL(linkToVideo));
@@ -215,7 +269,7 @@ public class _4_LivingRoomControllers {
     }
 
     private String saveNewsAddVideoWithError(String url,
-                                          Model model) {
+                                             Model model) {
         int fullTextSize = url.toCharArray().length;
         model.addAttribute("url", url);
         model.addAttribute("urlTextSize", fullTextSize);

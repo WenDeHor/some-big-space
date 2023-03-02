@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
       style="height: 100%">
 
 <head th:insert="blocks/library::library">
@@ -32,6 +31,9 @@
                         <a href="/user-page"
                            class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
                             До головної</a>
+                        <br>
+                        <div th:insert="blocks/buttons-read-all-my-composition::buttons"></div>
+                        <br>
                     </div>
                     <div class="col-md-8">
                         <div th:each="compositionDTO, el:${compositionList}" class="mt-2">

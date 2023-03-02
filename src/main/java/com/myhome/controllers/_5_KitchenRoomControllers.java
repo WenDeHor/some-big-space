@@ -1,11 +1,11 @@
 package com.myhome.controllers;
 
 import com.myhome.controllers.compresor.CompressorImgToJpg;
-import com.myhome.forms.ConvertFile;
-import com.myhome.forms.CookBookDTO;
-import com.myhome.forms.ErrorMessage;
-import com.myhome.forms.MenuDTO;
-import com.myhome.models.*;
+import com.myhome.forms.*;
+import com.myhome.models.CookBook;
+import com.myhome.models.Menu;
+import com.myhome.models.ShopMeals;
+import com.myhome.models.User;
 import com.myhome.repository.CookBookRepository;
 import com.myhome.repository.MenuRepository;
 import com.myhome.repository.ShopMealsRepository;
@@ -29,6 +29,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Controller
 public class _5_KitchenRoomControllers {
@@ -68,7 +70,62 @@ public class _5_KitchenRoomControllers {
                                        HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<CookBookDTO> cookBooks = cookBookRepository.findAllByIdUser(user.getId()).stream()
+        List<CookBookDTO> dtos = getAllCookBookDTO(user);
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<CookBookDTO> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("cookBooks", basePage);
+        model.addAttribute("title", KITCHEN_ROOM);
+        return "kitchen-read-cookbook";
+    }
+
+    @Transactional
+    @GetMapping("/kitchen/read-cookbook/{offset}")
+    public String kitchenReadCookBooksByPages(@PathVariable(value = "offset") int offset,
+                                              Authentication authentication,
+                                              Model model,
+                                              HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        List<CookBookDTO> dtos = getAllCookBookDTO(user);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<CookBookDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("cookBooks", offsetList);
+            model.addAttribute("title", KITCHEN_ROOM);
+            return "kitchen-read-cookbook";
+        }
+        List<CookBookDTO> offsetList = getOffsetListCookBookDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("cookBooks", offsetList);
+        model.addAttribute("title", KITCHEN_ROOM);
+        return "kitchen-read-cookbook";
+    }
+
+    private List<CookBookDTO> getOffsetListCookBookDTO(List<CookBookDTO> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
+    }
+
+    private String getCountPage(int size) {
+        if (size < 60) {
+            char[] chars = String.valueOf(size).toCharArray();
+            if (chars.length < 2) {
+                return "10";
+            }
+            return Integer.parseInt(String.valueOf(chars[0])) + 1 + "0";
+        }
+        return "60";
+    }
+
+    private List<CookBookDTO> getAllCookBookDTO(User user) {
+        return cookBookRepository.findAllByIdUser(user.getId()).stream()
                 .map(el -> new CookBookDTO(
                         el.getId(),
                         el.getDate(),
@@ -78,9 +135,6 @@ public class _5_KitchenRoomControllers {
                 ))
                 .sorted(Comparator.comparing(CookBookDTO::getId).reversed())
                 .collect(Collectors.toList());
-        model.addAttribute("cookBooks", cookBooks);
-        model.addAttribute("title", KITCHEN_ROOM);
-        return "kitchen-read-cookbook";
     }
 
     private String converterImage(byte[] img) {
@@ -351,7 +405,7 @@ public class _5_KitchenRoomControllers {
         shopMealsList.sort(Comparator.comparing(ShopMeals::getId));
         model.addAttribute("shopMealsList", shopMealsList);
 
-        model.addAttribute("error",  new ErrorMessage(""));
+        model.addAttribute("error", new ErrorMessage(""));
         model.addAttribute("shopMealsWithError", new ShopMeals());
         model.addAttribute("title", KITCHEN_ROOM);
         return "kitchen-write-shop-meals";

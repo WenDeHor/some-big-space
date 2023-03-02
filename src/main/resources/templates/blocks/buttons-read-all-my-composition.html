@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" lang="an">
+<head th:insert="blocks/library::library">
+    <title th:text="${title}"></title>
+</head>
+<div th:fragment="buttons">
+    <div th:if="${buttons.one == '10'}">
+        <a type="button"
+           th:class="${buttons.two == '10' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/10'">-1-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-2-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-3-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-4-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-5-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-6-</a>
+    </div>
+    <div th:if="${buttons.one == '20'}">
+        <a type="button"
+           th:class="${buttons.two == '10' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/10'">-1-</a>
+        <a type="button"
+           th:class="${buttons.two == '20' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/20'">-2-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-3-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-4-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-5-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-6-</a>
+    </div>
+    <div th:if="${buttons.one == '30'}">
+        <a type="button"
+           th:class="${buttons.two == '10' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/10'">-1-</a>
+        <a type="button"
+           th:class="${buttons.two == '20' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/20'">-2-</a>
+        <a type="button"
+           th:class="${buttons.two == '30' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/30'">-3-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-4-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-5-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-6-</a>
+    </div>
+    <div th:if="${buttons.one == '40'}">
+        <a type="button"
+           th:class="${buttons.two == '10' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/10'">-1-</a>
+        <a type="button"
+           th:class="${buttons.two == '20' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/20'">-2-</a>
+        <a type="button"
+           th:class="${buttons.two == '30' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/30'">-3-</a>
+        <a type="button"
+           th:class="${buttons.two == '40' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/40'">-4-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-5-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-6-</a>
+    </div>
+    <div th:if="${buttons.one == '50'}">
+        <a type="button"
+           th:class="${buttons.two == '10' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/10'">-1-</a>
+        <a type="button"
+           th:class="${buttons.two == '20' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/20'">-2-</a>
+        <a type="button"
+           th:class="${buttons.two == '30' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/30'">-3-</a>
+        <a type="button"
+           th:class="${buttons.two == '40' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/40'">-4-</a>
+        <a type="button"
+           th:class="${buttons.two == '50' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/50'">-5-</a>
+        <a type="button" class="btn btn-outline-secondary disabled">-6-</a>
+    </div>
+    <div th:if="${buttons.one == '60'}">
+        <a type="button"
+           th:class="${buttons.two == '10' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/10'">-1-</a>
+        <a type="button"
+           th:class="${buttons.two == '20' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/20'">-2-</a>
+        <a type="button"
+           th:class="${buttons.two == '30' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/30'">-3-</a>
+        <a type="button"
+           th:class="${buttons.two == '40' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/40'">-4-</a>
+        <a type="button"
+           th:class="${buttons.two == '50' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/50'">-5-</a>
+        <a type="button"
+           th:class="${buttons.two == '60' ? 'btn btn-outline-warning' : 'btn btn-outline-secondary' }"
+           th:href="'/library/read-all-my-composition/60'">-6-</a>
+    </div>
+</div>
+</html>

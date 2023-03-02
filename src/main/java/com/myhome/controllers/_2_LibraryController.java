@@ -1,6 +1,7 @@
 package com.myhome.controllers;
 
 import com.myhome.controllers.compresor.CompressorImgToJpg;
+import com.myhome.forms.Buttons;
 import com.myhome.forms.CompositionDTO;
 import com.myhome.forms.ConvertFile;
 import com.myhome.models.*;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.myhome.controllers.factory.MarkFactory.getMarkFromFactory;
+import static java.util.stream.Collectors.toList;
 
 @Controller
 public class _2_LibraryController {
@@ -67,7 +69,63 @@ public class _2_LibraryController {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
         int idUser = user.getId();
-        List<CompositionDTO> compositionList = compositionRepository
+        List<CompositionDTO> dtos = getAllCompetitiveComposition(idUser);
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<CompositionDTO> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("compositionList", basePage);
+        model.addAttribute("title", LIBRARY);
+        return "library-read-all-competitive-composition";
+    }
+
+    @Transactional
+    @GetMapping("/library/read-all-competitive-composition/{offset}")
+    public String readCompetitiveCompositionByPages(@PathVariable(value = "offset") int offset,
+                                                    Model model,
+                                                    Authentication authentication,
+                                                    HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        int idUser = user.getId();
+        List<CompositionDTO> dtos = getAllCompetitiveComposition(idUser);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<CompositionDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("compositionList", offsetList);
+            model.addAttribute("title", LIBRARY);
+            return "library-read-all-competitive-composition";
+        }
+        List<CompositionDTO> offsetList = getOffsetListCompositionDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("compositionList", offsetList);
+        model.addAttribute("title", LIBRARY);
+        return "library-read-all-competitive-composition";
+    }
+
+    private String getCountPage(int size) {
+        if (size < 60) {
+            char[] chars = String.valueOf(size).toCharArray();
+            if (chars.length < 2) {
+                return "10";
+            }
+            return Integer.parseInt(String.valueOf(chars[0])) + 1 + "0";
+        }
+        return "60";
+    }
+
+    private List<CompositionDTO> getOffsetListCompositionDTO(List<CompositionDTO> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
+    }
+
+    private List<CompositionDTO> getAllCompetitiveComposition(int idUser) {
+        return compositionRepository
                 .findAllByPublicationTypeAndIdUserNot(PublicationType.PUBLIC_TO_COMPETITIVE, idUser).stream()
                 .map(el -> new CompositionDTO(
                         el.getId(),
@@ -79,20 +137,53 @@ public class _2_LibraryController {
                         el.getGenre()))
                 .sorted(Comparator.comparing(CompositionDTO::getId).reversed())
                 .collect(Collectors.toList());
-
-        model.addAttribute("compositionList", compositionList);
-        model.addAttribute("title", LIBRARY);
-        return "library-read-all-competitive-composition";
     }
 
     @Transactional
     @GetMapping("/library/read-all-my-composition")
-    public String readAllComposition(Authentication authentication,
-                                     Model model,
-                                     HttpServletRequest request) {
+    public String readAllMyComposition(Authentication authentication,
+                                       Model model,
+                                       HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<CompositionDTO> compositionList = compositionRepository.findAllByIdUser(user.getId()).stream()
+        List<CompositionDTO> dtos = getAllMyComposition(user);
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<CompositionDTO> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("compositionList", basePage);
+        model.addAttribute("title", LIBRARY);
+        return "library-read-all-my-composition";
+    }
+
+    @Transactional
+    @GetMapping("/library/read-all-my-composition/{offset}")
+    public String readAllMyCompositionByPages(@PathVariable(value = "offset") int offset,
+                                              Authentication authentication,
+                                              Model model,
+                                              HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        List<CompositionDTO> dtos = getAllMyComposition(user);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<CompositionDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("compositionList", offsetList);
+            model.addAttribute("title", LIBRARY);
+            return "library-read-all-my-composition";
+        }
+        List<CompositionDTO> offsetList = getOffsetListCompositionDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("compositionList", offsetList);
+        model.addAttribute("title", LIBRARY);
+        return "library-read-all-my-composition";
+    }
+
+    private List<CompositionDTO> getAllMyComposition(User user) {
+        return compositionRepository.findAllByIdUser(user.getId()).stream()
                 .map(el -> new CompositionDTO(
                         el.getId(),
                         el.getTitleText(),
@@ -102,9 +193,6 @@ public class _2_LibraryController {
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
                 .sorted(Comparator.comparing(CompositionDTO::getId).reversed())
                 .collect(Collectors.toList());
-        model.addAttribute("compositionList", compositionList);
-        model.addAttribute("title", LIBRARY);
-        return "library-read-all-my-composition";
     }
 
     @Transactional
@@ -347,11 +435,49 @@ public class _2_LibraryController {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
         int idUser = user.getId();
+        List<CompositionDTO> dtos = getFriendComposition(idUser);
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<CompositionDTO> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("friendsPublications", basePage);
+        model.addAttribute("title", LIBRARY);
+        return "library-read-all-friend-composition";
+    }
+
+    @Transactional
+    @GetMapping("/library/read-friends-composition/{offset}")
+    public String readFriendCompositionByPages(@PathVariable(value = "offset") int offset,
+                                               Authentication authentication,
+                                               Model model,
+                                               HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        int idUser = user.getId();
+        List<CompositionDTO> dtos = getFriendComposition(idUser);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<CompositionDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("friendsPublications", offsetList);
+            model.addAttribute("title", LIBRARY);
+            return "library-read-all-friend-composition";
+        }
+        List<CompositionDTO> offsetList = getOffsetListCompositionDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("friendsPublications", offsetList);
+        model.addAttribute("title", LIBRARY);
+        return "library-read-all-friend-composition";
+    }
+
+    private List<CompositionDTO> getFriendComposition(int idUser) {
         List<Integer> integerList = Stream
                 .concat(friendsRepository.findAllByIdUser(idUser).stream().map(Friends::getIdFriend),
                         familyRepository.findAllByIdUser(idUser).stream().map(Family::getIdFamily))
                 .collect(Collectors.toList());
-        List<CompositionDTO> friendCompositions = compositionRepository.findAllByIdUserIn(integerList).stream()
+        return compositionRepository.findAllByIdUserIn(integerList).stream()
                 .filter(a -> a.getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS))
                 .map(composition -> new CompositionDTO(
                         composition.getId(),
@@ -361,9 +487,6 @@ public class _2_LibraryController {
                         HOST_NAME + "/library/read-friend-one-composition/" + composition.getId(),
                         converterImage(composition.getImage())))
                 .collect(Collectors.toList());
-        model.addAttribute("friendsPublications", friendCompositions);
-        model.addAttribute("title", LIBRARY);
-        return "library-read-all-friend-composition";
     }
 
     @Transactional
@@ -428,11 +551,13 @@ public class _2_LibraryController {
             composition.setShortText(convertTextToSave(shortText));
             composition.setFullText(convertTextToSave(fullText));
             composition.setIdUser(user.getId());
-            ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
-            composition.setImage(convert.img);
+            if (isNotPresentImage(file)) {// new photo
+                ConvertFile convert = compressorImgToJpg.convert(file, user.getEmail());
+                composition.setImage(convert.img);
+                compressorImgToJpg.deleteImage(convert.nameStart);
+                compressorImgToJpg.deleteImage(convert.nameEnd);
+            }
             compositionRepository.save(composition);
-            compressorImgToJpg.deleteImage(convert.nameStart);
-            compressorImgToJpg.deleteImage(convert.nameEnd);
         }
         return "redirect:/library/read-all-my-composition";
     }

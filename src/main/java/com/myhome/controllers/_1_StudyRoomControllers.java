@@ -1,8 +1,6 @@
 package com.myhome.controllers;
 
-import com.myhome.forms.ErrorMessage;
-import com.myhome.forms.LettersDTO;
-import com.myhome.forms.PublicationDTO;
+import com.myhome.forms.*;
 import com.myhome.models.LetterToADMIN;
 import com.myhome.models.LetterToUSER;
 import com.myhome.models.PublicationUser;
@@ -30,6 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 @Controller
 public class _1_StudyRoomControllers {
@@ -132,7 +132,50 @@ public class _1_StudyRoomControllers {
                                          HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         String address = findUserAddress(authentication);
-        List<LettersDTO> lettersDTOS = Stream
+        List<LettersDTO> dtos = getAllBySenderAddress(address);
+        List<LettersDTO> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        model.addAttribute("letters", basePage);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-letters-outer";
+    }
+
+    @GetMapping("/study/outer-letters/{offset}")
+    public String studyReadAllOutLettersByPages(@PathVariable(value = "offset") int offset,
+                                                Authentication authentication,
+                                                Model model,
+                                                HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        String address = findUserAddress(authentication);
+        List<LettersDTO> dtos = getAllBySenderAddress(address);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<LettersDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("letters", offsetList);
+            model.addAttribute("title", MY_ROOM);
+            return "study-read-letters-outer";
+        }
+        List<LettersDTO> offsetList = getOffsetListLettersDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("letters", offsetList);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-letters-outer";
+    }
+
+    private List<LettersDTO> getOffsetListLettersDTO(List<LettersDTO> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
+    }
+
+    List<LettersDTO> getAllBySenderAddress(String address) {
+        return Stream
                 .concat(letterToUSERRepository.findAllBySenderAddress(address).stream()
                                 .map(el -> new LettersDTO(el.getId(), el.getDate(), el.getTitleText(), el.getFullText(),
                                         buildInfoBySenderToLetterToUSER(el), el.getRecipientAddress())),
@@ -141,9 +184,6 @@ public class _1_StudyRoomControllers {
                                         buildInfoBySenderToLetterToADMIN(el), ADMIN)))
                 .sorted(Comparator.comparing(LettersDTO::getDate).reversed())
                 .collect(Collectors.toList());
-        model.addAttribute("letters", lettersDTOS);
-        model.addAttribute("title", MY_ROOM);
-        return "study-read-letters-outer";
     }
 
     private String buildInfoBySenderToLetterToUSER(LetterToUSER letter) {
@@ -167,11 +207,39 @@ public class _1_StudyRoomControllers {
     public String studyReadAlEnterLetters(Authentication authentication,
                                           Model model) {
         String address = findUserAddress(authentication);
-        List<LettersDTO> lettersDTOS = letterToUSERRepository.findAllByRecipientAddress(address).stream()
+        List<LettersDTO> basePage = letterToUSERRepository.findAllByRecipientAddress(address).stream()
+                .map(el -> new LettersDTO(el.getId(), el.getTitleText(), el.getFullText(), buildInfoByRecipient(el)))
+                .sorted(Comparator.comparing(LettersDTO::getId).reversed())
+                .limit(10)
+                .collect(Collectors.toList());
+        model.addAttribute("buttons", new Buttons(getCountPage(basePage.size()), "10"));
+        model.addAttribute("letters", basePage);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-letters-enter";
+    }
+
+    @GetMapping("/study/enter-letters/{offset}")
+    public String studyReadAlEnterLettersByPages(@PathVariable(value = "offset") int offset,
+                                                 Authentication authentication,
+                                                 Model model) {
+        String address = findUserAddress(authentication);
+        List<LettersDTO> dtos = letterToUSERRepository.findAllByRecipientAddress(address).stream()
                 .map(el -> new LettersDTO(el.getId(), el.getTitleText(), el.getFullText(), buildInfoByRecipient(el)))
                 .sorted(Comparator.comparing(LettersDTO::getId).reversed())
                 .collect(Collectors.toList());
-        model.addAttribute("letters", lettersDTOS);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<LettersDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("letters", offsetList);
+            model.addAttribute("title", MY_ROOM);
+            return "study-read-letters-enter";
+        }
+        List<LettersDTO> offsetList = getOffsetListLettersDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("letters", offsetList);
         model.addAttribute("title", MY_ROOM);
         return "study-read-letters-enter";
     }
@@ -206,8 +274,20 @@ public class _1_StudyRoomControllers {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
         int userId = user.getId();
-        List<PublicationDTO> publications = publicationRepository.findAllByIdUserNot(userId).stream()
-                .limit(LIMIT_LIST)
+        List<PublicationDTO> publications = findPublicationsDTOByUserId(userId);
+
+        model.addAttribute("buttons", new Buttons(getCountPage(publications.size()), "10"));
+        List<PublicationDTO> basePage = publications.stream()
+                .limit(10)
+                .collect(toList());
+
+        model.addAttribute("publications", basePage);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-all-publications";
+    }
+
+    private List<PublicationDTO> findPublicationsDTOByUserId(int userId) {
+        return publicationRepository.findAllByIdUserNot(userId).stream()
                 .map(el -> new PublicationDTO(
                         el.getId(),
                         el.getTitleText(),
@@ -215,10 +295,39 @@ public class _1_StudyRoomControllers {
                         info(el)))
                 .sorted(Comparator.comparing(PublicationDTO::getId).reversed())
                 .collect(Collectors.toList());
+    }
 
-        model.addAttribute("publications", publications);
+    @GetMapping("/study/read-all-publications/{offset}")
+    public String studyReadAllPublicationsOfUserByPages(@PathVariable(value = "offset") int offset,
+                                                        Authentication authentication,
+                                                        Model model,
+                                                        HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        int userId = user.getId();
+        List<PublicationDTO> dtos = findPublicationsDTOByUserId(userId);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<PublicationDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("publications", offsetList);
+            model.addAttribute("title", MY_ROOM);
+            return "study-read-all-publications";
+        }
+        List<PublicationDTO> offsetList = getOffsetListDTO(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("publications", offsetList);
         model.addAttribute("title", MY_ROOM);
         return "study-read-all-publications";
+    }
+
+    private List<PublicationDTO> getOffsetListDTO(List<PublicationDTO> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
     }
 
     private String info(PublicationUser publicationUser) {
@@ -228,6 +337,17 @@ public class _1_StudyRoomControllers {
                 .orElseGet(() -> "Дата: " + publicationUser.getDate().toString().split("\\s")[0]);
     }
 
+    private String getCountPage(int size) {
+        if (size < 60) {
+            char[] chars = String.valueOf(size).toCharArray();
+            if (chars.length < 2) {
+                return "10";
+            }
+            return Integer.parseInt(String.valueOf(chars[0])) + 1 + "0";
+        }
+        return "60";
+    }
+
     @GetMapping("/study/read-my-publications")
     public String studyReadMyPublicationsOfUser(Authentication authentication,
                                                 Model model,
@@ -235,12 +355,53 @@ public class _1_StudyRoomControllers {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
         int idUser = user.getId();
-        List<PublicationUser> publicationList = publicationRepository.findAllByIdUser(idUser).stream()
-                .sorted(Comparator.comparing(PublicationUser::getId).reversed())
-                .collect(Collectors.toList());
-        model.addAttribute("publicationUser", publicationList);
+        List<PublicationUser> dtos = findPublicationsByUserId(idUser);
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<PublicationUser> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("publicationUser", basePage);
         model.addAttribute("title", MY_ROOM);
         return "study-read-my-publications";
+    }
+
+    @GetMapping("/study/read-my-publications/{offset}")
+    public String studyReadMyPublicationsOfUserByPages(@PathVariable(value = "offset") int offset,
+                                                       Authentication authentication,
+                                                       Model model,
+                                                       HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        int idUser = user.getId();
+        List<PublicationUser> dtos = findPublicationsByUserId(idUser);
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<PublicationUser> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("publicationUser", offsetList);
+            model.addAttribute("title", MY_ROOM);
+            return "study-read-my-publications";
+        }
+        List<PublicationUser> offsetList = getOffsetListPublicationUser(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("publicationUser", offsetList);
+        model.addAttribute("title", MY_ROOM);
+        return "study-read-my-publications";
+    }
+
+    private List<PublicationUser> findPublicationsByUserId(int userId) {
+        return publicationRepository.findAllByIdUser(userId).stream()
+                .sorted(Comparator.comparing(PublicationUser::getId).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private List<PublicationUser> getOffsetListPublicationUser(List<PublicationUser> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
     }
 
     @GetMapping("/study/publication/{idPublication}/remove")

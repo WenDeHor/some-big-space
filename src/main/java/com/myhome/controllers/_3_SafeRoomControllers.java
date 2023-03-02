@@ -1,9 +1,7 @@
 package com.myhome.controllers;
 
 import com.myhome.controllers.compresor.CompressorImgToJpg;
-import com.myhome.forms.ConvertFile;
-import com.myhome.forms.DiaryDTO;
-import com.myhome.forms.ReferenceDTO;
+import com.myhome.forms.*;
 import com.myhome.models.Diary;
 import com.myhome.models.Reference;
 import com.myhome.models.User;
@@ -60,7 +58,44 @@ public class _3_SafeRoomControllers {
                                 HttpServletRequest request) {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         User user = getUser(authentication);
-        List<DiaryDTO> diaryList = diaryRepository.findAllByIdUser(user.getId()).stream()
+        List<DiaryDTO> dtos = findDiaryDTOByUserId(user.getId());
+        model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
+        List<DiaryDTO> basePage = dtos.stream()
+                .limit(10)
+                .collect(toList());
+        model.addAttribute("diaryList", basePage);
+        model.addAttribute("title", SAFE_ROOM);
+        return "safe-read-diary";
+    }
+
+    @Transactional
+    @GetMapping("/safe/read-save-diary/{offset}")
+    public String safeReadDiaryByPages(@PathVariable(value = "offset") int offset,
+                                       Authentication authentication,
+                                       Model model,
+                                       HttpServletRequest request) {
+        metricsService.startMetricsCheck(request, request.getRequestURI());
+        User user = getUser(authentication);
+        List<DiaryDTO> dtos = findDiaryDTOByUserId(user.getId());
+        String countPage = getCountPage(dtos.size());
+        if (offset == 60) {
+            List<DiaryDTO> offsetList = dtos.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("diaryList", offsetList);
+            model.addAttribute("title", SAFE_ROOM);
+            return "safe-read-diary";
+        }
+        List<DiaryDTO> offsetList = getOffsetList(dtos, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("diaryList", offsetList);
+        model.addAttribute("title", SAFE_ROOM);
+        return "safe-read-diary";
+    }
+
+    private List<DiaryDTO> findDiaryDTOByUserId(int userId) {
+        return diaryRepository.findAllByIdUser(userId).stream()
                 .map(el -> new DiaryDTO(
                         el.getId(),
                         el.getTitleText(),
@@ -68,9 +103,24 @@ public class _3_SafeRoomControllers {
                         converterImage(el.getImage())))
                 .sorted(Comparator.comparing(DiaryDTO::getId).reversed())
                 .collect(toList());
-        model.addAttribute("diaryList", diaryList);
-        model.addAttribute("title", SAFE_ROOM);
-        return "safe-read-diary";
+    }
+
+    private String getCountPage(int size) {
+        if (size < 60) {
+            char[] chars = String.valueOf(size).toCharArray();
+            if (chars.length < 2) {
+                return "10";
+            }
+            return Integer.parseInt(String.valueOf(chars[0])) + 1 + "0";
+        }
+        return "60";
+    }
+
+    private List<DiaryDTO> getOffsetList(List<DiaryDTO> dtos, int offset) {
+        return dtos.stream()
+                .skip(offset - 10)
+                .limit(10)
+                .collect(toList());
     }
 
     @PostMapping("/safe/read-save-diary")
@@ -146,18 +196,40 @@ public class _3_SafeRoomControllers {
     public String safeEditDiary(Authentication authentication,
                                 Model model) {
         User user = getUser(authentication);
-        List<DiaryDTO> diaryList = diaryRepository.findAllByIdUser(user.getId()).stream()
-                .map(el -> new DiaryDTO(
-                        el.getId(),
-                        el.getTitleText(),
-                        el.getFullText(),
-                        converterImage(el.getImage())))
-                .sorted(Comparator.comparing(DiaryDTO::getId).reversed())
+        List<DiaryDTO> diaryList = findDiaryDTOByUserId(user.getId());
+        model.addAttribute("buttons", new Buttons(getCountPage(diaryList.size()), "10"));
+        List<DiaryDTO> basePage = diaryList.stream()
+                .limit(10)
                 .collect(toList());
-        model.addAttribute("diaryList", diaryList);
+        model.addAttribute("diaryList", basePage);
         model.addAttribute("title", SAFE_ROOM);
         return "safe-edit-diary";
     }
+
+    @Transactional
+    @GetMapping("/safe/edit-diary/{offset}")
+    public String safeEditDiaryByPages(@PathVariable(value = "offset") int offset,
+                                       Authentication authentication,
+                                       Model model) {
+        User user = getUser(authentication);
+        List<DiaryDTO> diaryList = findDiaryDTOByUserId(user.getId());
+        String countPage = getCountPage(diaryList.size());
+        if (offset == 60) {
+            List<DiaryDTO> offsetList = diaryList.stream()
+                    .skip(50)
+                    .collect(toList());
+            model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+            model.addAttribute("diaryList", offsetList);
+            model.addAttribute("title", SAFE_ROOM);
+            return "safe-edit-diary";
+        }
+        List<DiaryDTO> offsetList = getOffsetList(diaryList, offset);
+        model.addAttribute("buttons", new Buttons(countPage, String.valueOf(offset)));
+        model.addAttribute("diaryList", offsetList);
+        model.addAttribute("title", SAFE_ROOM);
+        return "safe-edit-diary";
+    }
+
 
     private String converterImage(byte[] img) {
         return Base64.getEncoder().encodeToString(img);

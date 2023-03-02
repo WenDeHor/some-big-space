@@ -32,6 +32,9 @@
                         <a href="/user-page"
                            class="btn  btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
                             До головної</a>
+                        <br>
+                        <div th:insert="blocks/buttons-read-all-competitive-composition::buttons"></div>
+                        <br>
                     </div>
                     <div class="col-md-8">
                         <div th:each="compositionDTO, el:${compositionList}" class="mt-2">
@@ -41,7 +44,8 @@
                             </a>
                             <br>
                             <div>
-                                <h5><p class="font-weight-bold text-center" th:utext="${compositionDTO.titleText}"></p></h5>
+                                <h5><p class="font-weight-bold text-center" th:utext="${compositionDTO.titleText}"></p>
+                                </h5>
                                 <h6><p th:utext="${compositionDTO.genre}"></p></h6>
                                 <h5><p th:utext="${compositionDTO.shortText}"></p></h5>
                             </div>

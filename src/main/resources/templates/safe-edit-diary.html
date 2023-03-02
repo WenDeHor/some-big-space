@@ -30,6 +30,8 @@
                            class="btn btn-secondary btn-lg btn-block text-left font-weight-bold" role="button">
                             До головної</a>
                         <br>
+                        <div th:insert="blocks/buttons-edit-diary::buttons"></div>
+                        <br>
                     </div>
                     <div class="col-md-8">
                         <div th:each="diaryDTO, el:${diaryList}" class="mt-2">
