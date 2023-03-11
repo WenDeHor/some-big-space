@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
@@ -19,11 +21,13 @@ public class PublicationPostAdmin {
     private Date date;
 
     @Column(name = "title_text")
-    @Size(max = 5000)
+    @Size(max = 150)
+    @Type(type="text")
     private String titleText;
 
     @Column(name = "full_text")
-    @Size(max = 10000)
+    @Size(min = 0, max = 15000)
+    @Type(type="text")
     private String fullText;
 
     @Lob
@@ -32,20 +36,6 @@ public class PublicationPostAdmin {
 
 
     public PublicationPostAdmin() {
-    }
-
-    public PublicationPostAdmin(int id, Date date, String titleText, String fullText) {
-        this.id = id;
-        this.date = date;
-        this.titleText = titleText;
-        this.fullText = fullText;
-    }
-
-    public PublicationPostAdmin(Date date, String titleText, String fullText, byte[] image) {
-        this.date = date;
-        this.titleText = titleText;
-        this.fullText = fullText;
-        this.image = image;
     }
 
     public int getId() {

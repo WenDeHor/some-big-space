@@ -1,6 +1,9 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 
@@ -19,15 +22,11 @@ public class Comments {
     private int idComposition;
 
     @Column(name = "comments")
+    @Size(min = 0, max = 1000)
+    @Type(type="text")
     private String comments;
 
     public Comments() {
-    }
-
-    public Comments(int idUser, int idComposition, String comments) {
-        this.idUser = idUser;
-        this.idComposition = idComposition;
-        this.comments = comments;
     }
 
     public int getId() {

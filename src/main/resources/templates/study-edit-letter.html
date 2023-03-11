@@ -59,13 +59,13 @@
                                     <label for="titleText"> Заголовок : </label>
                                     <input id="titleText" type="text"
                                            th:value="${letterToUSER.titleText}" name="titleText" class="form-control"
-                                           placeholder="Місце для загловку" required>
+                                           placeholder="Місце для загловку {Максимальна кількість символів - 100}" required>
                                 </p>
                                 <br>
                                 <div class="alert alert-danger" th:if="${error.three == '3'}"> Перевищення довжини листа в 3 000 символів</div>
                                 <label for="fullText">Лист : </label>
                                 <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                          placeholder="Місце для основного тексту листа {максимальна кількість символів - 3000}"
+                                          placeholder="Місце для основного тексту листа {Максимальна кількість символів - 3000}"
                                           th:text="${letterToUSER.fullText}" required></textarea> <br>
                                 <br>
                                 <button class="btn btn-lg btn-primary btn-block" type="submit">Відправити</button>

@@ -38,6 +38,7 @@ public class _4_LivingRoomControllers {
 
     private final String LIVING_ROOM = "Вітальня";
     private int limit_url = 2000; //chars
+    private final static int LIMIT_LIST = 10;
 
     private final MetricsService metricsService;
 
@@ -173,7 +174,7 @@ public class _4_LivingRoomControllers {
         List<VideoBox> dtos = getAllVideoBox(user);
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         List<VideoBox> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("videoBoxList", basePage);
         model.addAttribute("title", LIVING_ROOM);

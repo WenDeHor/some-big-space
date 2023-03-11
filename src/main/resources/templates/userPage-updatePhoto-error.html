@@ -44,8 +44,8 @@
                                     th:text="'Розмір файлу : '+${file} + 'МВ. Допустимий розмір 6МВ'"></h5>
                             </div>
                             <div th:each="fullText:${fullTextSize}">
-                                <h5 class="text-left" th:style="${fullText>3000 ? 'color: crimson' : 'color: black'}"
-                                    th:text="'Розмір опису : '+${fullText} + '. Допустима кількись символів 3_000'"></h5>
+                                <h5 class="text-left" th:style="${fullText>500 ? 'color: crimson' : 'color: black'}"
+                                    th:text="'Розмір опису : '+${fullText} + '. Допустима кількись символів 500'"></h5>
                             </div>
                         </div>
                         <br>

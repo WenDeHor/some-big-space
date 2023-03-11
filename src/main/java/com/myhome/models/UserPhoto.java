@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
@@ -15,7 +17,8 @@ public class UserPhoto {
     private int id;
 
     @Column(name = "full_text")
-    @Size(max = 3000)
+    @Size(max = 1000)
+    @Type(type="text")
     private String fullText;
 
     @Lob
@@ -29,13 +32,6 @@ public class UserPhoto {
     private String address;
 
     public UserPhoto() {
-    }
-
-    public UserPhoto(@Size(max = 3000) String fullText, byte[] image, int idUser, String address) {
-        this.fullText = fullText;
-        this.image = image;
-        this.idUser = idUser;
-        this.address = address;
     }
 
     public int getId() {

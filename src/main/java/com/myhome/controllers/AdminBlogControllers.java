@@ -78,7 +78,7 @@ public class AdminBlogControllers {
         User user = getUser(authentication);
         if (user.getRole().equals(Role.ADMIN)) {
             List<CompositionDTO> compositionDTOList = compositionRepository
-                    .findAllByPublicationType(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN).stream()
+                    .findAllByPublication(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN).stream()
                     .map(composition -> new CompositionDTO(
                             composition.getId(),
                             composition.getTitleText()
@@ -103,7 +103,7 @@ public class AdminBlogControllers {
             Optional<Composition> oneById = compositionRepository.findOneById(id);
             if (oneById.isPresent()) {
                 Composition composition = oneById.get();
-                composition.setPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE);
+                composition.setPublication(PublicationType.PUBLIC_TO_COMPETITIVE);
                 compositionRepository.save(composition);
             }
             return "redirect:/admin-mine/users-competitive";
@@ -120,7 +120,7 @@ public class AdminBlogControllers {
             Optional<Composition> oneById = compositionRepository.findOneById(id);
             if (oneById.isPresent()) {
                 Composition composition = oneById.get();
-                composition.setPublicationType(PublicationType.PUBLIC_TO_DELETE);
+                composition.setPublication(PublicationType.PUBLIC_TO_DELETE);
                 compositionRepository.save(composition);
             }
             return "redirect:/admin-mine/users-competitive";
@@ -222,12 +222,6 @@ public class AdminBlogControllers {
             return "redirect:/admin-mine/admin-publications";
         }
         return "redirect:/";
-    }
-
-    private String convertText(String text) {
-        return text
-                .replace("&#160&#160 ", "")
-                .replace("<br>", "");
     }
 
     //TODO UserPublications

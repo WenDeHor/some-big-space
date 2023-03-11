@@ -38,9 +38,13 @@ public class PagesControllers {
 
     private int constant = 1049335;
     private int limit_photo = 6; //MB
-    private int limit_fullText = 3000; //chars
+    private int limit_fullText = 500; //chars
+    private int limit_letter_titleText = 100; //chars
+    private int limit_letter_fullText = 3000; //char
+
     private final String HOST_NAME = "http://localhost:8080";
     private final String MY_HOME = "Мій дім";
+    private final static int LIMIT_LIST = 3;
 
     public PagesControllers(CompositionRepository compositionRepository, UserRepository userRepository, CompressorImgToJpg compressorImgToJpg, VideoBoxAdminRepository videoBoxAdminRepository, UserPhotoRepository userPhotoRepository, PublicationPostAdminRepository publicationPostAdminRepository, LetterToADMINRepository letterToADMINRepository, MetricsService metricsService, CommentsRepository commentsRepository) {
         this.compositionRepository = compositionRepository;
@@ -93,13 +97,13 @@ public class PagesControllers {
                         el.getFullText(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
                 .sorted(Comparator.comparing(PublicationPostAdminDTO::getDate).reversed())
-                .limit(3)
+                .limit(LIMIT_LIST)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public List<CompositionDTO> getCompositionWithComments() {
-        return compositionRepository.findAllByPublicationType(PublicationType.PUBLIC_TO_COMPETITIVE).stream()
+        return compositionRepository.findAllByPublication(PublicationType.PUBLIC_TO_COMPETITIVE).stream()
                 .map(el -> new CompositionDTO(
                         el.getDate(),
                         el.getTitleText(),
@@ -107,7 +111,7 @@ public class PagesControllers {
                         HOST_NAME + "/users/read-competitive-one-composition-index/" + el.getId(),
                         converter(el.getImage())))
                 .sorted(Comparator.comparing(CompositionDTO::getDate).reversed())
-                .limit(3)
+                .limit(LIMIT_LIST)
                 .collect(Collectors.toList());
     }
 
@@ -120,8 +124,8 @@ public class PagesControllers {
         Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
         if (compositionOptional.isPresent()) {
             Composition composition = compositionOptional.get();
-            if (composition.getPublicationType().equals(PublicationType.PUBLIC_TO_COMPETITIVE)
-                    || composition.getPublicationType().equals(PublicationType.PUBLIC_FOR_ALL)) {
+            if (composition.getPublication().equals(PublicationType.PUBLIC_TO_COMPETITIVE)
+                    || composition.getPublication().equals(PublicationType.PUBLIC_FOR_ALL)) {
                 CompositionDTO compositionDTO = new CompositionDTO(
                         composition.getDate(),
                         composition.getTitleText(),
@@ -349,10 +353,10 @@ public class PagesControllers {
         if (!emailValidator(userPost)) {
             errorMessage.setOne("1");
         }
-        if (titleText.length() > 100) {
+        if (titleText.length() > limit_letter_titleText) {
             errorMessage.setTwo("2");
         }
-        if (fullText.length() > 3000) {
+        if (fullText.length() > limit_letter_fullText) {
             errorMessage.setThree("3");
         }
         return errorMessage;

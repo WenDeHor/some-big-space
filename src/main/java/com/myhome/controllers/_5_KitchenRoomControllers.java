@@ -43,8 +43,12 @@ public class _5_KitchenRoomControllers {
     private final String KITCHEN_ROOM = "Кухня";
     private int constant = 1049335;
     private int limit_photo = 6; //MB
-    private int limit_titleText = 1000; //chars
-    private int limit_fullText = 3000; //chars
+    private int limit_cook_book_titleText = 100; //chars
+    private int limit_cook_book_fullText = 3000; //chars
+    private int limit_menu_text = 50; //chars
+    private int limit_shop_meal_text = 100; //chars
+
+    private final static int LIMIT_LIST = 10;
 
     public _5_KitchenRoomControllers(ShopMealsRepository shopMealsRepository, UserRepository userRepository, CookBookRepository cookBookRepository, MenuRepository menuRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
         this.shopMealsRepository = shopMealsRepository;
@@ -73,7 +77,7 @@ public class _5_KitchenRoomControllers {
         List<CookBookDTO> dtos = getAllCookBookDTO(user);
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         List<CookBookDTO> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("cookBooks", basePage);
         model.addAttribute("title", KITCHEN_ROOM);
@@ -203,8 +207,8 @@ public class _5_KitchenRoomControllers {
 
     private boolean validatorCookBook(String titleText, String fullText, MultipartFile file) throws IOException {
         return file.getBytes().length / constant > limit_photo
-                || titleText.toCharArray().length > limit_titleText
-                || fullText.toCharArray().length > limit_fullText;
+                || titleText.toCharArray().length > limit_cook_book_titleText
+                || fullText.toCharArray().length > limit_cook_book_fullText;
     }
 
     private String saveCookBookWithError(MultipartFile file,
@@ -300,13 +304,13 @@ public class _5_KitchenRoomControllers {
                                        String supper) {
         ErrorMessage errorMessage = new ErrorMessage("", "", "");
 
-        if (breakfast.length() > 50) {
+        if (breakfast.length() > limit_menu_text) {
             errorMessage.setOne("1");
         }
-        if (dinner.length() > 50) {
+        if (dinner.length() > limit_menu_text) {
             errorMessage.setTwo("2");
         }
-        if (supper.length() > 50) {
+        if (supper.length() > limit_menu_text) {
             errorMessage.setThree("3");
         }
         return errorMessage;
@@ -434,7 +438,7 @@ public class _5_KitchenRoomControllers {
 
     private ErrorMessage validatorShopMeal(String fullText) {
         ErrorMessage errorMessage = new ErrorMessage("");
-        if (fullText.length() > 100) {
+        if (fullText.length() > limit_shop_meal_text) {
             errorMessage.setOne("1");
         }
         return errorMessage;

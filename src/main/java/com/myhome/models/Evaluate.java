@@ -43,17 +43,6 @@ public class Evaluate {
     public Evaluate() {
     }
 
-    public Evaluate(Date date, int idComposition, int idAppraiser, Mark environment, Mark characters, Mark atmosphere, Mark plot, Mark impression) {
-        this.date = date;
-        this.idComposition = idComposition;
-        this.idAppraiser = idAppraiser;
-        this.environment = environment;
-        this.characters = characters;
-        this.atmosphere = atmosphere;
-        this.plot = plot;
-        this.impression = impression;
-    }
-
     public int getId() {
         return id;
     }

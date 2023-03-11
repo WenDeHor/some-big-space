@@ -39,6 +39,12 @@ public class _1_StudyRoomControllers {
     private final LetterToADMINRepository letterToADMINRepository;
     private final MetricsService metricsService;
 
+    private int limit_letter_titleText = 100; //chars
+    private int limit_letter_fullText = 3000; //chars
+    private int limit_recipientAddress = 50;
+    private int limit_publication_titleText = 100; //chars
+    private int limit_publication_fullText = 3000; //chars
+
     private final static int LIMIT_LIST = 10;
     private final String MY_ROOM = "Моя кімната";
     private final String ADMIN = "ADMIN from New_Apple";
@@ -95,13 +101,13 @@ public class _1_StudyRoomControllers {
         Optional<User> isUserPresent = userRepository.findOneByAddress(recipientAddress.trim());
         ErrorMessage errorMessage = new ErrorMessage("", "", "");
 
-        if (recipientAddress.length() > 50 || !isUserPresent.isPresent()) {
+        if (recipientAddress.length() > limit_recipientAddress || !isUserPresent.isPresent()) {
             errorMessage.setOne("1");
         }
-        if (titleText.length() > 100) {
+        if (titleText.length() > limit_letter_titleText) {
             errorMessage.setTwo("2");
         }
-        if (fullText.length() > 3000) {
+        if (fullText.length() > limit_letter_fullText) {
             errorMessage.setThree("3");
         }
         return errorMessage;
@@ -134,7 +140,7 @@ public class _1_StudyRoomControllers {
         String address = findUserAddress(authentication);
         List<LettersDTO> dtos = getAllBySenderAddress(address);
         List<LettersDTO> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         model.addAttribute("letters", basePage);
@@ -210,7 +216,7 @@ public class _1_StudyRoomControllers {
         List<LettersDTO> basePage = letterToUSERRepository.findAllByRecipientAddress(address).stream()
                 .map(el -> new LettersDTO(el.getId(), el.getTitleText(), el.getFullText(), buildInfoByRecipient(el)))
                 .sorted(Comparator.comparing(LettersDTO::getId).reversed())
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(Collectors.toList());
         model.addAttribute("buttons", new Buttons(getCountPage(basePage.size()), "10"));
         model.addAttribute("letters", basePage);
@@ -278,7 +284,7 @@ public class _1_StudyRoomControllers {
 
         model.addAttribute("buttons", new Buttons(getCountPage(publications.size()), "10"));
         List<PublicationDTO> basePage = publications.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
 
         model.addAttribute("publications", basePage);
@@ -475,10 +481,10 @@ public class _1_StudyRoomControllers {
     private ErrorMessage validatorPublication(String titleText,
                                               String fullText) {
         ErrorMessage errorMessage = new ErrorMessage("", "");
-        if (titleText.length() > 100) {
+        if (titleText.length() > limit_publication_titleText) {
             errorMessage.setOne("1");
         }
-        if (fullText.length() > 3000) {
+        if (fullText.length() > limit_publication_fullText) {
             errorMessage.setTwo("2");
         }
         return errorMessage;

@@ -44,13 +44,13 @@
                                 <p>
                                     <label for="titleText"> Заголовок : </label>
                                     <input id="titleText" type="text" th:value="${publicationUser.titleText}" name="titleText" class="form-control"
-                                           placeholder="Місце для загловку" required>
+                                           placeholder="Місце для загловку {Максимальна кількість символів публікації - 100}" required>
                                 </p>
                                 <br>
                                 <div class="alert alert-danger" th:if="${error.two == '2'}"> Перевищення довжини публікації в 3 000 символів</div>
                                 <label for="fullText"> Місце для ваших публікацій : </label>
                                 <textarea id="fullText" name="fullText" class="form-control" rows="30" cols="33"
-                                          placeholder="Місце для основного тексту публікації {максимальна кількість символів публікації - 3000} "
+                                          placeholder="Місце для основного тексту публікації {Максимальна кількість символів публікації - 3000}"
                                           th:text="${publicationUser.fullText}" required></textarea> <br>
                                 <br>
                                 <button class="btn btn-lg btn-primary btn-block" type="submit">Обновити</button>

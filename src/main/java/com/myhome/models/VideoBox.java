@@ -24,12 +24,6 @@ public class VideoBox {
     public VideoBox() {
     }
 
-    public VideoBox(String linkToVideo, int idUser, Date date) {
-        this.linkToVideo = linkToVideo;
-        this.idUser = idUser;
-        this.date = date;
-    }
-
     public int getId() {
         return id;
     }

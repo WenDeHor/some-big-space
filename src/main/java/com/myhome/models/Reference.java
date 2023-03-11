@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
@@ -15,13 +17,15 @@ public class Reference {
 
     @Column(name = "url")
     @Size(max = 2000)
+    @Type(type="text")
     private String url;
 
     @Column(name = "id_user")
     private int idUser;
 
     @Column(name = "title_text")
-    @Size(max = 1000)
+    @Size(max = 150)
+    @Type(type="text")
     private String titleText;
 
     @Lob
@@ -31,7 +35,7 @@ public class Reference {
     public Reference() {
     }
 
-    public Reference(@Size(max = 2000) String url, int idUser, @Size(max = 1000) String titleText, byte[] image) {
+    public Reference(String url, int idUser, String titleText, byte[] image) {
         this.url = url;
         this.idUser = idUser;
         this.titleText = titleText;

@@ -58,7 +58,7 @@ public class DbBuilder {
         }
 
         UserPhoto userFirst = new UserPhoto();
-        userFirst.setFullText("Tell us about yourself and your family");
+        userFirst.setFullText("Розкажіть про свою сім’ю");
         userFirst.setImage(inputBytes);
         userFirst.setAddress(address);
         userPhotoRepository.save(userFirst);

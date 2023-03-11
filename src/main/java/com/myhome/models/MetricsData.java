@@ -38,16 +38,6 @@ public class MetricsData {
     public MetricsData() {
     }
 
-    public MetricsData(Currency currencyCode, String userName, LocalDate date, String acceptLanguage, String URLName, String remoteAddr, String marker) {
-        this.currencyCode = currencyCode;
-        this.userName = userName;
-        this.date = date;
-        this.acceptLanguage = acceptLanguage;
-        this.URLName = URLName;
-        this.remoteAddr = remoteAddr;
-        this.marker = marker;
-    }
-
     public int getId() {
         return id;
     }

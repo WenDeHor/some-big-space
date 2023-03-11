@@ -24,12 +24,6 @@ public class MetricsDTO {
     public MetricsDTO() {
     }
 
-    public MetricsDTO(LocalDate date, long countUsers, long countOfVotes) {
-        this.date = date;
-        this.countUsers = countUsers;
-        this.countOfVotes = countOfVotes;
-    }
-
     public int getId() {
         return id;
     }

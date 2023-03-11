@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -18,29 +20,24 @@ public class Menu {
     private Date date;
 
     @Column(name = "breakfast")
-    @Size(max = 1000)
+    @Size(max = 100)
+    @Type(type="text")
     private String breakfast;
 
     @Column(name = "dinner")
-    @Size(max = 1000)
+    @Size(max = 100)
+    @Type(type="text")
     private String dinner;
 
     @Column(name = "supper")
-    @Size(max = 1000)
+    @Size(max = 100)
+    @Type(type="text")
     private String supper;
 
     @Column(name = "id_user")
     private int idUser;
 
     public Menu() {
-    }
-
-    public Menu(Date date, String breakfast, String dinner, String supper, int idUser) {
-        this.date = date;
-        this.breakfast = breakfast;
-        this.dinner = dinner;
-        this.supper = supper;
-        this.idUser = idUser;
     }
 
     public int getId() {

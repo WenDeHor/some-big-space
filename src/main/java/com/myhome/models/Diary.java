@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
@@ -19,11 +21,13 @@ public class Diary {
     private Date date;
 
     @Column(name = "title_text")
-    @Size(min = 0, max = 1000)
+    @Size(min = 0, max = 150)
+    @Type(type="text")
     private String titleText;
 
     @Column(name = "full_text")
-    @Size(min = 0, max = 3000)
+    @Size(min = 0, max = 5000)
+    @Type(type="text")
     private String fullText;
 
     @Column(name = "id_user")
@@ -34,14 +38,6 @@ public class Diary {
     private byte[] image;
 
     public Diary() {
-    }
-
-    public Diary(Date date, String titleText, String fullText, int idUser, byte[] image) {
-        this.date = date;
-        this.titleText = titleText;
-        this.fullText = fullText;
-        this.idUser = idUser;
-        this.image = image;
     }
 
     public int getId() {

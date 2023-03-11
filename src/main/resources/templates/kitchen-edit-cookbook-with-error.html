@@ -41,8 +41,8 @@
                         </div>
                         <br>
                         <div th:each="titleText:${titleTextSize}">
-                            <h5 class="text-left" th:style="${titleText>1000 ? 'color: crimson' : 'color: black'}"
-                                th:text="'Кількість символів заголовку : '+${titleText} + '. Допустима кількись символів 1_000'"></h5>
+                            <h5 class="text-left" th:style="${titleText>100 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Кількість символів заголовку : '+${titleText} + '. Допустима кількись символів 100'"></h5>
                         </div>
                         <br>
                         <div th:each="fullText:${fullTextSize}">

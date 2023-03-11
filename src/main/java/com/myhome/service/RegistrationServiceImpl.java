@@ -79,7 +79,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             e.printStackTrace();
         }
         UserPhoto userFirst = new UserPhoto();
-        userFirst.setFullText("Tell us about yourself and your family");
+        userFirst.setFullText("Розкажіть про свою сім’ю");
         userFirst.setImage(inputBytes);
         userFirst.setAddress(address);
         userFirst.setIdUser(getUser(email).getId());

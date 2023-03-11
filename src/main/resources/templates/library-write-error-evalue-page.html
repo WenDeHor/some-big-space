@@ -35,8 +35,8 @@
                     </div>
                     <div class="col-md-8">
                         <div th:each="comments:${commentsTextSize}">
-                            <h5 class="text-left" th:style="${comments>3000 ? 'color: crimson' : 'color: black'}"
-                                th:text="'Розмір Вашого коментаря : '+${comments} + ' симовлів. Допустима кількись символів 3_000'"></h5>
+                            <h5 class="text-left" th:style="${comments>500 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір Вашого коментаря : '+${comments} + ' симовлів. Допустима кількись символів 500'"></h5>
                         </div>
                         <br>
                         <button class="btn btn-lg btn-primary btn-block" onclick="window.history.back()">Повернутися

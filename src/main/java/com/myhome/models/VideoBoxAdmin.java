@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -17,7 +19,8 @@ public class VideoBoxAdmin {
     private String linkToVideo;
 
     @Column(name = "title_text")
-    @Size(max = 3000)
+    @Size(max = 150)
+    @Type(type="text")
     private String titleText;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -25,12 +28,6 @@ public class VideoBoxAdmin {
     private Date date;
 
     public VideoBoxAdmin() {
-    }
-
-    public VideoBoxAdmin(String linkToVideo, @Size(max = 3000) String titleText, Date date) {
-        this.linkToVideo = linkToVideo;
-        this.titleText = titleText;
-        this.date = date;
     }
 
     public int getId() {

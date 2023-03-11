@@ -39,18 +39,18 @@
                         </div>
                         <br>
                         <div th:each="titleText:${titleTextSize}">
-                            <h5 class="text-left" th:style="${titleText>150 ? 'color: crimson' : 'color: black'}"
-                                th:text="'Розмір заголовку : '+${titleText} + '. Допустима кількись символів 150'"></h5>
+                            <h5 class="text-left" th:style="${titleText>100 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір заголовку : '+${titleText} + '. Допустима кількись символів 100'"></h5>
                         </div>
                         <br>
                         <div th:each="shortText:${shortTextSize}">
-                            <h5 class="text-left" th:style="${shortText>1000 ? 'color: crimson' : 'color: black'}"
-                                th:text="'Розмір короткого змісту історії : '+${shortText} + '. Допустима кількись символів 1_000'"></h5>
+                            <h5 class="text-left" th:style="${shortText>500 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір короткого змісту історії : '+${shortText} + '. Допустима кількись символів 500'"></h5>
                         </div>
                         <br>
                         <div th:each="fullText:${fullTextSize}">
-                            <h5 class="text-left" th:style="${fullText>20000 ? 'color: crimson' : 'color: black'}"
-                                th:text="'Розмір історії : '+${fullText} + '. Допустима кількись символів 20_000'"></h5>
+                            <h5 class="text-left" th:style="${fullText>10000 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір історії : '+${fullText} + '. Допустима кількись символів 10_000'"></h5>
                         </div>
                         <br>
                         <button class="btn btn-lg btn-primary btn-block" onclick="window.history.back()">

@@ -42,10 +42,11 @@ public class _2_LibraryController {
 
     private int constant = 1049335;
     private int limit_photo = 6; //MB
-    private int limit_titleText = 150; //chars
-    private int limit_shortText = 1000; //chars
-    private int limit_fullText = 20000; //chars
-    private int limit_comment = 3000; //chars
+    private int limit_composition_titleText = 100; //chars
+    private int limit_composition_shortText = 500; //chars
+    private int limit_composition_fullText = 10000; //chars
+    private int limit_composition_comment = 500; //chars
+    private final static int LIMIT_LIST = 10;
     private final String LIBRARY = "Читальня";
     private final String HOST_NAME = "http://localhost:8080";
 
@@ -72,7 +73,7 @@ public class _2_LibraryController {
         List<CompositionDTO> dtos = getAllCompetitiveComposition(idUser);
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         List<CompositionDTO> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("compositionList", basePage);
         model.addAttribute("title", LIBRARY);
@@ -126,7 +127,7 @@ public class _2_LibraryController {
 
     private List<CompositionDTO> getAllCompetitiveComposition(int idUser) {
         return compositionRepository
-                .findAllByPublicationTypeAndIdUserNot(PublicationType.PUBLIC_TO_COMPETITIVE, idUser).stream()
+                .findAllByPublicationAndIdUserNot(PublicationType.PUBLIC_TO_COMPETITIVE, idUser).stream()
                 .map(el -> new CompositionDTO(
                         el.getId(),
                         el.getDate(),
@@ -149,7 +150,7 @@ public class _2_LibraryController {
         List<CompositionDTO> dtos = getAllMyComposition(user);
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         List<CompositionDTO> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("compositionList", basePage);
         model.addAttribute("title", LIBRARY);
@@ -206,8 +207,8 @@ public class _2_LibraryController {
         Optional<Composition> compositionOptional = compositionRepository.findOneByIdUserAndId(user.getId(), id);
         if (compositionOptional.isPresent()) {
             Composition composition = compositionOptional.get();
-            if (composition.getPublicationType().equals(PublicationType.NO_PUBLIC)
-                    || composition.getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
+            if (composition.getPublication().equals(PublicationType.NO_PUBLIC)
+                    || composition.getPublication().equals(PublicationType.PUBLIC_TO_DELETE)) {
                 CompositionDTO compositionDTO = convertToCompositionDTO(composition);
                 model.addAttribute("compositionOne", compositionDTO);
                 model.addAttribute("title", LIBRARY);
@@ -314,10 +315,10 @@ public class _2_LibraryController {
         Optional<Composition> compositionOptional = compositionRepository.findAllByIdUserAndId(user.getId(), id);
         if (compositionOptional.isPresent()) {
             Composition composition = compositionOptional.get();
-            if (composition.getPublicationType().equals(PublicationType.PUBLIC_TO_DELETE)) {
+            if (composition.getPublication().equals(PublicationType.PUBLIC_TO_DELETE)) {
                 return "redirect:/library/read-all-my-composition";
             }
-            composition.setPublicationType(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN);
+            composition.setPublication(PublicationType.PUBLIC_TO_COORDINATION_OF_ADMIN);
             compositionRepository.save(composition);
             return "redirect:/library/read-all-my-composition";
         }
@@ -331,7 +332,7 @@ public class _2_LibraryController {
         User user = getUser(authentication);
         Optional<Composition> compositionOptional = compositionRepository.findAllByIdUserAndId(user.getId(), id);
         if (compositionOptional.isPresent()) {
-            compositionOptional.get().setPublicationType(PublicationType.PUBLIC_TO_FRIENDS);
+            compositionOptional.get().setPublication(PublicationType.PUBLIC_TO_FRIENDS);
             compositionRepository.save(compositionOptional.get());
         }
         return "redirect:/library/read-all-my-composition";
@@ -346,7 +347,7 @@ public class _2_LibraryController {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
         if (compositionOptional.isPresent()
-                && compositionOptional.get().getPublicationType().equals(PublicationType.PUBLIC_TO_COMPETITIVE)) {
+                && compositionOptional.get().getPublication().equals(PublicationType.PUBLIC_TO_COMPETITIVE)) {
             Composition composition = compositionOptional.get();
             CompositionDTO compositionDTO = new CompositionDTO(
                     composition.getId(),
@@ -415,7 +416,7 @@ public class _2_LibraryController {
     }
 
     private boolean checkEvaluationComments(String comments) {
-        return comments.toCharArray().length > limit_comment;
+        return comments.toCharArray().length > limit_composition_comment;
     }
 
     private String getErrorPageByEvaluation(String comments,
@@ -438,7 +439,7 @@ public class _2_LibraryController {
         List<CompositionDTO> dtos = getFriendComposition(idUser);
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         List<CompositionDTO> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("friendsPublications", basePage);
         model.addAttribute("title", LIBRARY);
@@ -478,7 +479,7 @@ public class _2_LibraryController {
                         familyRepository.findAllByIdUser(idUser).stream().map(Family::getIdFamily))
                 .collect(Collectors.toList());
         return compositionRepository.findAllByIdUserIn(integerList).stream()
-                .filter(a -> a.getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS))
+                .filter(a -> a.getPublication().equals(PublicationType.PUBLIC_TO_FRIENDS))
                 .map(composition -> new CompositionDTO(
                         composition.getId(),
                         composition.getTitleText(),
@@ -498,7 +499,7 @@ public class _2_LibraryController {
         metricsService.startMetricsCheck(request, request.getRequestURI());
         Optional<Composition> compositionOptional = compositionRepository.findOneById(id);
         if (compositionOptional.isPresent()
-                && compositionOptional.get().getPublicationType().equals(PublicationType.PUBLIC_TO_FRIENDS)) {
+                && compositionOptional.get().getPublication().equals(PublicationType.PUBLIC_TO_FRIENDS)) {
             int idUserComposition = compositionOptional.get().getIdUser();
             User user = getUser(authentication);
             int idUser = user.getId();
@@ -546,7 +547,7 @@ public class _2_LibraryController {
             Composition composition = new Composition();
             composition.setDate(new Date());
             composition.setGenre(getGenre(genre));
-            composition.setPublicationType(PublicationType.NO_PUBLIC);
+            composition.setPublication(PublicationType.NO_PUBLIC);
             composition.setTitleText(titleText);
             composition.setShortText(convertTextToSave(shortText));
             composition.setFullText(convertTextToSave(fullText));
@@ -567,9 +568,9 @@ public class _2_LibraryController {
                               String shortText,
                               String fullText) throws IOException {
         return file.getBytes().length / constant > limit_photo
-                || titleText.toCharArray().length > limit_titleText
-                || shortText.toCharArray().length > limit_shortText
-                || fullText.toCharArray().length > limit_fullText;
+                || titleText.toCharArray().length > limit_composition_titleText
+                || shortText.toCharArray().length > limit_composition_shortText
+                || fullText.toCharArray().length > limit_composition_fullText;
     }
 
     private String getErrorPage(MultipartFile file,

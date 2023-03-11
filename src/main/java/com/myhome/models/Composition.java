@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Arrays;
@@ -23,18 +25,21 @@ public class Composition {
     private Genre genre;
 
     @Column(name = "publication")
-    private PublicationType publicationType;
+    private PublicationType publication;
 
     @Column(name = "title_text")
-    @Size( max = 150)
+    @Size(min = 0, max = 150)
+    @Type(type="text")
     private String titleText;
 
     @Column(name = "short_text")
-    @Size( max = 1000)
+    @Size(min = 0, max = 1000)
+    @Type(type="text")
     private String shortText;
 
-    @Column(name = "full_text")
-    @Size( max = 20000)
+    @Column(name="full_text")
+    @Size(min = 0, max = 15000)
+    @Type(type="text")
     private String fullText;
 
     @Column(name = "id_user")
@@ -45,17 +50,6 @@ public class Composition {
     private byte[] image;
 
     public Composition() {
-    }
-
-    public Composition(Date date, Genre genre, PublicationType publicationType, @Size(max = 150) String titleText, @Size(max = 1000) String shortText, @Size(max = 20000) String fullText, int idUser, byte[] image) {
-        this.date = date;
-        this.genre = genre;
-        this.publicationType = publicationType;
-        this.titleText = titleText;
-        this.shortText = shortText;
-        this.fullText = fullText;
-        this.idUser = idUser;
-        this.image = image;
     }
 
     public int getId() {
@@ -82,12 +76,12 @@ public class Composition {
         this.genre = genre;
     }
 
-    public PublicationType getPublicationType() {
-        return publicationType;
+    public PublicationType getPublication() {
+        return publication;
     }
 
-    public void setPublicationType(PublicationType publicationType) {
-        this.publicationType = publicationType;
+    public void setPublication(PublicationType publicationType) {
+        this.publication = publicationType;
     }
 
     public String getTitleText() {
@@ -139,7 +133,7 @@ public class Composition {
                 idUser == that.idUser &&
                 Objects.equals(date, that.date) &&
                 genre == that.genre &&
-                publicationType == that.publicationType &&
+                publication == that.publication &&
                 Objects.equals(titleText, that.titleText) &&
                 Objects.equals(shortText, that.shortText) &&
                 Objects.equals(fullText, that.fullText) &&
@@ -148,7 +142,7 @@ public class Composition {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, date, genre, publicationType, titleText, shortText, fullText, idUser);
+        int result = Objects.hash(id, date, genre, publication, titleText, shortText, fullText, idUser);
         result = 31 * result + Arrays.hashCode(image);
         return result;
     }

@@ -37,8 +37,8 @@
                                 th:text="'Розмір фото : '+${file} + 'МВ. Допустимий розмір 6МВ'"></h5>
                         </div>
                         <div th:each="titleText:${titleTextSize}">
-                            <h5 class="text-left" th:style="${titleText>1000 ? 'color: crimson' : 'color: black'}"
-                                th:text="'Розмір заголовку : '+${titleText} + '. Допустима кількись символів 1000'"></h5>
+                            <h5 class="text-left" th:style="${titleText>100 ? 'color: crimson' : 'color: black'}"
+                                th:text="'Розмір заголовку : '+${titleText} + '. Допустима кількись символів 100'"></h5>
                         </div>
                         <div th:each="fullText:${fullTextSize}">
                             <h5 class="text-left" th:style="${fullText>3000 ? 'color: crimson' : 'color: black'}"

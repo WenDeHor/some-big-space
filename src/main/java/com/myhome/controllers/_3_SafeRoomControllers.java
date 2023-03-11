@@ -38,10 +38,11 @@ public class _3_SafeRoomControllers {
     private final String SAFE_ROOM = "Робоча кімната";
     private int constant = 1049335;
     private int limit_photo = 6; //MB
-    private int limit_url = 2000; //chars
-    private int limit_titleText_reference = 50; //chars
-    private int limit_titleText = 1000; //chars
-    private int limit_fullText = 3000; //chars
+    private int limit_reference_url = 2000; //chars
+    private int limit_reference_titleText = 100; //chars
+    private int limit_diary_titleText = 100; //chars
+    private int limit_diary_fullText = 3000; //chars
+    private final static int LIMIT_LIST = 10;
 
     public _3_SafeRoomControllers(UserRepository userRepository, DiaryRepository diaryRepository, ReferenceRepository referenceRepository, MetricsService metricsService, CompressorImgToJpg compressorImgToJpg) {
         this.userRepository = userRepository;
@@ -61,7 +62,7 @@ public class _3_SafeRoomControllers {
         List<DiaryDTO> dtos = findDiaryDTOByUserId(user.getId());
         model.addAttribute("buttons", new Buttons(getCountPage(dtos.size()), "10"));
         List<DiaryDTO> basePage = dtos.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("diaryList", basePage);
         model.addAttribute("title", SAFE_ROOM);
@@ -151,8 +152,8 @@ public class _3_SafeRoomControllers {
                                    String titleText,
                                    String fullText) throws IOException {
         return file.getBytes().length / constant > limit_photo
-                || titleText.toCharArray().length > limit_titleText
-                || fullText.toCharArray().length > limit_fullText;
+                || titleText.toCharArray().length > limit_diary_titleText
+                || fullText.toCharArray().length > limit_diary_fullText;
     }
 
     private String getErrorPageSaveDiary(MultipartFile file,
@@ -199,7 +200,7 @@ public class _3_SafeRoomControllers {
         List<DiaryDTO> diaryList = findDiaryDTOByUserId(user.getId());
         model.addAttribute("buttons", new Buttons(getCountPage(diaryList.size()), "10"));
         List<DiaryDTO> basePage = diaryList.stream()
-                .limit(10)
+                .limit(LIMIT_LIST)
                 .collect(toList());
         model.addAttribute("diaryList", basePage);
         model.addAttribute("title", SAFE_ROOM);
@@ -336,8 +337,8 @@ public class _3_SafeRoomControllers {
 
     private boolean validatorReference(String titleText, String url, MultipartFile file) throws IOException {
         return file.getBytes().length / constant > limit_photo
-                || titleText.toCharArray().length > limit_titleText_reference
-                || url.toCharArray().length > limit_url;
+                || titleText.toCharArray().length > limit_reference_titleText
+                || url.toCharArray().length > limit_reference_url;
     }
 
     private String saveReferenceWithError(MultipartFile file,

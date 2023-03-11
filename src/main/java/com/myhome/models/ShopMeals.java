@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -18,19 +20,14 @@ public class ShopMeals {
     private Date date;
 
     @Column(name = "full_text")
-    @Size(max = 3000)
+    @Size(max = 150)
+    @Type(type="text")
     private String fullText;
 
     @Column(name = "id_user")
     private int idUser;
 
     public ShopMeals() {
-    }
-
-    public ShopMeals(Date date, @Size(max = 3000) String fullText, int idUser) {
-        this.date = date;
-        this.fullText = fullText;
-        this.idUser = idUser;
     }
 
     public int getId() {

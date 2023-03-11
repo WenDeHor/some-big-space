@@ -24,12 +24,6 @@ public class Friends {
     public Friends() {
     }
 
-    public Friends(int idUser, int idFriend, String addressFriend) {
-        this.idUser = idUser;
-        this.idFriend = idFriend;
-        this.addressFriend = addressFriend;
-    }
-
     public int getId() {
         return id;
     }

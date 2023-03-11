@@ -1,5 +1,7 @@
 package com.myhome.models;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -18,11 +20,13 @@ public class LetterToUSER {
     private Date date;
 
     @Column(name = "title_text")
-    @Size(max = 1000)
+    @Size(max = 150)
+    @Type(type="text")
     private String titleText;
 
     @Column(name = "full_text")
-    @Size(max = 3000)
+    @Size(max = 5000)
+    @Type(type="text")
     private String fullText;
 
     @Column(name = "sender_address")
@@ -32,15 +36,6 @@ public class LetterToUSER {
     private String recipientAddress;
 
     public LetterToUSER() {
-    }
-
-    public LetterToUSER(Date date, String titleText, String fullText,
-                        String senderAddress, String recipientAddress) {
-        this.date = date;
-        this.titleText = titleText;
-        this.fullText = fullText;
-        this.senderAddress = senderAddress;
-        this.recipientAddress = recipientAddress;
     }
 
     public int getId() {
