@@ -40,7 +40,7 @@
                     <div class="col-md-8">
                         <div class="col-md-8">
                             <div th:each="file:${fileSize}">
-                                <h5 class="text-left" th:style="${file>2 ? 'color: crimson' : 'color: black'}"
+                                <h5 class="text-left" th:style="${file>6 ? 'color: crimson' : 'color: black'}"
                                     th:text="'Розмір файлу : '+${file} + 'МВ. Допустимий розмір 6МВ'"></h5>
                             </div>
                             <div th:each="fullText:${fullTextSize}">

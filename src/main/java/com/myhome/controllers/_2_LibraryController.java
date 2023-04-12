@@ -48,7 +48,8 @@ public class _2_LibraryController {
     private int limit_composition_comment = 500; //chars
     private final static int LIMIT_LIST = 10;
     private final String LIBRARY = "Читальня";
-    private final String HOST_NAME = "http://localhost:8080";
+    //    private final String HOST_NAME = "http://localhost:8080";
+    private final String HOST_NAME = "http://my-story-home.com:8080";
 
 
     public _2_LibraryController(UserRepository userRepository, CompositionRepository compositionRepository, CompressorImgToJpg compressorImgToJpg, EvaluateRepository evaluateRepository, CommentsRepository commentsRepository, MetricsService metricsService, FamilyRepository familyRepository, FriendsRepository friendsRepository) {

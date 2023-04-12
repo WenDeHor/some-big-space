@@ -31,7 +31,7 @@ public class DbBuilder {
         for (int i = 0; i < 1000; i++) {
             createUser(i + 1);
         }
-        return "mine-page";
+        return "index";
     }
 
     private void createUser(int id) {

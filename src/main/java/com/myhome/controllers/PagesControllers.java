@@ -42,7 +42,8 @@ public class PagesControllers {
     private int limit_letter_titleText = 100; //chars
     private int limit_letter_fullText = 3000; //char
 
-    private final String HOST_NAME = "http://localhost:8080";
+    //    private final String HOST_NAME = "http://localhost:8080";
+    private final String HOST_NAME = "http://my-story-home.com:8080";
     private final String MY_HOME = "Мій дім";
     private final static int LIMIT_LIST = 3;
 
@@ -86,7 +87,7 @@ public class PagesControllers {
             model.addAttribute("videoBoxAdmin", videoBoxAdmins.get(sizeVideoList - 1));
         }
         model.addAttribute("title", MY_HOME);
-        return "mine-page";
+        return "index";
     }
 
     private List<PublicationPostAdminDTO> getPublicationPostAdminList(List<PublicationPostAdmin> publicationList) {
