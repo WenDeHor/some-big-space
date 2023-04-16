@@ -42,8 +42,6 @@ public class PagesControllers {
     private int limit_letter_titleText = 100; //chars
     private int limit_letter_fullText = 3000; //char
 
-    //    private final String HOST_NAME = "http://localhost:8080";
-    private final String HOST_NAME = "http://my-story-home.com";
     private final String MY_HOME = "Мій дім";
     private final static int LIMIT_LIST = 3;
 
