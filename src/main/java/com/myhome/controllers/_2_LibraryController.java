@@ -49,7 +49,7 @@ public class _2_LibraryController {
     private final static int LIMIT_LIST = 10;
     private final String LIBRARY = "Читальня";
     //    private final String HOST_NAME = "http://localhost:8080";
-    private final String HOST_NAME = "http://my-story-home.com:8080";
+    private final String HOST_NAME = "http://my-story-home.com";
 
 
     public _2_LibraryController(UserRepository userRepository, CompositionRepository compositionRepository, CompressorImgToJpg compressorImgToJpg, EvaluateRepository evaluateRepository, CommentsRepository commentsRepository, MetricsService metricsService, FamilyRepository familyRepository, FriendsRepository friendsRepository) {
@@ -134,7 +134,6 @@ public class _2_LibraryController {
                         el.getDate(),
                         el.getTitleText(),
                         el.getShortText(),
-                        HOST_NAME + "/library/read-competitive-one-composition/" + el.getId(),
                         Base64.getMimeEncoder().encodeToString(el.getImage()),
                         el.getGenre()))
                 .sorted(Comparator.comparing(CompositionDTO::getId).reversed())
@@ -191,7 +190,6 @@ public class _2_LibraryController {
                         el.getTitleText(),
                         el.getShortText(),
                         el.getGenre(),
-                        HOST_NAME + "/library/read-my-one-composition/" + el.getId(),
                         Base64.getMimeEncoder().encodeToString(el.getImage())))
                 .sorted(Comparator.comparing(CompositionDTO::getId).reversed())
                 .collect(Collectors.toList());
@@ -486,7 +484,6 @@ public class _2_LibraryController {
                         composition.getTitleText(),
                         composition.getShortText(),
                         composition.getGenre(),
-                        HOST_NAME + "/library/read-friend-one-composition/" + composition.getId(),
                         converterImage(composition.getImage())))
                 .collect(Collectors.toList());
     }

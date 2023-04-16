@@ -43,7 +43,7 @@ public class PagesControllers {
     private int limit_letter_fullText = 3000; //char
 
     //    private final String HOST_NAME = "http://localhost:8080";
-    private final String HOST_NAME = "http://my-story-home.com:8080";
+    private final String HOST_NAME = "http://my-story-home.com";
     private final String MY_HOME = "Мій дім";
     private final static int LIMIT_LIST = 3;
 
@@ -106,10 +106,10 @@ public class PagesControllers {
     public List<CompositionDTO> getCompositionWithComments() {
         return compositionRepository.findAllByPublication(PublicationType.PUBLIC_TO_COMPETITIVE).stream()
                 .map(el -> new CompositionDTO(
+                        el.getId(),
                         el.getDate(),
                         el.getTitleText(),
                         el.getShortText(),
-                        HOST_NAME + "/users/read-competitive-one-composition-index/" + el.getId(),
                         converter(el.getImage())))
                 .sorted(Comparator.comparing(CompositionDTO::getDate).reversed())
                 .limit(LIMIT_LIST)

@@ -24,11 +24,19 @@ public class CompositionDTO {
         this.titleText = titleText;
     }
 
-    public CompositionDTO(Date date, String titleText, String shortText, String url, String image) {
+    public CompositionDTO(int id, Date date, String titleText, String shortText, String image) {
+        this.id = id;
         this.date = date;
         this.titleText = titleText;
         this.shortText = shortText;
-        this.url = url;
+        this.image = image;
+    }
+
+    public CompositionDTO(int id, String titleText, String shortText, Genre genre, String image) {
+        this.id = id;
+        this.titleText = titleText;
+        this.shortText = shortText;
+        this.genre = genre;
         this.image = image;
     }
 
@@ -54,30 +62,12 @@ public class CompositionDTO {
         this.image = image;
     }
 
-    public CompositionDTO(int id, String titleText, String shortText, Genre genre, String url, String image) {
-        this.id = id;
-        this.titleText = titleText;
-        this.shortText = shortText;
-        this.genre = genre;
-        this.url = url;
-        this.image = image;
-    }
 
-    public CompositionDTO(Date date, String titleText, String shortText, String url, String image, Genre genre) {
-        this.date = date;
-        this.titleText = titleText;
-        this.shortText = shortText;
-        this.url = url;
-        this.image = image;
-        this.genre = genre;
-    }
-
-    public CompositionDTO(int id, Date date, String titleText, String shortText, String url, String image, Genre genre) {
+    public CompositionDTO(int id, Date date, String titleText, String shortText, String image, Genre genre) {
         this.id = id;
         this.date = date;
         this.titleText = titleText;
         this.shortText = shortText;
-        this.url = url;
         this.image = image;
         this.genre = genre;
     }

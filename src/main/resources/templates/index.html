@@ -27,7 +27,7 @@
             </div>
             <div th:each="compositionDTO, el:${compositionWithComments}" class="mt-2">
 
-                <a th:href="${compositionDTO.url}">
+                <a th:href="'/users/read-competitive-one-composition-index/'+${compositionDTO.id}">
                     <img th:src="'data:image/jpeg;base64,' + ${compositionDTO.image}"
                          style="width:50%"
                          class="rounded mx-auto d-block"
